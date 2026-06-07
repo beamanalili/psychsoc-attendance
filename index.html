@@ -194,38 +194,37 @@ async function loadActiveEvent() {
   alert("Event created");
 }
 
-  async function startEvent() {
+ async function startEvent() {
   if (userRole !== "admin") return;
 
-  const events = await db.collection("events").get();
-
-  // turn OFF all events first
-  events.forEach(doc => {
-    db.collection("events").doc(doc.id).update({ active: false });
-  });
-
-  // pick the event you want to start (by name input)
-  const name = eventName.value;
-
   const snap = await db.collection("events")
-    .where("name", "==", name)
+    .orderBy("createdAt", "desc")
     .limit(1)
     .get();
 
   if (snap.empty) {
-    alert("Event not found");
+    alert("No events found");
     return;
   }
 
   const eventDoc = snap.docs[0];
 
+  // turn off all events
+  const all = await db.collection("events").get();
+  all.forEach(doc => {
+    db.collection("events").doc(doc.id).update({ active: false });
+  });
+
+  // activate latest
   await db.collection("events").doc(eventDoc.id).update({
     active: true
   });
 
   activeEvent = eventDoc.id;
-  activeEventText.innerText = "Active: " + name;
+  activeEventText.innerText = "Active: " + eventDoc.data().name;
 }
+
+  let scanning = false;
 
   async function endEvent() {
   if (userRole !== "admin") return;
@@ -259,29 +258,39 @@ async function loadActiveEvent() {
 
 /* ================= SCANNER ================= */
 
-function startScanner() {
+async function startScanner() {
 
   if (html5QrCode) {
-    html5QrCode.stop().catch(()=>{});
-    html5QrCode.clear();
+    try {
+      await html5QrCode.stop();
+      await html5QrCode.clear();
+    } catch (e) {}
   }
 
   html5QrCode = new Html5Qrcode("reader");
 
-  Html5Qrcode.getCameras().then(devices => {
-    if (!devices.length) return;
+  const devices = await Html5Qrcode.getCameras();
 
-    html5QrCode.start(
-      devices[0].id,
-      { fps: 10, qrbox: 250 },
-      onScan
-    );
-  });
+  if (!devices.length) {
+    alert("No camera found");
+    return;
+  }
+
+  await html5QrCode.start(
+    devices[0].id,
+    { fps: 10, qrbox: 250 },
+    onScan
+  );
 }
 
 /* ================= SCAN ================= */
 
 async function onScan(decodedText) {
+
+  if (scanning) return;
+  scanning = true;
+
+  setTimeout(() => scanning = false, 2000);
 
   if (!activeEvent) {
     result.innerText = "❌ No active event";
