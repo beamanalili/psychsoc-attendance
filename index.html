@@ -279,6 +279,35 @@
     <div id="print-qr-container" class="print-only grid grid-cols-2 md:grid-cols-4 gap-4 p-4"></div>
 
     <!-- Firebase & App Logic -->
-    <script type="module" src="app.js"></script>
+       <!-- ... rest of your HTML ... -->
+
+    <!-- REMOVE the <script type="module" src="app.js"></script> line -->
+    
+    <!-- ADD THIS INSTEAD FOR TESTING -->
+    <script type="module">
+        console.log("🚀 INLINE TEST SUCCESSFUL");
+        
+        // Import Firebase directly from the web to test
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        
+        console.log("✅ Firebase Imported Successfully");
+
+        // PASTE YOUR FIREBASE CONFIG HERE
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            console.log("✅ Firebase Initialized");
+        } catch (e) {
+            console.error("❌ Firebase Error:", e);
+        }
+    </script>
 </body>
 </html>
