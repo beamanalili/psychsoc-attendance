@@ -8,7 +8,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
 
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -16,7 +15,7 @@
 
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-4">
 
-<!-- ================= LOGIN ================= -->
+<!-- LOGIN -->
 <div id="loginPage" class="w-full max-w-md mt-20 bg-gray-800 p-6 rounded-xl">
   <h1 class="text-xl font-bold text-center mb-4">Officer Login</h1>
 
@@ -33,12 +32,10 @@
   <p id="loginError" class="text-red-400 text-sm mt-2"></p>
 </div>
 
-<!-- ================= APP ================= -->
+<!-- APP -->
 <div id="app" class="hidden w-full max-w-md">
 
-  <h1 class="text-2xl font-bold text-center mt-4">
-    PsychSoc Attendance
-  </h1>
+  <h1 class="text-2xl font-bold text-center mt-4">PsychSoc Attendance</h1>
 
   <div class="text-center">
     <button onclick="logout()" class="bg-red-500 px-3 py-1 rounded mt-2 text-sm">
@@ -46,7 +43,7 @@
     </button>
   </div>
 
-  <!-- ================= ADMIN PANEL ================= -->
+  <!-- ADMIN PANEL -->
   <div id="adminPanel" class="mt-4 bg-gray-800 p-4 rounded-xl hidden">
 
     <h2 class="font-bold mb-2">Admin Controls</h2>
@@ -59,7 +56,7 @@
     </button>
 
     <button onclick="startEvent()" class="bg-blue-500 w-full p-2 rounded mb-2">
-      Start Event
+      Start Latest Event
     </button>
 
     <button onclick="endEvent()" class="bg-red-500 w-full p-2 rounded">
@@ -69,10 +66,9 @@
     <p id="activeEventText" class="text-sm mt-2 text-gray-300">
       No active event
     </p>
-
   </div>
 
-  <!-- ================= SCANNER ================= -->
+  <!-- SCANNER -->
   <div class="mt-4 bg-white p-3 rounded-xl">
     <div id="reader"></div>
   </div>
@@ -93,25 +89,34 @@
 
 /* ================= FIREBASE ================= */
 const firebaseConfig = {
-  apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
+  apiKey: "AIzaSyBTEYT5qUaVJMP3ZamaX7pRov51Dix_74w",
   authDomain: "psychsoc-attendance-system.firebaseapp.com",
   projectId: "psychsoc-attendance-system",
   storageBucket: "psychsoc-attendance-system.firebasestorage.app",
   messagingSenderId: "93131590758",
-  appId: "1:93131590758:web:bfea89644381b1972af1a7",
-  measurementId: "G-C5SH1EEQP2"
+  appId: "1:93131590758:web:bfea89644381b1972af1a7"
 };
-  
-firebase.initializeApp(firebaseConfig);
 
+firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+/* ================= DOM ================= */
+const loginPage = document.getElementById("loginPage");
+const app = document.getElementById("app");
+const adminPanel = document.getElementById("adminPanel");
+
+const eventName = document.getElementById("eventName");
+const activeEventText = document.getElementById("activeEventText");
+
+const result = document.getElementById("result");
+const countEl = document.getElementById("count");
+
 /* ================= STATE ================= */
 let html5QrCode = null;
-let count = 0;
 let userRole = null;
 let activeEvent = null;
+let count = 0;
 
 /* ================= LOGIN ================= */
 
@@ -137,12 +142,10 @@ async function loadUserRole(user) {
     userRole = doc.data().role;
   }
 
-  if (userRole === "admin") {
-    adminPanel.classList.remove("hidden");
-  }
+  adminPanel.classList.toggle("hidden", userRole !== "admin");
 }
 
-/* ================= EVENT SYSTEM ================= */
+/* ================= EVENTS ================= */
 
 async function createEvent() {
   if (userRole !== "admin") return;
@@ -160,34 +163,30 @@ async function createEvent() {
 async function startEvent() {
   if (userRole !== "admin") return;
 
-  const events = await db.collection("events").get();
-
-  events.forEach(doc => {
-    db.collection("events").doc(doc.id).update({ active: false });
-  });
-
-  const latest = await db.collection("events")
+  const snap = await db.collection("events")
     .orderBy("createdAt", "desc")
     .limit(1)
     .get();
 
-  latest.forEach(doc => {
-    db.collection("events").doc(doc.id).update({ active: true });
-    activeEvent = doc.id;
-    activeEventText.innerText = "Active: " + doc.data().name;
-  });
+  if (snap.empty) return;
+
+  const event = snap.docs[0];
+
+  const all = await db.collection("events").get();
+  all.forEach(d => db.collection("events").doc(d.id).update({ active: false }));
+
+  await db.collection("events").doc(event.id).update({ active: true });
+
+  activeEvent = event.id;
+  activeEventText.innerText = "Active: " + event.data().name;
 }
 
 async function endEvent() {
   if (userRole !== "admin") return;
 
-  const snap = await db.collection("events")
-    .where("active", "==", true)
-    .get();
+  const snap = await db.collection("events").where("active", "==", true).get();
 
-  snap.forEach(doc => {
-    db.collection("events").doc(doc.id).update({ active: false });
-  });
+  snap.forEach(d => db.collection("events").doc(d.id).update({ active: false }));
 
   activeEvent = null;
   activeEventText.innerText = "No active event";
@@ -201,15 +200,11 @@ async function loadActiveEvent() {
     .limit(1)
     .get();
 
-  if (snap.empty) {
-    activeEvent = null;
-    return;
-  }
+  if (snap.empty) return;
 
-  snap.forEach(doc => {
-    activeEvent = doc.id;
-    activeEventText.innerText = "Active: " + doc.data().name;
-  });
+  const doc = snap.docs[0];
+  activeEvent = doc.id;
+  activeEventText.innerText = "Active: " + doc.data().name;
 }
 
 /* ================= SCANNER ================= */
@@ -219,6 +214,8 @@ function startScanner() {
   html5QrCode = new Html5Qrcode("reader");
 
   Html5Qrcode.getCameras().then(devices => {
+    if (!devices.length) return;
+
     html5QrCode.start(
       devices[0].id,
       { fps: 10, qrbox: 250 },
@@ -226,6 +223,8 @@ function startScanner() {
     );
   });
 }
+
+/* ================= SCAN LOGIC ================= */
 
 async function onScan(decodedText) {
 
@@ -243,12 +242,12 @@ async function onScan(decodedText) {
 
   const student = studentDoc.data();
 
-  const duplicate = await db.collection("attendance")
+  const dup = await db.collection("attendance")
     .where("studentId", "==", decodedText)
     .where("eventId", "==", activeEvent)
     .get();
 
-  if (!duplicate.empty) {
+  if (!dup.empty) {
     result.innerText = "⚠ Already scanned";
     return;
   }
@@ -263,7 +262,7 @@ async function onScan(decodedText) {
 
   await db.collection("attendance").add(record);
 
-  fetch("https://script.google.com/macros/s/AKfycbwl211Y87r-NUNjYi3ocV9z7Bw4NLZozAlhM1o2nVeSil_U9xujZd__GrPG56TFdqc/exec", {
+  fetch("YOUR_GOOGLE_SCRIPT_URL", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(record)
@@ -284,6 +283,7 @@ auth.onAuthStateChanged(async user => {
 
     await loadUserRole(user);
     await loadActiveEvent();
+
     startScanner();
 
   } else {
