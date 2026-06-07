@@ -37,20 +37,23 @@
         <i class="fas fa-wifi-slash mr-2"></i> You are offline. Some features may be limited.
     </div>
 
-    <!-- Header -->
+       <!-- Header -->
     <header class="bg-suNavy text-white shadow-lg no-print">
         <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
             <div class="flex items-center space-x-4 mb-4 md:mb-0">
-                <div class="bg-white text-suNavy p-2 rounded-full"><i class="fas fa-university text-2xl"></i></div>
+                <!-- REPLACE THE SRC BELOW WITH YOUR PSYCH SOCIETY LOGO -->
+                <img src="https://imgur.com/S81aquO" 
+                     alt="SU Psychology Society Logo" 
+                     class="h-14 w-14 md:h-16 md:w-16 rounded-full bg-white p-1 object-contain shadow-md">
                 <div>
-                    <h1 class="text-xl md:text-2xl font-bold">SU Psychology Society Attendance System</h1>
-                    <p class="text-sm text-gray-300">Silliman University • School Year 2026–2027</p>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">SU Psychology Society Attendance System</h1>
+                    <p class="text-sm text-gray-300 font-medium">Silliman University • School Year 2026–2027</p>
                 </div>
             </div>
             <div id="user-info" class="hidden flex items-center space-x-4">
-                <span id="user-role-badge" class="px-3 py-1 bg-blue-600 rounded-full text-xs font-semibold uppercase"></span>
-                <span id="user-email" class="text-sm hidden md:inline"></span>
-                <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm transition">
+                <span id="user-role-badge" class="px-3 py-1 bg-blue-600 rounded-full text-xs font-semibold uppercase tracking-wider"></span>
+                <span id="user-email" class="text-sm hidden md:inline text-gray-200"></span>
+                <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm transition flex items-center shadow">
                     <i class="fas fa-sign-out-alt mr-2"></i>Logout
                 </button>
             </div>
@@ -830,5 +833,42 @@ document.getElementById('add-user-form').addEventListener('submit', async (e) =>
         setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
     };
 </script>
+
+        <!-- Footer -->
+    <footer class="bg-suNavy text-white py-8 mt-auto no-print border-t border-blue-900">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-center items-center gap-8 mb-6">
+                
+                <!-- Silliman University Logo -->
+                <div class="flex flex-col items-center group">
+                    <!-- REPLACE THE SRC BELOW WITH THE OFFICIAL SU LOGO -->
+                    <img src="https://imgur.com/lDJUOvv" 
+                         alt="Silliman University Logo" 
+                         class="h-16 w-16 md:h-20 md:w-20 bg-white rounded-full p-1.5 object-contain mb-2 shadow-md group-hover:scale-105 transition-transform">
+                    <span class="text-sm font-semibold tracking-wide">Silliman University</span>
+                </div>
+
+                <!-- Vertical Divider (Hidden on mobile) -->
+                <div class="hidden md:block w-px h-16 bg-gray-600"></div>
+
+                <!-- Psychology Society Logo -->
+                <div class="flex flex-col items-center group">
+                    <!-- REPLACE THE SRC BELOW WITH YOUR PSYCH SOCIETY LOGO -->
+                    <img src="https://imgur.com/S81aquO" 
+                         alt="SU Psychology Society Logo" 
+                         class="h-16 w-16 md:h-20 md:w-20 bg-white rounded-full p-1.5 object-contain mb-2 shadow-md group-hover:scale-105 transition-transform">
+                    <span class="text-sm font-semibold tracking-wide">Psychology Society</span>
+                </div>
+
+            </div>
+            
+            <!-- Copyright Text -->
+            <div class="text-center border-t border-gray-700 pt-6">
+                <p class="text-sm text-gray-300">&copy; 2026 Silliman University Psychology Society. All rights reserved.</p>
+                <p class="text-xs text-gray-500 mt-1">Official Attendance Management Platform • School Year 2026–2027</p>
+            </div>
+        </div>
+    </footer>
+    
 </body>
 </html>
