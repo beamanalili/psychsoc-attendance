@@ -1,78 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Attendance Scanner</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PsychSoc Attendance System</title>
 
-  <!-- Tailwind CDN (for clean UI) -->
+  <!-- Tailwind UI -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- QR Scanner Library -->
+  <!-- QR Scanner -->
   <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 
-<body class="bg-gray-900 text-white flex flex-col items-center min-h-screen">
+<body class="bg-gray-900 text-white flex flex-col items-center min-h-screen p-4">
 
   <!-- HEADER -->
-  <div class="w-full max-w-md mt-6 text-center">
-    <h1 class="text-2xl font-bold">📍 Attendance Scanner</h1>
-    <p class="text-gray-400 text-sm">Scan member QR code to mark attendance</p>
+  <div class="text-center mt-4">
+    <h1 class="text-2xl font-bold">📍 PsychSoc Attendance</h1>
+    <p class="text-gray-400 text-sm">Scan QR to mark attendance</p>
   </div>
 
-  <!-- STATUS CARD -->
-  <div class="w-full max-w-md mt-4 bg-gray-800 p-4 rounded-xl shadow">
-    <p class="text-sm text-gray-400">Event Status</p>
+  <!-- STATUS -->
+  <div class="w-full max-w-md mt-4 bg-gray-800 p-4 rounded-xl">
+    <p class="text-gray-400 text-sm">Event Status</p>
     <p class="text-green-400 font-bold">🟢 ACTIVE</p>
   </div>
 
-  <!-- SCANNER BOX -->
-  <div class="w-full max-w-md mt-6 bg-white p-4 rounded-xl shadow">
-    <div id="reader" class="w-full"></div>
+  <!-- SCANNER -->
+  <div class="w-full max-w-md mt-4 bg-white p-3 rounded-xl">
+    <div id="reader"></div>
   </div>
 
-  <!-- RESULT BOX -->
+  <!-- RESULT -->
   <div class="w-full max-w-md mt-4 bg-gray-800 p-4 rounded-xl">
-    <p class="text-sm text-gray-400">Last Scan</p>
-    <p id="result" class="text-lg font-semibold">Waiting for scan...</p>
+    <p class="text-gray-400 text-sm">Last Scan</p>
+    <p id="result">Waiting...</p>
   </div>
 
-  <!-- ATTENDANCE COUNTER -->
+  <!-- COUNT -->
   <div class="w-full max-w-md mt-4 bg-gray-800 p-4 rounded-xl text-center">
     <p class="text-gray-400 text-sm">Attendance Count</p>
-    <p class="text-2xl font-bold" id="count">0</p>
+    <p id="count" class="text-2xl font-bold">0</p>
   </div>
 
-  <script>
-    let count = 0;
+<script>
+/* =========================
+   1. FIREBASE SETUP
+========================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
+  authDomain: "psychsoc-attendance-system.firebaseapp.com",
+  projectId: "psychsoc-attendance-system",
+  storageBucket: "psychsoc-attendance-system.firebasestorage.app",
+  messagingSenderId: "93131590758",
+  appId: "1:93131590758:web:bfea89644381b1972af1a7",
+  measurementId: "G-C5SH1EEQP2"
+};
 
-    function onScanSuccess(decodedText) {
-      document.getElementById("result").innerText = "✔ " + decodedText;
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-      count++;
-      document.getElementById("count").innerText = count;
+/* =========================
+   2. STATE
+========================= */
+let count = 0;
+let scannedIds = new Set(); // prevents duplicates in same session
 
-      // Simple anti-spam delay (prevents rapid duplicate scans)
-      setTimeout(() => {}, 2000);
-    }
+/* =========================
+   3. SCAN SUCCESS
+========================= */
+function onScanSuccess(decodedText) {
 
-    function onScanError(errorMessage) {
-      // ignore scan errors (normal)
-    }
+  const studentId = decodedText.trim();
 
-    let html5QrCode = new Html5Qrcode("reader");
+  // basic anti-cheat (no duplicate scan in same session)
+  if (scannedIds.has(studentId)) {
+    document.getElementById("result").innerText =
+      "⚠ Already scanned: " + studentId;
+    return;
+  }
 
-    Html5Qrcode.getCameras().then(devices => {
-      if (devices && devices.length) {
-        html5QrCode.start(
-          devices[0].id,
-          { fps: 10, qrbox: 250 },
-          onScanSuccess,
-          onScanError
-        );
-      }
-    });
-  </script>
+  scannedIds.add(studentId);
+
+  document.getElementById("result").innerText =
+    "✔ " + studentId;
+
+  count++;
+  document.getElementById("count").innerText = count;
+
+  // save to Firebase
+  db.collection("attendance").add({
+    studentId: studentId,
+    event: "PsychSoc Attendance System",
+    timestamp: new Date()
+  });
+
+}
+
+/* =========================
+   4. SCANNER START
+========================= */
+const html5QrCode = new Html5Qrcode("reader");
+
+Html5Qrcode.getCameras().then(devices => {
+  if (devices && devices.length) {
+    html5QrCode.start(
+      devices[0].id,
+      { fps: 10, qrbox: 250 },
+      onScanSuccess
+    );
+  }
+});
+
+</script>
 
 </body>
 </html>
