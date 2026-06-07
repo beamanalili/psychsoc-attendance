@@ -93,12 +93,13 @@
 
 /* ================= FIREBASE ================= */
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
+  authDomain: "psychsoc-attendance-system.firebaseapp.com",
+  projectId: "psychsoc-attendance-system",
+  storageBucket: "psychsoc-attendance-system.firebasestorage.app",
+  messagingSenderId: "93131590758",
+  appId: "1:93131590758:web:bfea89644381b1972af1a7",
+  measurementId: "G-C5SH1EEQP2"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -262,7 +263,7 @@ async function onScan(decodedText) {
 
   await db.collection("attendance").add(record);
 
-  fetch("YOUR_GOOGLE_SCRIPT_URL", {
+  fetch("https://script.google.com/macros/s/AKfycbwl211Y87r-NUNjYi3ocV9z7Bw4NLZozAlhM1o2nVeSil_U9xujZd__GrPG56TFdqc/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(record)
