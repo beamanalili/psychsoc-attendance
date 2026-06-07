@@ -465,6 +465,19 @@
         let yearChartInstance = null;
         let statusChartInstance = null;
 
+            // Helper function to disable buttons and show a spinner while processing
+    function setButtonLoading(btn, isLoading, originalText) {
+        if (isLoading) {
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
+        } else {
+            btn.disabled = false;
+            btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            btn.innerHTML = originalText;
+        }
+    }
+
         window.addEventListener('online', () => document.getElementById('offline-banner').classList.add('hidden'));
         window.addEventListener('offline', () => document.getElementById('offline-banner').classList.remove('hidden'));
 
@@ -603,16 +616,21 @@
             else stopLiveAttendanceListener();
         };
 
-        document.getElementById('create-event-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('event-name').value;
-            try {
-                await setDoc(doc(collection(db, "events")), { name, active: false, createdBy: currentUser.uid, createdAt: serverTimestamp() });
-                showToast("Event created!", "success");
-                document.getElementById('event-name').value = "";
-                renderEvents();
-            } catch (err) { showToast("Error creating event", "error"); }
-        });
+            document.getElementById('create-event-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        setButtonLoading(btn, true); // START LOADING
+
+        const name = document.getElementById('event-name').value;
+        try {
+            await setDoc(doc(collection(db, "events")), { name, active: false, createdBy: currentUser.uid, createdAt: serverTimestamp() });
+            showToast("Event created!", "success");
+            document.getElementById('event-name').value = "";
+            renderEvents();
+        } catch (err) { showToast("Error creating event", "error"); } 
+        finally { setButtonLoading(btn, false, originalText); } // STOP LOADING
+    });
 
         window.renderEvents = async () => {
             const snap = await getDocs(query(collection(db, "events"), orderBy("createdAt", "desc")));
@@ -716,19 +734,24 @@
             document.getElementById('student-modal').classList.add('flex');
         };
 
-        document.getElementById('student-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('edit-student-id').value || document.getElementById('form-student-id').value;
-            const name = document.getElementById('form-student-name').value;
-            const year = parseInt(document.getElementById('form-student-year').value);
-            const active = document.getElementById('form-student-active').checked;
-            try {
-                await setDoc(doc(db, "students", id), { name, year, active, qrCode: id });
-                showToast("Student saved!", "success");
-                closeStudentModal();
-                renderStudents();
-            } catch (err) { showToast("Error saving student", "error"); }
-        });
+            document.getElementById('student-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        setButtonLoading(btn, true);
+
+        const id = document.getElementById('edit-student-id').value || document.getElementById('form-student-id').value;
+        const name = document.getElementById('form-student-name').value;
+        const year = parseInt(document.getElementById('form-student-year').value);
+        const active = document.getElementById('form-student-active').checked;
+        try {
+            await setDoc(doc(db, "students", id), { name, year, active, qrCode: id });
+            showToast("Student saved!", "success");
+            closeStudentModal();
+            renderStudents();
+        } catch (err) { showToast("Error saving student", "error"); } 
+        finally { setButtonLoading(btn, false, originalText); }
+    });
 
         window.toggleStudentActive = async (id, status) => {
             await updateDoc(doc(db, "students", id), { active: status });
@@ -787,18 +810,23 @@
             });
         };
 
-        document.getElementById('add-user-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('new-user-name').value;
-            const email = document.getElementById('new-user-email').value;
-            const role = document.getElementById('new-user-role').value;
-            try {
-                await setDoc(doc(db, "users", email), { name: name, email: email, role: role });
-                showToast("Role assigned successfully!", "success");
-                document.getElementById('add-user-form').reset();
-                renderUsers();
-            } catch (err) { showToast("Error assigning role: " + err.message, "error"); }
-        });
+            document.getElementById('add-user-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        setButtonLoading(btn, true);
+
+        const name = document.getElementById('new-user-name').value;
+        const email = document.getElementById('new-user-email').value;
+        const role = document.getElementById('new-user-role').value;
+        try {
+            await setDoc(doc(db, "users", email), { name: name, email: email, role: role });
+            showToast("Role assigned successfully!", "success");
+            document.getElementById('add-user-form').reset();
+            renderUsers();
+        } catch (err) { showToast("Error assigning role: " + err.message, "error"); } 
+        finally { setButtonLoading(btn, false, originalText); }
+    });
 
         window.toggleScanner = async () => {
             const btn = document.getElementById('toggle-scanner-btn');
@@ -1020,28 +1048,33 @@
             showToast("Export successful!", "success");
         };
 
-        document.getElementById('student-register-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const studentId = document.getElementById('reg-student-id').value.trim();
-            const name = document.getElementById('reg-student-name').value.trim();
-            const year = parseInt(document.getElementById('reg-student-year').value);
-            try {
-                await setDoc(doc(db, "students", studentId), {
-                    name: name, year: year, active: true, qrCode: studentId, authUid: currentUser.uid
-                });
-                await setDoc(doc(db, "users", currentUser.uid), {
-                    email: currentUser.email, role: 'student', studentId: studentId
-                });
-                showToast("Profile created! Generating ID...", "success");
-                document.getElementById('student-registration-form').classList.add('hidden');
-                document.getElementById('student-id-card-view').classList.remove('hidden');
-                document.getElementById('user-role-badge').innerText = 'student';
-                renderIDCard(studentId, name, year);
-            } catch (err) {
-                console.error(err);
-                showToast("Error: " + err.message, "error");
-            }
-        });
+           document.getElementById('student-register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        setButtonLoading(btn, true);
+
+        const studentId = document.getElementById('reg-student-id').value.trim();
+        const name = document.getElementById('reg-student-name').value.trim();
+        const year = parseInt(document.getElementById('reg-student-year').value);
+
+        try {
+            await setDoc(doc(db, "students", studentId), {
+                name: name, year: year, active: true, qrCode: studentId, authUid: currentUser.uid
+            });
+            await setDoc(doc(db, "users", currentUser.uid), {
+                email: currentUser.email, role: 'student', studentId: studentId
+            });
+            showToast("Profile created! Generating ID...", "success");
+            document.getElementById('student-registration-form').classList.add('hidden');
+            document.getElementById('student-id-card-view').classList.remove('hidden');
+            document.getElementById('user-role-badge').innerText = 'student';
+            renderIDCard(studentId, name, year);
+        } catch (err) {
+            console.error(err);
+            showToast("Error: " + err.message, "error");
+        } finally { setButtonLoading(btn, false, originalText); }
+    });
 
         async function loadStudentProfile(uid) {
             const userDoc = await getDoc(doc(db, "users", uid));
