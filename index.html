@@ -710,13 +710,30 @@ document.getElementById('add-user-form').addEventListener('submit', async (e) =>
     }
 
     function sendToGoogleSheets(data) {
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        }).catch(err => console.error("Sheets sync failed", err));
+    // 1. Check if URL is still a placeholder
+    if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS")) {
+        console.error("❌ Google Sheets URL is not configured in index.html!");
+        return;
     }
+
+    console.log("📤 Sending to Google Sheets:", data);
+
+    // 2. Use 'text/plain' to prevent CORS preflight failures with Google Apps Script
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors", 
+        headers: { 
+            "Content-Type": "text/plain;charset=utf-8" 
+        },
+        body: JSON.stringify(data)
+    })
+    .then(() => {
+        console.log("✅ Google Sheets request sent successfully.");
+    })
+    .catch(err => {
+        console.error("❌ Google Sheets sync failed:", err);
+    });
+}
 
     window.startLiveAttendanceListener = async () => {
         const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
@@ -747,43 +764,88 @@ document.getElementById('add-user-form').addEventListener('submit', async (e) =>
     };
 
     window.loadAnalytics = async () => {
-        const studentsSnap = await getDocs(collection(db, "students"));
-        const total = studentsSnap.size;
-        const years = {1: 0, 2: 0, 3: 0, 4: 0};
-        studentsSnap.forEach(d => { if (years[d.data().year] !== undefined) years[d.data().year]++; });
+    const select = document.getElementById('analytics-event-select');
+    const selectedEventId = select.value;
 
-        let present = 0;
-        const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
-        if (!eventSnap.empty) {
-            const attSnap = await getDocs(query(collection(db, "attendance"), where("eventId", "==", eventSnap.docs[0].id)));
-            present = attSnap.size;
-        }
-
-        const absent = total - present;
-        const rate = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
-
-        document.getElementById("stat-total").innerText = total;
-        document.getElementById("stat-present").innerText = present;
-        document.getElementById("stat-absent").innerText = absent;
-        document.getElementById("stat-rate").innerText = rate + "%";
-
-        const ctxYear = document.getElementById('yearChart').getContext('2d');
-        const ctxStatus = document.getElementById('statusChart').getContext('2d');
-        if (yearChartInstance) yearChartInstance.destroy();
-        if (statusChartInstance) statusChartInstance.destroy();
-
-        yearChartInstance = new Chart(ctxYear, {
-            type: 'bar',
-            data: { labels: ['1st Year', '2nd Year', '3rd Year', '4th Year'], datasets: [{ label: 'Students', data: [years[1], years[2], years[3], years[4]], backgroundColor: '#0B1F4D' }] },
-            options: { responsive: true }
+    // 1. Populate dropdown with events if it's currently empty (only has "All Time")
+    if (select.options.length <=1) {
+        const eventsSnap = await getDocs(query(collection(db, "events"), orderBy("createdAt", "desc")));
+        eventsSnap.forEach(docSnap => {
+            const data = docSnap.data();
+            const option = document.createElement('option');
+            option.value = docSnap.id;
+            option.text = data.name + (data.active ? " 🟢 (Active)" : "");
+            select.appendChild(option);
         });
+    }
 
-        statusChartInstance = new Chart(ctxStatus, {
-            type: 'doughnut',
-            data: { labels: ['Present', 'Absent'], datasets: [{ data: [present, absent], backgroundColor: ['#10B981', '#EF4444'] }] },
-            options: { responsive: true }
-        });
-    };
+    // 2. Get total students and year breakdown
+    const studentsSnap = await getDocs(collection(db, "students"));
+    const total = studentsSnap.size;
+    const years = {1: 0, 2: 0, 3: 0, 4: 0};
+    studentsSnap.forEach(d => { 
+        if (years[d.data().year] !== undefined) years[d.data().year]++; 
+    });
+
+    // 3. Get attendance based on selection
+    let present = 0;
+    let attQuery;
+    
+    if (selectedEventId === 'all') {
+        attQuery = collection(db, "attendance");
+    } else {
+        attQuery = query(collection(db, "attendance"), where("eventId", "==", selectedEventId));
+    }
+    
+    const attSnap = await getDocs(attQuery);
+    present = attSnap.size;
+
+    // 4. Calculate stats
+    const absent = selectedEventId === 'all' ? 'N/A' : (total - present);
+    const rate = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
+
+    document.getElementById("stat-total").innerText = total;
+    document.getElementById("stat-present").innerText = present;
+    document.getElementById("stat-absent").innerText = absent;
+    document.getElementById("stat-rate").innerText = rate + "%";
+
+    // 5. Update Charts
+    const ctxYear = document.getElementById('yearChart').getContext('2d');
+    const ctxStatus = document.getElementById('statusChart').getContext('2d');
+    
+    if (yearChartInstance) yearChartInstance.destroy();
+    if (statusChartInstance) statusChartInstance.destroy();
+
+    yearChartInstance = new Chart(ctxYear, {
+        type: 'bar',
+        data: { 
+            labels: ['1st Year', '2nd Year', '3rd Year', '4th Year'], 
+            datasets: [{ 
+                label: 'Students', 
+                data: [years[1], years[2], years[3], years[4]], 
+                backgroundColor: '#0B1F4D' 
+            }] 
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+
+    // Dynamic labels for the status chart based on selection
+    const statusLabels = selectedEventId === 'all' ? ['Total Scans', 'Unscanned Members'] : ['Present', 'Absent'];
+    const statusData = selectedEventId === 'all' ? [present, total] : [present, total - present];
+    const statusColors = selectedEventId === 'all' ? ['#0B1F4D', '#E5E7EB'] : ['#10B981', '#EF4444'];
+
+    statusChartInstance = new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: { 
+            labels: statusLabels, 
+            datasets: [{ 
+                data: statusData, 
+                backgroundColor: statusColors 
+            }] 
+        },
+        options: { responsive: true }
+    });
+};
 
     window.updateExportUI = async () => {
         const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
