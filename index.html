@@ -134,13 +134,14 @@
                     <h3 class="text-lg font-bold text-suNavy mb-2">Manage Officers & Admins</h3>
                     <p class="text-sm text-gray-600 mb-4">Note: Firebase Auth accounts must be created in the Firebase Console. This tool assigns their database role.</p>
                     <form id="add-user-form" class="flex flex-col md:flex-row gap-4 mb-6">
-                        <input type="email" id="new-user-email" placeholder="User Email" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg">
-                        <select id="new-user-role" class="px-4 py-2 border border-gray-300 rounded-lg">
-                            <option value="officer">Officer</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                        <button type="submit" class="bg-suNavy text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-900 transition">Assign Role</button>
-                    </form>
+    <input type="text" id="new-user-name" placeholder="Full Name (e.g., Juan Dela Cruz)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+    <input type="email" id="new-user-email" placeholder="User Email (Must match Firebase Auth)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+    <select id="new-user-role" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+        <option value="officer">Officer</option>
+        <option value="admin">Admin</option>
+    </select>
+    <button type="submit" class="bg-suNavy text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-900 transition whitespace-nowrap">Assign Role</button>
+</form>
                     <div id="users-list" class="space-y-2"></div>
                 </div>
             </div>
@@ -555,23 +556,54 @@
         setTimeout(() => window.print(), 500);
     };
 
-    window.renderUsers = async () => {
-        const snap = await getDocs(collection(db, "users"));
-        const container = document.getElementById('users-list');
-        container.innerHTML = "";
-        snap.forEach(docSnap => {
-            const data = docSnap.data();
-            const div = document.createElement('div');
-            div.className = "flex justify-between items-center bg-gray-50 p-3 rounded-lg";
-            div.innerHTML = `
-                <div>
-                    <p class="font-semibold">${docSnap.id}</p>
-                    <p class="text-sm text-gray-500">${data.email} • <span class="uppercase font-bold text-xs">${data.role}</span></p>
-                </div>
-            `;
-            container.appendChild(div);
+    // 1. Update how users are displayed to show the Name
+window.renderUsers = async () => {
+    const snap = await getDocs(collection(db, "users"));
+    const container = document.getElementById('users-list');
+    container.innerHTML = "";
+    snap.forEach(docSnap => {
+        const data = docSnap.data();
+        const div = document.createElement('div');
+        div.className = "flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100";
+        
+        // Use the name if it exists, otherwise fallback to the email
+        const displayName = data.name ? data.name : "Unnamed User";
+        const roleColor = data.role === 'admin' ? 'bg-suNavy text-white' : 'bg-blue-100 text-blue-800';
+        
+        div.innerHTML = `
+            <div>
+                <p class="font-bold text-suNavy">${displayName}</p>
+                <p class="text-sm text-gray-500">${data.email}</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${roleColor}">
+                ${data.role}
+            </span>
+        `;
+        container.appendChild(div);
+    });
+};
+
+// 2. Update the form submission to save the Name
+document.getElementById('add-user-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('new-user-name').value;
+    const email = document.getElementById('new-user-email').value;
+    const role = document.getElementById('new-user-role').value;
+    
+    try {
+        // We use the email as the Document ID to keep it simple and searchable
+        await setDoc(doc(db, "users", email), { 
+            name: name, 
+            email: email, 
+            role: role 
         });
-    };
+        showToast("Role assigned successfully!", "success");
+        document.getElementById('add-user-form').reset();
+        renderUsers();
+    } catch (err) { 
+        showToast("Error assigning role: " + err.message, "error"); 
+    }
+});
 
     document.getElementById('add-user-form').addEventListener('submit', async (e) => {
         e.preventDefault();
