@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PsychSoc Attendance System</title>
+  <title>Psychology Society Attendance System</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
@@ -42,7 +42,6 @@
       Logout
     </button>
   </div>
-
 
   <!-- ADMIN PANEL -->
   <div id="adminPanel" class="mt-4 bg-gray-800 p-4 rounded-xl hidden">
@@ -113,6 +112,10 @@ const activeEventText = document.getElementById("activeEventText");
 const result = document.getElementById("result");
 const countEl = document.getElementById("count");
 
+const email = document.getElementById("email");
+const password = document.getElementById("password");
+const loginError = document.getElementById("loginError");
+
 /* ================= STATE ================= */
 let html5QrCode = null;
 let userRole = null;
@@ -126,15 +129,9 @@ function login() {
     .catch(err => loginError.innerText = err.message);
 }
 
-function logout() {
-  if (html5QrCode) {
-    html5QrCode.stop().catch(()=>{});
-    html5QrCode.clear();
-  }
-  auth.signOut();
-}
+/* ================= FIXED LOGOUT (SAFE) ================= */
 
-  function logout() {
+function logout() {
   try {
     if (html5QrCode) {
       html5QrCode.stop().catch(()=>{});
@@ -202,7 +199,9 @@ async function startEvent() {
 async function endEvent() {
   if (userRole !== "admin") return;
 
-  const snap = await db.collection("events").where("active", "==", true).get();
+  const snap = await db.collection("events")
+    .where("active", "==", true)
+    .get();
 
   snap.forEach(d => db.collection("events").doc(d.id).update({ active: false }));
 
@@ -229,6 +228,11 @@ async function loadActiveEvent() {
 
 function startScanner() {
 
+  if (html5QrCode) {
+    html5QrCode.stop().catch(()=>{});
+    html5QrCode.clear();
+  }
+
   html5QrCode = new Html5Qrcode("reader");
 
   Html5Qrcode.getCameras().then(devices => {
@@ -242,11 +246,7 @@ function startScanner() {
   });
 }
 
-  const email = document.getElementById("email");
-const password = document.getElementById("password");
-const loginError = document.getElementById("loginError");
-
-/* ================= SCAN LOGIC ================= */
+/* ================= SCAN ================= */
 
 async function onScan(decodedText) {
 
