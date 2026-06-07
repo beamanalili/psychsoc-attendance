@@ -181,22 +181,41 @@ async function loadActiveEvent() {
   activeEventText.innerText = "Active: " + doc.data().name;
 }
 
-  async function createEvent() {
-console.log("CREATE EVENT CLICKED");
-    
-  if (userRole !== "admin") return;
+/* ================= CREATE EVENT ================= */
 
-  await db.collection("events").add({
-    name: eventName.value,
-    active: false,
-    createdBy: auth.currentUser.email,
-    createdAt: new Date()
-  });
+async function createNewEvent() {
+  console.log("CREATE EVENT CLICKED");
 
-  alert("Event created");
+  if (userRole !== "admin") {
+    alert("Not authorized");
+    return;
+  }
+
+  if (!eventName.value.trim()) {
+    alert("Enter event name");
+    return;
+  }
+
+  try {
+    await db.collection("events").add({
+      name: eventName.value,
+      active: false,
+      createdBy: auth.currentUser.email,
+      createdAt: new Date()
+    });
+
+    alert("Event created");
+    eventName.value = "";
+
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
 }
 
- async function startEvent() {
+/* ================= START EVENT ================= */
+
+async function startEvent() {
   if (userRole !== "admin") return;
 
   const snap = await db.collection("events")
@@ -211,13 +230,11 @@ console.log("CREATE EVENT CLICKED");
 
   const eventDoc = snap.docs[0];
 
-  // turn off all events
   const all = await db.collection("events").get();
   all.forEach(doc => {
     db.collection("events").doc(doc.id).update({ active: false });
   });
 
-  // activate latest
   await db.collection("events").doc(eventDoc.id).update({
     active: true
   });
@@ -226,9 +243,9 @@ console.log("CREATE EVENT CLICKED");
   activeEventText.innerText = "Active: " + eventDoc.data().name;
 }
 
-  let scanning = false;
+/* ================= END EVENT ================= */
 
-  async function endEvent() {
+async function endEvent() {
   if (userRole !== "admin") return;
 
   const snap = await db.collection("events")
@@ -241,21 +258,6 @@ console.log("CREATE EVENT CLICKED");
 
   activeEvent = null;
   activeEventText.innerText = "No active event";
-}
-
-/* ================= ACTIVE EVENT ================= */
-
-async function loadActiveEvent() {
-  const snap = await db.collection("events")
-    .where("active", "==", true)
-    .limit(1)
-    .get();
-
-  if (snap.empty) return;
-
-  const doc = snap.docs[0];
-  activeEvent = doc.id;
-  activeEventText.innerText = "Active: " + doc.data().name;
 }
 
 /* ================= SCANNER ================= */
