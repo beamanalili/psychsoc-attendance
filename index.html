@@ -72,24 +72,57 @@
   </div>
 
   <!-- ================= SCANNER ================= -->
-  <div class="mt-4 bg-white p-3 rounded-xl">
-    <div id="reader"></div>
-  </div>
+ async function onScan(decodedText) {
 
-  <div class="mt-4 bg-gray-800 p-3 rounded-xl">
-    <p class="text-gray-400 text-sm">Last Scan</p>
-    <p id="result">Waiting...</p>
-  </div>
+  if (!activeEvent) {
+    result.innerText = "❌ No active event";
+    return;
+  }
 
-  <div class="mt-4 bg-gray-800 p-3 rounded-xl text-center">
-    <p class="text-gray-400 text-sm">Count</p>
-    <p id="count" class="text-2xl font-bold">0</p>
-  </div>
+  const studentId = decodedText;
 
-</div>
+  /* ================= 1. CHECK STUDENT EXISTS ================= */
+  const studentDoc = await db.collection("students").doc(studentId).get();
 
-<script>
+  if (!studentDoc.exists || !studentDoc.data().active) {
+    result.innerText = "❌ Invalid student: " + studentId;
+    return;
+  }
 
+  const studentData = studentDoc.data();
+
+  /* ================= 2. PREVENT DUPLICATE PER EVENT ================= */
+  const check = await db.collection("attendance")
+    .where("studentId", "==", studentId)
+    .where("eventId", "==", activeEvent)
+    .get();
+
+  if (!check.empty) {
+    result.innerText = "⚠ Already recorded in this event";
+    return;
+  }
+
+  /* ================= 3. SAVE TO FIREBASE ================= */
+  const record = {
+    studentId,
+    name: studentData.name,
+    eventId: activeEvent,
+    timestamp: new Date().toISOString(),
+    scannedBy: auth.currentUser.email
+  };
+
+  await db.collection("attendance").add(record);
+
+  /* ================= 4. SEND TO GOOGLE SHEETS ================= */
+  fetch("https://script.google.com/macros/s/AKfycbwl211Y87r-NUNjYi3ocV9z7Bw4NLZozAlhM1o2nVeSil_U9xujZd__GrPG56TFdqc/exec", {
+    method: "POST",
+    body: JSON.stringify(record)
+  });
+
+  result.innerText = "✔ " + studentData.name;
+  count++;
+  countEl.innerText = count;
+}
 /* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
