@@ -16,7 +16,7 @@
 
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-4">
 
-<!-- ================= LOGIN PAGE ================= -->
+<!-- ================= LOGIN ================= -->
 <div id="loginPage" class="w-full max-w-md mt-20 bg-gray-800 p-6 rounded-xl">
 
   <h1 class="text-xl font-bold text-center mb-4">🔐 Officer Login</h1>
@@ -27,30 +27,51 @@
   <input id="password" type="password" placeholder="Password"
     class="w-full p-2 mb-4 rounded bg-gray-700"/>
 
-  <button onclick="login()"
-    class="w-full bg-blue-500 hover:bg-blue-600 p-2 rounded">
+  <button onclick="login()" class="w-full bg-blue-500 p-2 rounded">
     Login
   </button>
 
-  <p id="loginError" class="text-red-400 text-sm mt-2 text-center"></p>
+  <p id="loginError" class="text-red-400 text-sm mt-2"></p>
 </div>
 
-<!-- ================= SCANNER PAGE ================= -->
+<!-- ================= APP ================= -->
 <div id="app" class="hidden w-full max-w-md">
 
-  <div class="text-center mt-4">
-    <h1 class="text-2xl font-bold">📍 PsychSoc Attendance</h1>
+  <h1 class="text-2xl font-bold text-center mt-4">📍 PsychSoc Attendance</h1>
 
-    <button onclick="logout()"
-      class="bg-red-500 px-3 py-1 rounded mt-2 text-sm">
+  <div class="text-center">
+    <button onclick="logout()" class="bg-red-500 px-3 py-1 rounded mt-2 text-sm">
       Logout
     </button>
   </div>
 
-  <div class="mt-4 bg-gray-800 p-3 rounded-xl text-center">
-    <p class="text-green-400 font-bold">🟢 SCANNER ACTIVE</p>
+  <!-- ================= ADMIN PANEL ================= -->
+  <div id="adminPanel" class="mt-4 bg-gray-800 p-4 rounded-xl hidden">
+
+    <h2 class="font-bold mb-2">👑 Admin Controls</h2>
+
+    <input id="eventName" placeholder="New event name"
+      class="w-full p-2 rounded bg-gray-700 mb-2"/>
+
+    <button onclick="createEvent()" class="bg-green-500 w-full p-2 rounded mb-2">
+      Create Event
+    </button>
+
+    <button onclick="startEvent()" class="bg-blue-500 w-full p-2 rounded mb-2">
+      Start Event
+    </button>
+
+    <button onclick="endEvent()" class="bg-red-500 w-full p-2 rounded">
+      End Event
+    </button>
+
+    <p id="activeEventText" class="text-sm mt-2 text-gray-300">
+      No active event
+    </p>
+
   </div>
 
+  <!-- ================= SCANNER ================= -->
   <div class="mt-4 bg-white p-3 rounded-xl">
     <div id="reader"></div>
   </div>
@@ -76,8 +97,7 @@ const firebaseConfig = {
   projectId: "psychsoc-attendance-system",
   storageBucket: "psychsoc-attendance-system.firebasestorage.app",
   messagingSenderId: "93131590758",
-  appId: "1:93131590758:web:bfea89644381b1972af1a7",
-  measurementId: "G-C5SH1EEQP2"
+  appId: "1:93131590758:web:bfea89644381b1972af1a7"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -85,98 +105,181 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* ================= GLOBALS ================= */
+/* ================= STATE ================= */
 let html5QrCode = null;
 let count = 0;
 let scanned = new Set();
 
+let userRole = null;
+let activeEvent = null;
+
 /* ================= AUTH ================= */
 
 function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  auth.signInWithEmailAndPassword(email, password)
-    .catch(err => {
-      document.getElementById("loginError").innerText = err.message;
-    });
+  auth.signInWithEmailAndPassword(email.value, password.value)
+    .catch(err => loginError.innerText = err.message);
 }
 
 function logout() {
   if (html5QrCode) {
-    html5QrCode.stop().then(() => {
-      html5QrCode.clear();
-    }).catch(() => {});
+    html5QrCode.stop().catch(()=>{});
+    html5QrCode.clear();
   }
-
   auth.signOut();
 }
 
-/* ================= UI STATE ================= */
+/* ================= LOAD USER ROLE ================= */
 
-auth.onAuthStateChanged(user => {
-  if (user) {
-    document.getElementById("loginPage").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    startScanner();
-  } else {
-    document.getElementById("loginPage").style.display = "block";
-    document.getElementById("app").style.display = "none";
+async function loadUserRole(user) {
+  const doc = await db.collection("users").doc(user.uid).get();
+
+  if (doc.exists) {
+    userRole = doc.data().role;
   }
-});
+
+  if (userRole === "admin") {
+    adminPanel.classList.remove("hidden");
+  } else {
+    adminPanel.classList.add("hidden");
+  }
+}
+
+/* ================= EVENT SYSTEM ================= */
+
+async function createEvent() {
+  if (userRole !== "admin") return;
+
+  await db.collection("events").add({
+    name: eventName.value,
+    active: false,
+    createdBy: auth.currentUser.email,
+    createdAt: new Date()
+  });
+
+  alert("Event created");
+}
+
+async function startEvent() {
+  if (userRole !== "admin") return;
+
+  const snap = await db.collection("events").get();
+
+  snap.forEach(async doc => {
+    await db.collection("events").doc(doc.id).update({ active: false });
+  });
+
+  const active = await db.collection("events")
+    .orderBy("createdAt", "desc")
+    .limit(1)
+    .get();
+
+  active.forEach(async doc => {
+    await db.collection("events").doc(doc.id).update({ active: true });
+    activeEvent = doc.id;
+  });
+
+  loadActiveEvent();
+}
+
+async function endEvent() {
+  if (userRole !== "admin") return;
+
+  const snap = await db.collection("events")
+    .where("active", "==", true)
+    .get();
+
+  snap.forEach(doc => {
+    db.collection("events").doc(doc.id).update({ active: false });
+  });
+
+  activeEvent = null;
+  activeEventText.innerText = "No active event";
+}
+
+/* ================= LOAD ACTIVE EVENT ================= */
+
+async function loadActiveEvent() {
+  const snap = await db.collection("events")
+    .where("active", "==", true)
+    .limit(1)
+    .get();
+
+  if (snap.empty) {
+    activeEvent = null;
+    activeEventText.innerText = "No active event";
+    return;
+  }
+
+  snap.forEach(doc => {
+    activeEvent = doc.id;
+    activeEventText.innerText = "Active: " + doc.data().name;
+  });
+}
 
 /* ================= SCANNER ================= */
 
 function startScanner() {
 
   if (html5QrCode) {
-    html5QrCode.stop().catch(() => {});
+    html5QrCode.stop().catch(()=>{});
     html5QrCode.clear();
   }
 
   html5QrCode = new Html5Qrcode("reader");
 
   Html5Qrcode.getCameras().then(devices => {
-    if (!devices.length) return;
-
     html5QrCode.start(
       devices[0].id,
       { fps: 10, qrbox: 250 },
-      onScanSuccess
+      onScan
     );
-  }).catch(err => {
-    document.getElementById("result").innerText =
-      "Camera error: " + err;
   });
+
 }
 
-function onScanSuccess(decodedText) {
+function onScan(decodedText) {
 
-  if (scanned.has(decodedText)) {
-    document.getElementById("result").innerText =
-      "⚠ Already scanned: " + decodedText;
+  if (!activeEvent) {
+    result.innerText = "❌ No active event";
     return;
   }
 
-  scanned.add(decodedText);
+  if (scanned.has(decodedText + activeEvent)) {
+    result.innerText = "⚠ Already scanned in this event";
+    return;
+  }
 
-  document.getElementById("result").innerText =
-    "✔ " + decodedText;
+  scanned.add(decodedText + activeEvent);
+
+  result.innerText = "✔ " + decodedText;
 
   count++;
-  document.getElementById("count").innerText = count;
+  countEl.innerText = count;
 
-  const user = auth.currentUser;
-
-  if (user) {
-    db.collection("attendance").add({
-      studentId: decodedText,
-      event: "PsychSoc Attendance System",
-      timestamp: new Date(),
-      scannedBy: user.email
-    });
-  }
+  db.collection("attendance").add({
+    studentId: decodedText,
+    eventId: activeEvent,
+    timestamp: new Date(),
+    scannedBy: auth.currentUser.email
+  });
 }
+
+/* ================= AUTH STATE ================= */
+
+auth.onAuthStateChanged(async user => {
+  if (user) {
+    loginPage.classList.add("hidden");
+    app.classList.remove("hidden");
+
+    await loadUserRole(user);
+    await loadActiveEvent();
+
+    startScanner();
+  } else {
+    loginPage.classList.remove("hidden");
+    app.classList.add("hidden");
+  }
+});
 
 </script>
 
