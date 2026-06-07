@@ -5,116 +5,155 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PsychSoc Attendance System</title>
 
-  <!-- Tailwind UI -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- QR Scanner -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 
-<body class="bg-gray-900 text-white flex flex-col items-center min-h-screen p-4">
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-4">
 
-  <!-- HEADER -->
-  <div class="text-center mt-4">
-    <h1 class="text-2xl font-bold">📍 PsychSoc Attendance</h1>
-    <p class="text-gray-400 text-sm">Scan QR to mark attendance</p>
+<!-- ================= LOGIN PAGE ================= -->
+<div id="loginPage" class="w-full max-w-md mt-20 bg-gray-800 p-6 rounded-xl">
+
+  <h1 class="text-xl font-bold text-center mb-4">🔐 Officer Login</h1>
+
+  <input id="email" type="email" placeholder="Email"
+    class="w-full p-2 mb-2 rounded bg-gray-700"/>
+
+  <input id="password" type="password" placeholder="Password"
+    class="w-full p-2 mb-4 rounded bg-gray-700"/>
+
+  <button onclick="login()"
+    class="w-full bg-blue-500 hover:bg-blue-600 p-2 rounded">
+    Login
+  </button>
+
+  <p id="loginError" class="text-red-400 text-sm mt-2 text-center"></p>
+</div>
+
+<!-- ================= SCANNER PAGE ================= -->
+<div id="app" class="hidden w-full max-w-md">
+
+  <h1 class="text-2xl font-bold text-center mt-4">📍 PsychSoc Attendance</h1>
+
+  <button onclick="logout()"
+    class="bg-red-500 px-3 py-1 rounded mt-2 text-sm">
+    Logout
+  </button>
+
+  <div class="mt-4 bg-gray-800 p-3 rounded-xl text-center">
+    <p class="text-green-400 font-bold">🟢 EVENT ACTIVE</p>
   </div>
 
-  <!-- STATUS -->
-  <div class="w-full max-w-md mt-4 bg-gray-800 p-4 rounded-xl">
-    <p class="text-gray-400 text-sm">Event Status</p>
-    <p class="text-green-400 font-bold">🟢 ACTIVE</p>
-  </div>
-
-  <!-- SCANNER -->
-  <div class="w-full max-w-md mt-4 bg-white p-3 rounded-xl">
+  <div class="mt-4 bg-white p-3 rounded-xl">
     <div id="reader"></div>
   </div>
 
-  <!-- RESULT -->
-  <div class="w-full max-w-md mt-4 bg-gray-800 p-4 rounded-xl">
+  <div class="mt-4 bg-gray-800 p-3 rounded-xl">
     <p class="text-gray-400 text-sm">Last Scan</p>
     <p id="result">Waiting...</p>
   </div>
 
-  <!-- COUNT -->
-  <div class="w-full max-w-md mt-4 bg-gray-800 p-4 rounded-xl text-center">
-    <p class="text-gray-400 text-sm">Attendance Count</p>
+  <div class="mt-4 bg-gray-800 p-3 rounded-xl text-center">
+    <p class="text-gray-400 text-sm">Count</p>
     <p id="count" class="text-2xl font-bold">0</p>
   </div>
 
+</div>
+
 <script>
-/* =========================
-   1. FIREBASE SETUP
-========================= */
+
+/* ================= FIREBASE CONFIG ================= */
 const firebaseConfig = {
-  apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
-  authDomain: "psychsoc-attendance-system.firebaseapp.com",
-  projectId: "psychsoc-attendance-system",
-  storageBucket: "psychsoc-attendance-system.firebasestorage.app",
-  messagingSenderId: "93131590758",
-  appId: "1:93131590758:web:bfea89644381b1972af1a7",
-  measurementId: "G-C5SH1EEQP2"
+  apiKey: "PASTE_HERE",
+  authDomain: "PASTE_HERE",
+  projectId: "PASTE_HERE",
+  storageBucket: "PASTE_HERE",
+  messagingSenderId: "PASTE_HERE",
+  appId: "PASTE_HERE"
 };
 
 firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* =========================
-   2. STATE
-========================= */
-let count = 0;
-let scannedIds = new Set(); // prevents duplicates in same session
+/* ================= AUTH ================= */
 
-/* =========================
-   3. SCAN SUCCESS
-========================= */
-function onScanSuccess(decodedText) {
+function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-  const studentId = decodedText.trim();
-
-  // basic anti-cheat (no duplicate scan in same session)
-  if (scannedIds.has(studentId)) {
-    document.getElementById("result").innerText =
-      "⚠ Already scanned: " + studentId;
-    return;
-  }
-
-  scannedIds.add(studentId);
-
-  document.getElementById("result").innerText =
-    "✔ " + studentId;
-
-  count++;
-  document.getElementById("count").innerText = count;
-
-  // save to Firebase
-  db.collection("attendance").add({
-    studentId: studentId,
-    event: "PsychSoc Attendance System",
-    timestamp: new Date()
-  });
-
+  auth.signInWithEmailAndPassword(email, password)
+    .catch(err => {
+      document.getElementById("loginError").innerText = err.message;
+    });
 }
 
-/* =========================
-   4. SCANNER START
-========================= */
-const html5QrCode = new Html5Qrcode("reader");
+function logout() {
+  auth.signOut();
+}
 
-Html5Qrcode.getCameras().then(devices => {
-  if (devices && devices.length) {
-    html5QrCode.start(
-      devices[0].id,
-      { fps: 10, qrbox: 250 },
-      onScanSuccess
-    );
+/* ================= UI SWITCH ================= */
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    startScanner();
+  } else {
+    document.getElementById("loginPage").style.display = "block";
+    document.getElementById("app").style.display = "none";
   }
 });
+
+/* ================= SCANNER ================= */
+
+let count = 0;
+let scanned = new Set();
+
+function startScanner() {
+
+  const html5QrCode = new Html5Qrcode("reader");
+
+  Html5Qrcode.getCameras().then(devices => {
+    if (devices.length) {
+      html5QrCode.start(
+        devices[0].id,
+        { fps: 10, qrbox: 250 },
+        onScanSuccess
+      );
+    }
+  });
+
+  function onScanSuccess(decodedText) {
+
+    if (scanned.has(decodedText)) {
+      document.getElementById("result").innerText =
+        "⚠ Already scanned: " + decodedText;
+      return;
+    }
+
+    scanned.add(decodedText);
+
+    document.getElementById("result").innerText =
+      "✔ " + decodedText;
+
+    count++;
+    document.getElementById("count").innerText = count;
+
+    db.collection("attendance").add({
+      studentId: decodedText,
+      event: "PsychSoc Attendance System",
+      timestamp: new Date(),
+      scannedBy: auth.currentUser.email
+    });
+  }
+}
 
 </script>
 
