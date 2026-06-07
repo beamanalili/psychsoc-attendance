@@ -197,6 +197,97 @@
                 <button onclick="switchOfficerTab('live')" class="officer-tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Live Attendance</button>
             </div>
 
+                    <!-- Student Dashboard -->
+        <div id="student-dashboard" class="hidden fade-in max-w-2xl mx-auto">
+            <!-- Registration Form (Shown to new students) -->
+            <div id="student-registration-form" class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <div class="text-center mb-6">
+                    <div class="mx-auto bg-suNavy text-white w-16 h-16 rounded-full flex items-center justify-center mb-3">
+                        <i class="fas fa-user-plus text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-suNavy">Welcome, Student!</h2>
+                    <p class="text-gray-600 text-sm mt-1">Please complete your profile to generate your official QR ID.</p>
+                </div>
+                <form id="student-register-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Official Student ID</label>
+                        <input type="text" id="reg-student-id" placeholder="e.g., 20261234" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input type="text" id="reg-student-name" placeholder="e.g., Juan Dela Cruz" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Year Level</label>
+                        <select id="reg-student-year" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-suNavy text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition mt-4">
+                        Generate My ID Card
+                    </button>
+                </form>
+            </div>
+
+            <!-- Digital ID Card (Shown after registration) -->
+            <div id="student-id-card-view" class="hidden">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-suNavy">Your Digital ID</h2>
+                    <p class="text-gray-600 text-sm mt-1">Show this QR code to officers when attending events.</p>
+                </div>
+
+                <!-- The Actual ID Card Layout -->
+                <div id="student-id-card" class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200 mb-6">
+                    <!-- Card Header -->
+                    <div class="bg-suNavy p-4 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <img src="su-logo.png" class="h-8 w-8 rounded-full bg-white p-0.5 object-contain">
+                            <img src="psych-logo.png" class="h-8 w-8 rounded-full bg-white p-0.5 object-contain">
+                        </div>
+                        <span class="text-white text-xs font-bold tracking-widest">OFFICIAL ID</span>
+                    </div>
+                    
+                    <!-- Card Body -->
+                    <div class="p-6 flex flex-col md:flex-row items-center gap-6">
+                        <div class="flex-grow text-center md:text-left">
+                            <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Silliman University</p>
+                            <h3 id="card-name" class="text-2xl font-bold text-suNavy mt-1">Student Name</h3>
+                            <p class="text-sm text-gray-600 mt-1">Psychology Society Member</p>
+                            
+                            <div class="mt-4 space-y-1">
+                                <p class="text-xs text-gray-500">Student ID</p>
+                                <p id="card-id" class="font-mono font-bold text-lg text-gray-800">00000000</p>
+                                
+                                <p class="text-xs text-gray-500 mt-2">Year Level</p>
+                                <p id="card-year" class="font-semibold text-gray-800">1st Year</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-xl border border-gray-200">
+                            <div id="card-qr" class="w-32 h-32 flex items-center justify-center"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Card Footer -->
+                    <div class="bg-gray-100 px-6 py-2 text-center">
+                        <p class="text-[10px] text-gray-500">School Year 2026–2027 • If found, please return to SU Psych Soc.</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="downloadIDCard()" class="bg-suNavy text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition flex items-center justify-center shadow-lg">
+                        <i class="fas fa-download mr-2"></i> Download ID Card
+                    </button>
+                    <button onclick="signOut(auth)" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition flex items-center justify-center">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
             <!-- Scanner Tab -->
             <div id="officer-tab-scanner" class="officer-tab-content">
                 <div class="bg-white rounded-xl shadow p-6 text-center">
@@ -320,35 +411,45 @@
     window.addEventListener('online', () => document.getElementById('offline-banner').classList.add('hidden'));
     window.addEventListener('offline', () => document.getElementById('offline-banner').classList.remove('hidden'));
 
-    onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUser = user;
             const userDoc = await getDoc(doc(db, "users", user.uid));
+            
+            // Hide login, show user info
+            document.getElementById('user-info').classList.remove('hidden');
+            document.getElementById('user-email').innerText = user.email;
+            document.getElementById('login-view').classList.add('hidden');
+            
             if (userDoc.exists()) {
                 currentRole = userDoc.data().role;
-                document.getElementById('user-info').classList.remove('hidden');
-                document.getElementById('user-email').innerText = user.email;
                 document.getElementById('user-role-badge').innerText = currentRole;
-                document.getElementById('login-view').classList.add('hidden');
                 
                 if (currentRole === 'admin') {
                     document.getElementById('admin-dashboard').classList.remove('hidden');
-                    renderEvents();
-                    renderStudents();
-                    renderUsers();
+                    renderEvents(); renderStudents(); renderUsers();
                 } else if (currentRole === 'officer') {
                     document.getElementById('officer-dashboard').classList.remove('hidden');
+                } else if (currentRole === 'student') {
+                    document.getElementById('student-dashboard').classList.remove('hidden');
+                    loadStudentProfile(user.uid);
                 }
             } else {
-                showToast("Role not assigned. Contact Admin.", "error");
-                signOut(auth);
+                // NEW USER: No role assigned yet. Show Student Registration.
+                currentRole = 'pending';
+                document.getElementById('user-role-badge').innerText = 'New Student';
+                document.getElementById('student-dashboard').classList.remove('hidden');
+                document.getElementById('student-registration-form').classList.remove('hidden');
+                document.getElementById('student-id-card-view').classList.add('hidden');
             }
         } else {
+            // LOGGED OUT
             currentUser = null;
             currentRole = null;
             document.getElementById('login-view').classList.remove('hidden');
             document.getElementById('admin-dashboard').classList.add('hidden');
             document.getElementById('officer-dashboard').classList.add('hidden');
+            document.getElementById('student-dashboard').classList.add('hidden');
             document.getElementById('user-info').classList.add('hidden');
             stopScanner();
         }
@@ -885,6 +986,105 @@ document.getElementById('add-user-form').addEventListener('submit', async (e) =>
         const filename = `Attendance_${scope}_${new Date().toISOString().split('T')[0]}.${format === 'excel' ? 'xlsx' : 'csv'}`;
         XLSX.writeFile(wb, filename, { bookType: format === 'excel' ? 'xlsx' : 'csv' });
         showToast("Export successful!", "success");
+    };
+
+        // Handle Student Self-Registration
+    document.getElementById('student-register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const studentId = document.getElementById('reg-student-id').value.trim();
+        const name = document.getElementById('reg-student-name').value.trim();
+        const year = parseInt(document.getElementById('reg-student-year').value);
+
+        try {
+            // 1. Save student data to Firestore (using Student ID as the document ID for QR scanning)
+            await setDoc(doc(db, "students", studentId), {
+                name: name,
+                year: year,
+                active: true,
+                qrCode: studentId,
+                authUid: currentUser.uid // Link to their Firebase Auth account
+            });
+
+            // 2. Assign the 'student' role in the users collection
+            await setDoc(doc(db, "users", currentUser.uid), {
+                email: currentUser.email,
+                role: 'student',
+                studentId: studentId
+            });
+
+            showToast("Profile created! Generating ID...", "success");
+            
+            // 3. Show the ID Card
+            document.getElementById('student-registration-form').classList.add('hidden');
+            document.getElementById('student-id-card-view').classList.remove('hidden');
+            document.getElementById('user-role-badge').innerText = 'student';
+            
+            // 4. Render the card data
+            renderIDCard(studentId, name, year);
+
+        } catch (err) {
+            console.error(err);
+            showToast("Error: " + err.message, "error");
+        }
+    });
+
+    // Load existing student profile
+    async function loadStudentProfile(uid) {
+        const userDoc = await getDoc(doc(db, "users", uid));
+        if (userDoc.exists()) {
+            const studentId = userDoc.data().studentId;
+            const studentDoc = await getDoc(doc(db, "students", studentId));
+            if (studentDoc.exists()) {
+                const data = studentDoc.data();
+                document.getElementById('student-registration-form').classList.add('hidden');
+                document.getElementById('student-id-card-view').classList.remove('hidden');
+                renderIDCard(studentId, data.name, data.year);
+            }
+        }
+    }
+
+    // Render the Digital ID Card
+    function renderIDCard(id, name, year) {
+        document.getElementById('card-name').innerText = name;
+        document.getElementById('card-id').innerText = id;
+        document.getElementById('card-year').innerText = year + getYearSuffix(year);
+        
+        // Generate QR Code inside the card
+        const qrContainer = document.getElementById('card-qr');
+        qrContainer.innerHTML = ""; // Clear old QR
+        new QRCode(qrContainer, {
+            text: id,
+            width: 110,
+            height: 110,
+            colorDark : "#0B1F4D",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    }
+
+    function getYearSuffix(year) {
+        if (year === 1) return "st Year";
+        if (year === 2) return "nd Year";
+        if (year === 3) return "rd Year";
+        return "th Year";
+    }
+
+    // Download ID Card as Image
+    window.downloadIDCard = () => {
+        const card = document.getElementById('student-id-card');
+        showToast("Generating ID Card...", "info");
+        
+        html2canvas(card, { 
+            scale: 3, // High resolution for printing
+            backgroundColor: "#ffffff",
+            useCORS: true 
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `SU_Psych_ID_${document.getElementById('card-id').innerText}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showToast("ID Card Downloaded!", "success");
+        });
     };
 
     window.showToast = (message, type = 'info') => {
