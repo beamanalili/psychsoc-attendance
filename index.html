@@ -18,7 +18,6 @@
 
 <!-- ================= LOGIN ================= -->
 <div id="loginPage" class="w-full max-w-md mt-20 bg-gray-800 p-6 rounded-xl">
-
   <h1 class="text-xl font-bold text-center mb-4">Officer Login</h1>
 
   <input id="email" type="email" placeholder="Email"
@@ -37,7 +36,9 @@
 <!-- ================= APP ================= -->
 <div id="app" class="hidden w-full max-w-md">
 
-  <h1 class="text-2xl font-bold text-center mt-4">PsychSoc Attendance</h1>
+  <h1 class="text-2xl font-bold text-center mt-4">
+    PsychSoc Attendance
+  </h1>
 
   <div class="text-center">
     <button onclick="logout()" class="bg-red-500 px-3 py-1 rounded mt-2 text-sm">
@@ -72,65 +73,32 @@
   </div>
 
   <!-- ================= SCANNER ================= -->
- async function onScan(decodedText) {
+  <div class="mt-4 bg-white p-3 rounded-xl">
+    <div id="reader"></div>
+  </div>
 
-  if (!activeEvent) {
-    result.innerText = "❌ No active event";
-    return;
-  }
+  <div class="mt-4 bg-gray-800 p-3 rounded-xl">
+    <p class="text-gray-400 text-sm">Last Scan</p>
+    <p id="result">Waiting...</p>
+  </div>
 
-  const studentId = decodedText;
+  <div class="mt-4 bg-gray-800 p-3 rounded-xl text-center">
+    <p class="text-gray-400 text-sm">Count</p>
+    <p id="count">0</p>
+  </div>
 
-  /* ================= 1. CHECK STUDENT EXISTS ================= */
-  const studentDoc = await db.collection("students").doc(studentId).get();
+</div>
 
-  if (!studentDoc.exists || !studentDoc.data().active) {
-    result.innerText = "❌ Invalid student: " + studentId;
-    return;
-  }
+<script>
 
-  const studentData = studentDoc.data();
-
-  /* ================= 2. PREVENT DUPLICATE PER EVENT ================= */
-  const check = await db.collection("attendance")
-    .where("studentId", "==", studentId)
-    .where("eventId", "==", activeEvent)
-    .get();
-
-  if (!check.empty) {
-    result.innerText = "⚠ Already recorded in this event";
-    return;
-  }
-
-  /* ================= 3. SAVE TO FIREBASE ================= */
-  const record = {
-    studentId,
-    name: studentData.name,
-    eventId: activeEvent,
-    timestamp: new Date().toISOString(),
-    scannedBy: auth.currentUser.email
-  };
-
-  await db.collection("attendance").add(record);
-
-  /* ================= 4. SEND TO GOOGLE SHEETS ================= */
-  fetch("https://script.google.com/macros/s/AKfycbwl211Y87r-NUNjYi3ocV9z7Bw4NLZozAlhM1o2nVeSil_U9xujZd__GrPG56TFdqc/exec", {
-    method: "POST",
-    body: JSON.stringify(record)
-  });
-
-  result.innerText = "✔ " + studentData.name;
-  count++;
-  countEl.innerText = count;
-}
 /* ================= FIREBASE ================= */
 const firebaseConfig = {
-  apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
-  authDomain: "psychsoc-attendance-system.firebaseapp.com",
-  projectId: "psychsoc-attendance-system",
-  storageBucket: "psychsoc-attendance-system.firebasestorage.app",
-  messagingSenderId: "93131590758",
-  appId: "1:93131590758:web:bfea89644381b1972af1a7"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -141,12 +109,10 @@ const db = firebase.firestore();
 /* ================= STATE ================= */
 let html5QrCode = null;
 let count = 0;
-let scanned = new Set();
-
 let userRole = null;
 let activeEvent = null;
 
-/* ================= AUTH ================= */
+/* ================= LOGIN ================= */
 
 function login() {
   auth.signInWithEmailAndPassword(email.value, password.value)
@@ -161,7 +127,7 @@ function logout() {
   auth.signOut();
 }
 
-/* ================= LOAD USER ROLE ================= */
+/* ================= ROLE ================= */
 
 async function loadUserRole(user) {
   const doc = await db.collection("users").doc(user.uid).get();
@@ -172,8 +138,6 @@ async function loadUserRole(user) {
 
   if (userRole === "admin") {
     adminPanel.classList.remove("hidden");
-  } else {
-    adminPanel.classList.add("hidden");
   }
 }
 
@@ -195,23 +159,22 @@ async function createEvent() {
 async function startEvent() {
   if (userRole !== "admin") return;
 
-  const snap = await db.collection("events").get();
+  const events = await db.collection("events").get();
 
-  snap.forEach(async doc => {
-    await db.collection("events").doc(doc.id).update({ active: false });
+  events.forEach(doc => {
+    db.collection("events").doc(doc.id).update({ active: false });
   });
 
-  const active = await db.collection("events")
+  const latest = await db.collection("events")
     .orderBy("createdAt", "desc")
     .limit(1)
     .get();
 
-  active.forEach(async doc => {
-    await db.collection("events").doc(doc.id).update({ active: true });
+  latest.forEach(doc => {
+    db.collection("events").doc(doc.id).update({ active: true });
     activeEvent = doc.id;
+    activeEventText.innerText = "Active: " + doc.data().name;
   });
-
-  loadActiveEvent();
 }
 
 async function endEvent() {
@@ -229,7 +192,7 @@ async function endEvent() {
   activeEventText.innerText = "No active event";
 }
 
-/* ================= LOAD ACTIVE EVENT ================= */
+/* ================= ACTIVE EVENT ================= */
 
 async function loadActiveEvent() {
   const snap = await db.collection("events")
@@ -239,7 +202,6 @@ async function loadActiveEvent() {
 
   if (snap.empty) {
     activeEvent = null;
-    activeEventText.innerText = "No active event";
     return;
   }
 
@@ -253,11 +215,6 @@ async function loadActiveEvent() {
 
 function startScanner() {
 
-  if (html5QrCode) {
-    html5QrCode.stop().catch(()=>{});
-    html5QrCode.clear();
-  }
-
   html5QrCode = new Html5Qrcode("reader");
 
   Html5Qrcode.getCameras().then(devices => {
@@ -267,34 +224,54 @@ function startScanner() {
       onScan
     );
   });
-
 }
 
-function onScan(decodedText) {
+async function onScan(decodedText) {
 
   if (!activeEvent) {
     result.innerText = "❌ No active event";
     return;
   }
 
-  if (scanned.has(decodedText + activeEvent)) {
-    result.innerText = "⚠ Already scanned in this event";
+  const studentDoc = await db.collection("students").doc(decodedText).get();
+
+  if (!studentDoc.exists || !studentDoc.data().active) {
+    result.innerText = "❌ Invalid student";
     return;
   }
 
-  scanned.add(decodedText + activeEvent);
+  const student = studentDoc.data();
 
-  result.innerText = "✔ " + decodedText;
+  const duplicate = await db.collection("attendance")
+    .where("studentId", "==", decodedText)
+    .where("eventId", "==", activeEvent)
+    .get();
+
+  if (!duplicate.empty) {
+    result.innerText = "⚠ Already scanned";
+    return;
+  }
+
+  const record = {
+    studentId: decodedText,
+    name: student.name,
+    eventId: activeEvent,
+    timestamp: new Date().toISOString(),
+    scannedBy: auth.currentUser.email
+  };
+
+  await db.collection("attendance").add(record);
+
+  fetch("YOUR_GOOGLE_SCRIPT_URL", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(record)
+  });
+
+  result.innerText = "✔ " + student.name;
 
   count++;
   countEl.innerText = count;
-
-  db.collection("attendance").add({
-    studentId: decodedText,
-    eventId: activeEvent,
-    timestamp: new Date(),
-    scannedBy: auth.currentUser.email
-  });
 }
 
 /* ================= AUTH STATE ================= */
@@ -306,8 +283,8 @@ auth.onAuthStateChanged(async user => {
 
     await loadUserRole(user);
     await loadActiveEvent();
-
     startScanner();
+
   } else {
     loginPage.classList.remove("hidden");
     app.classList.add("hidden");
