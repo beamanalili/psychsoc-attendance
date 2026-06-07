@@ -1,546 +1,705 @@
-<script>
-/* ================= FIREBASE ================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
-  authDomain: "psychsoc-attendance-system.firebaseapp.com",
-  projectId: "psychsoc-attendance-system",
-  storageBucket: "psychsoc-attendance-system.firebasestorage.app",
-  messagingSenderId: "93131590758",
-  appId: "1:93131590758:web:bfea89644381b1972af1a7",
-  measurementId: "G-C5SH1EEQP2"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-/* ================= DOM ================= */
-const loginPage = document.getElementById("loginPage");
-const app = document.getElementById("app");
-const adminPanel = document.getElementById("adminPanel");
-
-const eventName = document.getElementById("eventName");
-const activeEventText = document.getElementById("activeEventText");
-
-const result = document.getElementById("result");
-const countEl = document.getElementById("count");
-
-const email = document.getElementById("email");
-const password = document.getElementById("password");
-const loginError = document.getElementById("loginError");
-
-/* ================= STATE ================= */
-let html5QrCode = null;
-let userRole = null;
-let activeEvent = null;
-let count = 0;
-let attendanceUnsubscribe = null; // Track the real-time listener
-
-/* ================= UTILITY FUNCTIONS ================= */
-
-// Format timestamp for display
-function formatTimestamp(isoString) {
-  try {
-    const date = new Date(isoString);
-    return date.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  } catch (e) {
-    return isoString;
-  }
-}
-
-// Safe async wrapper with error handling
-async function safeAsync(fn, errorMessage = "An error occurred") {
-  try {
-    return await fn();
-  } catch (error) {
-    console.error(errorMessage, error);
-    alert(errorMessage + ": " + error.message);
-    return null;
-  }
-}
-
-/* ================= LOGIN ================= */
-async function login() {
-  loginError.innerText = "";
-  
-  if (!email.value || !password.value) {
-    loginError.innerText = "Please enter both email and password";
-    return;
-  }
-
-  try {
-    await auth.signInWithEmailAndPassword(email.value, password.value);
-  } catch (err) {
-    loginError.innerText = err.message;
-  }
-}
-
-/* ================= LOGOUT ================= */
-async function logout() {
-  try {
-    // Stop scanner first
-    await stopScanner();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUPS Y Attendance Tracker</title>
     
-    // Unsubscribe from real-time listener
-    if (attendanceUnsubscribe) {
-      attendanceUnsubscribe();
-      attendanceUnsubscribe = null;
-    }
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    // Reset UI
-    result.innerText = "Waiting...";
-    count = 0;
-    countEl.innerText = "0";
-    activeEvent = null;
+    <!-- Firebase SDK (Compat version) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
-    // Sign out
-    await auth.signOut();
-  } catch (error) {
-    console.error("Logout error:", error);
-  }
-}
-
-/* ================= SCANNER MANAGEMENT ================= */
-
-async function stopScanner() {
-  if (html5QrCode) {
-    try {
-      await html5QrCode.stop();
-      html5QrCode.clear();
-    } catch (e) {
-      console.warn("Scanner stop error:", e);
-    }
-    html5QrCode = null;
-  }
-}
-
-async function startScanner() {
-  // Stop existing scanner if any
-  await stopScanner();
-
-  try {
-    html5QrCode = new Html5Qrcode("reader");
+    <!-- QR Code Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
-    const devices = await Html5Qrcode.getCameras();
+    <!-- Html5Qrcode Scanner -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     
-    if (!devices || devices.length === 0) {
-      result.innerText = "❌ No camera found";
-      return;
-    }
-
-    // Use back camera if available, otherwise first camera
-    const backCamera = devices.find(device => 
-      device.label.toLowerCase().includes('back') || 
-      device.label.toLowerCase().includes('rear')
-    );
-    
-    const cameraId = backCamera ? backCamera.id : devices[0].id;
-
-    await html5QrCode.start(
-      cameraId,
-      { 
-        fps: 10, 
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0
-      },
-      onScan,
-      (errorMessage) => {
-        // Optional: handle parse errors
-        console.debug("QR parse error:", errorMessage);
-      }
-    );
-    
-    result.innerText = "📷 Scanner ready - Scan student ID";
-  } catch (error) {
-    console.error("Scanner start error:", error);
-    result.innerText = "❌ Camera error: " + error.message;
-  }
-}
-
-/* ================= ROLE ================= */
-async function loadUserRole(user) {
-  try {
-    const doc = await db.collection("users").doc(user.uid).get();
-
-    if (doc.exists) {
-      userRole = doc.data().role;
-    } else {
-      userRole = "user"; // Default role
-    }
-
-    if (adminPanel) {
-      adminPanel.classList.toggle("hidden", userRole !== "admin");
-    }
-  } catch (error) {
-    console.error("Error loading user role:", error);
-    userRole = "user";
-  }
-}
-
-/* ================= EVENTS ================= */
-
-async function loadEvents() {
-  try {
-    const snap = await db.collection("events")
-      .orderBy("createdAt", "desc")
-      .get();
-
-    const list = document.getElementById("eventList");
-    if (!list) return;
-
-    list.innerHTML = "";
-
-    if (snap.empty) {
-      list.innerHTML = "<p class='text-gray-500'>No events created yet</p>";
-      return;
-    }
-
-    snap.forEach(doc => {
-      const data = doc.data();
-
-      const btn = document.createElement("button");
-      btn.innerText = (data.active ? "🟢 " : "⚪ ") + data.name;
-      btn.className = "w-full p-2 border rounded mb-2 text-left hover:bg-gray-50 transition";
-      
-      // Disable button if not admin
-      if (userRole !== "admin") {
-        btn.disabled = true;
-        btn.classList.add("opacity-50", "cursor-not-allowed");
-      }
-
-      btn.onclick = () => {
-        if (userRole === "admin") {
-          setActiveEvent(doc.id);
+    <style>
+        /* Custom styles for Psych Card and Print */
+        .psych-card {
+            width: 350px;
+            height: 220px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-      };
-
-      list.appendChild(btn);
-    });
-  } catch (error) {
-    console.error("Error loading events:", error);
-  }
-}
-
-async function loadActiveEvent() {
-  try {
-    const snap = await db.collection("events")
-      .where("active", "==", true)
-      .limit(1)
-      .get();
-
-    if (snap.empty) {
-      activeEvent = null;
-      if (activeEventText) activeEventText.innerText = "No active event";
-      return;
-    }
-
-    const doc = snap.docs[0];
-    activeEvent = doc.id;
-
-    if (activeEventText) {
-      activeEventText.innerText = "Active: " + doc.data().name;
-    }
-
-    // Start listening to attendance for this event
-    listenToAttendance();
-  } catch (error) {
-    console.error("Error loading active event:", error);
-  }
-}
-
-async function createNewEvent() {
-  if (userRole !== "admin") {
-    alert("Only admins can create events");
-    return;
-  }
-
-  if (!eventName.value.trim()) {
-    alert("Enter event name");
-    return;
-  }
-
-  try {
-    await db.collection("events").add({
-      name: eventName.value.trim(),
-      active: false,
-      createdBy: auth.currentUser.email,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    eventName.value = "";
-    await loadEvents();
-    alert("Event created successfully!");
-  } catch (error) {
-    console.error("Error creating event:", error);
-    alert("Failed to create event: " + error.message);
-  }
-}
-
-async function setActiveEvent(eventId) {
-  if (userRole !== "admin") {
-    alert("Only admins can set active events");
-    return;
-  }
-
-  try {
-    // Get all events
-    const all = await db.collection("events").get();
-
-    // Use batch to deactivate all
-    const batch = db.batch();
-    all.forEach(doc => {
-      batch.update(doc.ref, { active: false });
-    });
-
-    // Activate selected event
-    batch.update(db.collection("events").doc(eventId), { active: true });
-
-    await batch.commit();
-
-    await loadActiveEvent();
-    await loadEvents();
-    
-    alert("Event activated successfully!");
-  } catch (error) {
-    console.error("Error setting active event:", error);
-    alert("Failed to activate event: " + error.message);
-  }
-}
-
-async function endEvent() {
-  if (userRole !== "admin") {
-    alert("Only admins can end events");
-    return;
-  }
-
-  try {
-    const snap = await db.collection("events")
-      .where("active", "==", true)
-      .get();
-
-    if (snap.empty) {
-      alert("No active event to end");
-      return;
-    }
-
-    const batch = db.batch();
-    snap.forEach(doc => {
-      batch.update(doc.ref, { active: false });
-    });
-
-    await batch.commit();
-
-    activeEvent = null;
-
-    if (activeEventText) {
-      activeEventText.innerText = "No active event";
-    }
-
-    // Unsubscribe from attendance listener
-    if (attendanceUnsubscribe) {
-      attendanceUnsubscribe();
-      attendanceUnsubscribe = null;
-    }
-
-    alert("Event ended successfully!");
-  } catch (error) {
-    console.error("Error ending event:", error);
-    alert("Failed to end event: " + error.message);
-  }
-}
-
-/* ================= LIVE DASHBOARD ================= */
-
-function listenToAttendance() {
-  // Unsubscribe from previous listener if exists
-  if (attendanceUnsubscribe) {
-    attendanceUnsubscribe();
-  }
-
-  if (!activeEvent) return;
-
-  try {
-    attendanceUnsubscribe = db.collection("attendance")
-      .doc(activeEvent)
-      .collection("records")
-      .orderBy("timestamp", "desc")
-      .onSnapshot(snapshot => {
-        const list = document.getElementById("attendanceList");
-        if (!list) return;
-
-        list.innerHTML = "";
-
-        if (snapshot.empty) {
-          list.innerHTML = "<p class='text-gray-500 text-sm'>No attendees yet</p>";
-          return;
+        .psych-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+        }
+        .psych-card-content {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .psych-card-header {
+            font-size: 11px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .psych-card-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .psych-card-photo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.5);
+            object-fit: cover;
+            background: white;
+        }
+        .psych-card-info h2 {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .psych-card-info p {
+            font-size: 14px;
+            margin: 2px 0;
+            opacity: 0.9;
+        }
+        .psych-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 10px;
+        }
+        .psych-card-id {
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        #qrcode-display img, #qrcode-display canvas {
+            border-radius: 5px;
+            background: white;
+            padding: 5px;
         }
 
-        snapshot.forEach(doc => {
-          const d = doc.data();
+        /* Print Styles for Psych Card */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .psych-card, .psych-card * {
+                visibility: visible;
+            }
+            .psych-card {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                box-shadow: none;
+                border: 2px solid #ccc; 
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                width: 450px;
+                height: 280px;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
 
-          const row = document.createElement("div");
-          row.className = "p-2 border rounded text-sm mb-1";
+    <!-- ================= LOGIN PAGE ================= -->
+    <div id="loginPage" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+            <h1 class="text-2xl font-bold text-center mb-2 text-purple-700">Silliman University Psychology Society</h1>
+            <p class="text-center text-gray-500 mb-6">Attendance Tracker S.Y. 2026-2027</p>
+            <input type="email" id="email" placeholder="Email" class="w-full p-3 border rounded mb-3 focus:ring-2 focus:ring-purple-500 outline-none">
+            <input type="password" id="password" placeholder="Password" class="w-full p-3 border rounded mb-3 focus:ring-2 focus:ring-purple-500 outline-none">
+            <p id="loginError" class="text-red-500 text-sm mb-3"></p>
+            <button onclick="login()" class="w-full bg-purple-600 text-white p-3 rounded hover:bg-purple-700 transition font-semibold">Login</button>
+        </div>
+    </div>
 
-          row.innerHTML = `
-            <div class="font-semibold">${d.name || 'Unknown'}</div>
-            <div class="text-gray-500">${d.studentId || 'N/A'} • ${d.year || 'N/A'}</div>
-            <div class="text-xs text-gray-400">${formatTimestamp(d.timestamp)}</div>
-          `;
+    <!-- ================= MAIN APP ================= -->
+    <div id="app" class="hidden h-screen flex">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-md flex flex-col">
+            <div class="p-6 border-b">
+                <h1 class="text-xl font-bold text-purple-700">SUPSY</h1>
+                <p class="text-xs text-gray-500">Attendance System</p>
+            </div>
+            <nav class="flex-1 p-4">
+                <button onclick="switchTab('dashboard')" class="tab-btn w-full text-left p-3 rounded hover:bg-purple-50 mb-2 flex items-center gap-3" data-tab="dashboard">
+                    <span>📊</span> Dashboard
+                </button>
+                <button onclick="switchTab('students')" class="tab-btn w-full text-left p-3 rounded hover:bg-purple-50 mb-2 flex items-center gap-3" data-tab="students">
+                    <span>🎓</span> Students & Psych Cards
+                </button>
+                <button onclick="switchTab('events')" class="tab-btn w-full text-left p-3 rounded hover:bg-purple-50 mb-2 flex items-center gap-3 admin-only" data-tab="events">
+                    <span>📅</span> Events
+                </button>
+            </nav>
+            <div class="p-4 border-t">
+                <button onclick="logout()" class="w-full text-left p-3 rounded hover:bg-red-50 text-red-600 flex items-center gap-3">
+                    <span>🚪</span> Logout
+                </button>
+            </div>
+        </div>
 
-          list.appendChild(row);
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Bar -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <h2 id="pageTitle" class="text-xl font-semibold">Dashboard</h2>
+                <div class="text-sm text-gray-600">
+                    Logged in as: <span id="userEmail" class="font-medium"></span>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+                <!-- Dashboard Tab -->
+                <div id="tab-dashboard" class="tab-content">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-gray-500 text-sm">Active Event</h3>
+                            <p id="activeEventText" class="text-2xl font-bold text-purple-700 mt-2">No active event</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-gray-500 text-sm">Total Attendees</h3>
+                            <p id="count" class="text-2xl font-bold text-green-600 mt-2">0</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-gray-500 text-sm">Status</h3>
+                            <p id="result" class="text-lg font-medium mt-2">Waiting...</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold mb-4">QR Scanner</h3>
+                            <div id="reader" class="w-full rounded-lg overflow-hidden bg-gray-200" style="height: 300px;"></div>
+                            <button onclick="startScanner()" class="mt-4 w-full bg-purple-600 text-white p-2 rounded hover:bg-purple-700">Restart Scanner</button>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow flex flex-col">
+                            <h3 class="text-lg font-semibold mb-4">Live Attendance</h3>
+                            <div id="attendanceList" class="flex-1 overflow-y-auto space-y-2">
+                                <p class="text-gray-500 text-sm">No attendees yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Tab -->
+                <div id="tab-students" class="tab-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-semibold">Student Directory & Psych Cards</h3>
+                        <button onclick="document.getElementById('addStudentModal').classList.remove('hidden')" class="admin-only bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">+ Add Student</button>
+                    </div>
+                    <div id="studentList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Student cards injected here -->
+                    </div>
+                </div>
+
+                <!-- Events Tab -->
+                <div id="tab-events" class="tab-content hidden">
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <h3 class="text-lg font-semibold mb-4">Create New Event</h3>
+                        <div class="flex gap-3">
+                            <input type="text" id="eventName" placeholder="Event Name" class="flex-1 p-2 border rounded focus:ring-2 focus:ring-purple-500 outline-none">
+                            <button onclick="createNewEvent()" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Create</button>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold">Manage Events</h3>
+                            <button onclick="endEvent()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 admin-only">End Active Event</button>
+                        </div>
+                        <div id="eventList" class="space-y-2">
+                            <p class="text-gray-500">No events created yet</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+    
+    <!-- Add Student Modal -->
+    <div id="addStudentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4">Add New Student</h3>
+            <input type="text" id="studentName" placeholder="Full Name" class="w-full p-2 border rounded mb-3 focus:ring-2 focus:ring-purple-500 outline-none">
+            <select id="studentYear" class="w-full p-2 border rounded mb-3 focus:ring-2 focus:ring-purple-500 outline-none">
+                <option value="1st Year">1st Year</option>
+                <option value="2nd Year">2nd Year</option>
+                <option value="3rd Year">3rd Year</option>
+                <option value="4th Year">4th Year</option>
+            </select>
+            <input type="file" id="studentPhoto" accept="image/*" class="w-full p-2 border rounded mb-3">
+            <div class="flex justify-end gap-3">
+                <button onclick="document.getElementById('addStudentModal').classList.add('hidden')" class="px-4 py-2 border rounded hover:bg-gray-100">Cancel</button>
+                <button onclick="addStudent()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Psych Card Modal -->
+    <div id="psychCardModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md flex flex-col items-center">
+            <h3 class="text-xl font-bold mb-4 no-print">Psych Card</h3>
+            <div id="psychCard" class="psych-card">
+                <div class="psych-card-content">
+                    <div class="psych-card-header">Silliman University Psychology Society</div>
+                    <div class="psych-card-body">
+                        <img id="pcPhoto" src="" alt="Student" class="psych-card-photo">
+                        <div class="psych-card-info">
+                            <h2 id="pcName">Student Name</h2>
+                            <p id="pcYear">Year Level</p>
+                        </div>
+                    </div>
+                    <div class="psych-card-footer">
+                        <div class="psych-card-id" id="pcId">PSY-26-0000</div>
+                        <div id="qrcode-display"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 flex gap-3 no-print">
+                <button onclick="window.print()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Print Card</button>
+                <button onclick="document.getElementById('psychCardModal').classList.add('hidden')" class="px-4 py-2 border rounded hover:bg-gray-100">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+        /* ================= FIREBASE ================= */
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
+            authDomain: "psychsoc-attendance-system.firebaseapp.com",
+            projectId: "psychsoc-attendance-system",
+            storageBucket: "psychsoc-attendance-system.firebasestorage.app",
+            messagingSenderId: "93131590758",
+            appId: "1:93131590758:web:bfea89644381b1972af1a7",
+            measurementId: "G-C5SH1EEQP2"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        /* ================= DOM ================= */
+        const loginPage = document.getElementById("loginPage");
+        const app = document.getElementById("app");
+        const eventName = document.getElementById("eventName");
+        const activeEventText = document.getElementById("activeEventText");
+        const result = document.getElementById("result");
+        const countEl = document.getElementById("count");
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
+        const loginError = document.getElementById("loginError");
+
+        /* ================= STATE ================= */
+        let html5QrCode = null;
+        let userRole = null;
+        let activeEvent = null;
+        let count = 0;
+        let attendanceUnsubscribe = null;
+        let scanLock = false;
+
+        /* ================= UTILITY FUNCTIONS ================= */
+        function formatTimestamp(isoString) {
+            try {
+                const date = new Date(isoString);
+                return date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            } catch (e) { return isoString; }
+        }
+
+        /* ================= UI NAVIGATION ================= */
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-100', 'text-purple-700', 'font-semibold');
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('bg-purple-100', 'text-purple-700', 'font-semibold');
+                }
+            });
+
+            document.getElementById('pageTitle').innerText = tabName.charAt(0).toUpperCase() + tabName.slice(1);
+
+            if (tabName === 'students') {
+                loadStudents();
+            } else if (tabName === 'dashboard') {
+                setTimeout(() => startScanner(), 300);
+            } else {
+                stopScanner();
+            }
+        }
+
+        /* ================= AUTH ================= */
+        async function login() {
+            loginError.innerText = "";
+            if (!email.value || !password.value) {
+                loginError.innerText = "Please enter both email and password";
+                return;
+            }
+            try {
+                await auth.signInWithEmailAndPassword(email.value, password.value);
+            } catch (err) {
+                loginError.innerText = err.message;
+            }
+        }
+
+        async function logout() {
+            try {
+                await stopScanner();
+                if (attendanceUnsubscribe) attendanceUnsubscribe();
+                result.innerText = "Waiting...";
+                count = 0;
+                countEl.innerText = "0";
+                activeEvent = null;
+                await auth.signOut();
+            } catch (error) { console.error("Logout error:", error); }
+        }
+
+        async function loadUserRole(user) {
+            try {
+                const doc = await db.collection("users").doc(user.uid).get();
+                userRole = doc.exists ? doc.data().role : "user";
+                document.getElementById('userEmail').innerText = user.email;
+                
+                // Toggle admin-only elements
+                document.querySelectorAll('.admin-only').forEach(el => {
+                    el.style.display = userRole === 'admin' ? '' : 'none';
+                });
+            } catch (error) {
+                console.error("Error loading user role:", error);
+                userRole = "user";
+            }
+        }
+
+        /* ================= SCANNER ================= */
+        async function stopScanner() {
+            if (html5QrCode) {
+                try { await html5QrCode.stop(); html5QrCode.clear(); } catch (e) { console.warn("Scanner stop error:", e); }
+                html5QrCode = null;
+            }
+        }
+
+        async function startScanner() {
+            await stopScanner();
+            try {
+                html5QrCode = new Html5Qrcode("reader");
+                const devices = await Html5Qrcode.getCameras();
+                if (!devices || devices.length === 0) { result.innerText = "❌ No camera found"; return; }
+                
+                const backCamera = devices.find(device => device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('rear'));
+                const cameraId = backCamera ? backCamera.id : devices[0].id;
+
+                await html5QrCode.start(cameraId, { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 }, onScan, () => {});
+                result.innerText = "📷 Scanner ready - Scan Psych Card";
+            } catch (error) {
+                console.error("Scanner start error:", error);
+                result.innerText = "❌ Camera error: " + error.message;
+            }
+        }
+
+        async function onScan(decodedText) {
+            if (scanLock) return;
+            scanLock = true;
+            result.innerText = "⏳ Processing...";
+            setTimeout(() => { scanLock = false; }, 2000);
+
+            if (!activeEvent) { result.innerText = "❌ No active event"; return; }
+
+            try {
+                const studentDoc = await db.collection("students").doc(decodedText).get();
+                if (!studentDoc.exists) { result.innerText = "❌ Student not found"; return; }
+
+                const student = studentDoc.data();
+                if (!student.active) { result.innerText = "❌ Student account inactive"; return; }
+
+                const ref = db.collection("attendance").doc(activeEvent).collection("records");
+                const dup = await ref.where("studentId", "==", decodedText).get();
+                if (!dup.empty) { result.innerText = "⚠️ Already scanned"; return; }
+
+                const timestamp = new Date().toISOString();
+                const currentUserEmail = auth.currentUser?.email || "unknown";
+
+                await ref.add({
+                    studentId: decodedText,
+                    name: student.name,
+                    year: student.year,
+                    timestamp: timestamp,
+                    scannedBy: currentUserEmail
+                });
+
+                result.innerText = "✔️ " + student.name;
+                sendToGoogleSheets({ eventId: activeEvent, studentId: decodedText, name: student.name, year: student.year, timestamp: timestamp, scannedBy: currentUserEmail });
+            } catch (error) {
+                console.error("Scan error:", error);
+                result.innerText = "❌ Error: " + error.message;
+            }
+        }
+
+        async function sendToGoogleSheets(data) {
+            try {
+                await fetch("https://script.google.com/macros/s/AKfycbwWnhp4kVnc_StNi_J6D71Llc5ui63LNyB37AyPXn2vWGL2aNdavqMH17JFX_MsvaY/exec", {
+                    method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data)
+                });
+            } catch (error) { console.error("Google Sheets sync failed:", error); }
+        }
+
+        /* ================= EVENTS ================= */
+        async function loadEvents() {
+            try {
+                const snap = await db.collection("events").orderBy("createdAt", "desc").get();
+                const list = document.getElementById("eventList");
+                list.innerHTML = "";
+                if (snap.empty) { list.innerHTML = "<p class='text-gray-500'>No events created yet</p>"; return; }
+
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const btn = document.createElement("button");
+                    btn.innerText = (data.active ? "🟢 " : "⚪ ") + data.name;
+                    btn.className = "w-full p-3 border rounded mb-2 text-left hover:bg-purple-50 transition flex justify-between items-center";
+                    
+                    if (userRole !== "admin") { btn.disabled = true; btn.classList.add("opacity-50", "cursor-not-allowed"); }
+                    btn.onclick = () => { if (userRole === "admin") setActiveEvent(doc.id); };
+                    list.appendChild(btn);
+                });
+            } catch (error) { console.error("Error loading events:", error); }
+        }
+
+        async function loadActiveEvent() {
+            try {
+                const snap = await db.collection("events").where("active", "==", true).limit(1).get();
+                if (snap.empty) {
+                    activeEvent = null;
+                    if (activeEventText) activeEventText.innerText = "No active event";
+                    return;
+                }
+                const doc = snap.docs[0];
+                activeEvent = doc.id;
+                if (activeEventText) activeEventText.innerText = "Active: " + doc.data().name;
+                listenToAttendance();
+            } catch (error) { console.error("Error loading active event:", error); }
+        }
+
+        async function createNewEvent() {
+            if (userRole !== "admin") return alert("Only admins can create events");
+            if (!eventName.value.trim()) return alert("Enter event name");
+            try {
+                await db.collection("events").add({ name: eventName.value.trim(), active: false, createdBy: auth.currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                eventName.value = "";
+                await loadEvents();
+                alert("Event created successfully!");
+            } catch (error) { alert("Failed to create event: " + error.message); }
+        }
+
+        async function setActiveEvent(eventId) {
+            if (userRole !== "admin") return;
+            try {
+                const all = await db.collection("events").get();
+                const batch = db.batch();
+                all.forEach(doc => batch.update(doc.ref, { active: false }));
+                batch.update(db.collection("events").doc(eventId), { active: true });
+                await batch.commit();
+                await loadActiveEvent();
+                await loadEvents();
+                alert("Event activated successfully!");
+            } catch (error) { alert("Failed to activate event: " + error.message); }
+        }
+
+        async function endEvent() {
+            if (userRole !== "admin") return;
+            try {
+                const snap = await db.collection("events").where("active", "==", true).get();
+                if (snap.empty) return alert("No active event to end");
+                const batch = db.batch();
+                snap.forEach(doc => batch.update(doc.ref, { active: false }));
+                await batch.commit();
+                activeEvent = null;
+                if (activeEventText) activeEventText.innerText = "No active event";
+                if (attendanceUnsubscribe) attendanceUnsubscribe();
+                alert("Event ended successfully!");
+            } catch (error) { alert("Failed to end event: " + error.message); }
+        }
+
+        /* ================= LIVE DASHBOARD ================= */
+        function listenToAttendance() {
+            if (attendanceUnsubscribe) attendanceUnsubscribe();
+            if (!activeEvent) return;
+
+            attendanceUnsubscribe = db.collection("attendance").doc(activeEvent).collection("records").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+                const list = document.getElementById("attendanceList");
+                list.innerHTML = "";
+                if (snapshot.empty) { list.innerHTML = "<p class='text-gray-500 text-sm'>No attendees yet</p>"; return; }
+
+                snapshot.forEach(doc => {
+                    const d = doc.data();
+                    const row = document.createElement("div");
+                    row.className = "p-3 border rounded text-sm mb-1 bg-white shadow-sm";
+                    row.innerHTML = `
+                        <div class="font-semibold">${d.name || 'Unknown'}</div>
+                        <div class="text-gray-500">${d.studentId || 'N/A'} • ${d.year || 'N/A'}</div>
+                        <div class="text-xs text-gray-400">${formatTimestamp(d.timestamp)}</div>
+                    `;
+                    list.appendChild(row);
+                });
+                count = snapshot.size;
+                countEl.innerText = count;
+            }, error => console.error("Attendance listener error:", error));
+        }
+
+        /* ================= STUDENTS & PSYCH CARDS ================= */
+        async function loadStudents() {
+            try {
+                const snap = await db.collection("students").orderBy("name").get();
+                const list = document.getElementById("studentList");
+                list.innerHTML = "";
+
+                if (snap.empty) {
+                    list.innerHTML = "<p class='text-gray-500 col-span-3 text-center py-10'>No students added yet.</p>";
+                    return;
+                }
+
+                snap.forEach(doc => {
+                    const s = doc.data();
+                    const card = document.createElement("div");
+                    card.className = "bg-white p-4 rounded-lg shadow flex items-center gap-4 hover:shadow-md transition cursor-pointer";
+                    card.onclick = () => showPsychCard(doc.id);
+                    
+                    card.innerHTML = `
+                        <img src="${s.photoUrl}" alt="${s.name}" class="w-16 h-16 rounded-full object-cover border-2 border-purple-200">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-800">${s.name}</h4>
+                            <p class="text-sm text-gray-500">${s.year}</p>
+                            <p class="text-xs text-purple-600 font-mono">${s.id}</p>
+                        </div>
+                        <button class="text-purple-600 hover:text-purple-800 text-xl" title="View Psych Card">🎫</button>
+                    `;
+                    list.appendChild(card);
+                });
+            } catch (error) { console.error("Error loading students:", error); }
+        }
+
+        async function addStudent() {
+            const name = document.getElementById('studentName').value.trim();
+            const year = document.getElementById('studentYear').value;
+            const photoFile = document.getElementById('studentPhoto').files[0];
+
+            if (!name || !year || !photoFile) return alert("Please fill all fields and upload a photo.");
+
+            try {
+                // Generate unique ID (Format: PSY-26-XXXX)
+                const uniqueId = "PSY-26-" + Math.floor(1000 + Math.random() * 9000);
+                
+                // Check if ID exists (rare but possible)
+                const existingDoc = await db.collection("students").doc(uniqueId).get();
+                if (existingDoc.exists) return alert("Generated ID already exists. Please try again.");
+
+                // Upload photo to Firebase Storage
+                const photoRef = storage.ref(`students/${uniqueId}.jpg`);
+                await photoRef.put(photoFile);
+                const photoUrl = await photoRef.getDownloadURL();
+
+                // Save to Firestore
+                await db.collection("students").doc(uniqueId).set({
+                    id: uniqueId,
+                    name: name,
+                    year: year,
+                    photoUrl: photoUrl,
+                    active: true,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                alert("Student added successfully!");
+                document.getElementById('addStudentModal').classList.add('hidden');
+                document.getElementById('studentName').value = "";
+                document.getElementById('studentPhoto').value = "";
+                loadStudents();
+            } catch (error) {
+                console.error("Error adding student:", error);
+                alert("Failed to add student: " + error.message);
+            }
+        }
+
+        function showPsychCard(studentId) {
+            db.collection("students").doc(studentId).get().then(doc => {
+                if (doc.exists) {
+                    const student = doc.data();
+                    document.getElementById('pcName').innerText = student.name;
+                    document.getElementById('pcYear').innerText = student.year;
+                    document.getElementById('pcId').innerText = student.id;
+                    document.getElementById('pcPhoto').src = student.photoUrl;
+                    
+                    // Generate QR Code
+                    const qrContainer = document.getElementById('qrcode-display');
+                    qrContainer.innerHTML = ""; 
+                    new QRCode(qrContainer, {
+                        text: student.id,
+                        width: 80,
+                        height: 80,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+
+                    document.getElementById('psychCardModal').classList.remove('hidden');
+                }
+            });
+        }
+
+        /* ================= AUTH STATE LISTENER ================= */
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                loginPage.classList.add("hidden");
+                app.classList.remove("hidden");
+                await loadUserRole(user);
+                await loadActiveEvent();
+                await loadEvents();
+                setTimeout(() => startScanner(), 500);
+            } else {
+                loginPage.classList.remove("hidden");
+                app.classList.add("hidden");
+                await stopScanner();
+                if (attendanceUnsubscribe) attendanceUnsubscribe();
+            }
         });
-        
-        // Update count based on actual records
-        count = snapshot.size;
-        countEl.innerText = count;
-      }, error => {
-        console.error("Attendance listener error:", error);
-      });
-  } catch (error) {
-    console.error("Error setting up attendance listener:", error);
-  }
-}
 
-/* ================= SCANNER ================= */
-
-let scanLock = false;
-
-async function onScan(decodedText) {
-  if (scanLock) return;
-  scanLock = true;
-  
-  // Visual feedback
-  result.innerText = "⏳ Processing...";
-  
-  setTimeout(() => {
-    scanLock = false;
-  }, 2000);
-
-  if (!activeEvent) {
-    result.innerText = "❌ No active event";
-    return;
-  }
-
-  try {
-    // Check if student exists and is active
-    const studentDoc = await db.collection("students").doc(decodedText).get();
-
-    if (!studentDoc.exists) {
-      result.innerText = "❌ Student not found";
-      return;
-    }
-
-    const studentData = studentDoc.data();
-    
-    if (!studentData.active) {
-      result.innerText = "❌ Student account inactive";
-      return;
-    }
-
-    const student = studentData;
-
-    // Check for duplicate attendance
-    const ref = db.collection("attendance")
-      .doc(activeEvent)
-      .collection("records");
-
-    const dup = await ref.where("studentId", "==", decodedText).get();
-
-    if (!dup.empty) {
-      result.innerText = "⚠️ Already scanned";
-      return;
-    }
-
-    // Record attendance
-    const timestamp = new Date().toISOString();
-    const currentUserEmail = auth.currentUser?.email || "unknown";
-
-    await ref.add({
-      studentId: decodedText,
-      name: student.name,
-      year: student.year,
-      timestamp: timestamp,
-      scannedBy: currentUserEmail
-    });
-
-    result.innerText = "✔️ " + student.name;
-
-    // Send to Google Sheets backup
-    sendToGoogleSheets({
-      eventId: activeEvent,
-      studentId: decodedText,
-      name: student.name,
-      year: student.year,
-      timestamp: timestamp,
-      scannedBy: currentUserEmail
-    });
-
-  } catch (error) {
-    console.error("Scan error:", error);
-    result.innerText = "❌ Error: " + error.message;
-  }
-}
-
-// Separate function for Google Sheets sync with better error handling
-async function sendToGoogleSheets(data) {
-  try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbwWnhp4kVnc_StNi_J6D71Llc5ui63LNyB37AyPXn2vWGL2aNdavqMH17JFX_MsvaY/exec", {
-      method: "POST",
-      mode: "no-cors", // Required for Google Apps Script
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data)
-    });
-    
-    console.log("Synced to Google Sheets");
-  } catch (error) {
-    console.error("Google Sheets sync failed:", error);
-    // Don't show alert to avoid disrupting UX
-  }
-}
-
-/* ================= AUTH STATE LISTENER ================= */
-
-auth.onAuthStateChanged(async user => {
-  if (user) {
-    loginPage.classList.add("hidden");
-    app.classList.remove("hidden");
-
-    await loadUserRole(user);
-    await loadActiveEvent();
-    await loadEvents();
-
-    // Start scanner after a brief delay to ensure DOM is ready
-    setTimeout(() => {
-      startScanner();
-    }, 500);
-  } else {
-    // User is signed out
-    loginPage.classList.remove("hidden");
-    app.classList.add("hidden");
-    
-    // Clean up
-    await stopScanner();
-    if (attendanceUnsubscribe) {
-      attendanceUnsubscribe();
-      attendanceUnsubscribe = null;
-    }
-  }
-});
-
-/* ================= WINDOW EXPORTS ================= */
-window.login = login;
-window.logout = logout;
-window.createNewEvent = createNewEvent;
-window.startScanner = startScanner;
-window.endEvent = endEvent;
-window.setActiveEvent = setActiveEvent;
-
-</script>
+        /* ================= WINDOW EXPORTS ================= */
+        window.login = login;
+        window.logout = logout;
+        window.createNewEvent = createNewEvent;
+        window.startScanner = startScanner;
+        window.endEvent = endEvent;
+        window.setActiveEvent = setActiveEvent;
+        window.switchTab = switchTab;
+        window.addStudent = addStudent;
+        window.showPsychCard = showPsychCard;
+    </script>
+</body>
+</html>
