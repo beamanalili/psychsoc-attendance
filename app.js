@@ -4,14 +4,15 @@ import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, dele
 
 // --- CONFIGURATION ---
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
+  authDomain: "psychsoc-attendance-system.firebaseapp.com",
+  projectId: "psychsoc-attendance-system",
+  storageBucket: "psychsoc-attendance-system.firebasestorage.app",
+  messagingSenderId: "93131590758",
+  appId: "1:93131590758:web:bfea89644381b1972af1a7",
+  measurementId: "G-C5SH1EEQP2"
 };
-const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwPWkqDzUA6X7Zqf6OSnPJUZ8koPqbIs5vbiArKJZfxHoWxQqLg8ey6Bh_-moNdhPc/exec";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
