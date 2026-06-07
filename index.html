@@ -182,6 +182,8 @@ async function loadActiveEvent() {
 }
 
   async function createEvent() {
+console.log("CREATE EVENT CLICKED");
+    
   if (userRole !== "admin") return;
 
   await db.collection("events").add({
