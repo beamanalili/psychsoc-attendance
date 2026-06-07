@@ -38,15 +38,17 @@
 <!-- ================= SCANNER PAGE ================= -->
 <div id="app" class="hidden w-full max-w-md">
 
-  <h1 class="text-2xl font-bold text-center mt-4">📍 PsychSoc Attendance</h1>
+  <div class="text-center mt-4">
+    <h1 class="text-2xl font-bold">📍 PsychSoc Attendance</h1>
 
-  <button onclick="logout()"
-    class="bg-red-500 px-3 py-1 rounded mt-2 text-sm">
-    Logout
-  </button>
+    <button onclick="logout()"
+      class="bg-red-500 px-3 py-1 rounded mt-2 text-sm">
+      Logout
+    </button>
+  </div>
 
   <div class="mt-4 bg-gray-800 p-3 rounded-xl text-center">
-    <p class="text-green-400 font-bold">🟢 EVENT ACTIVE</p>
+    <p class="text-green-400 font-bold">🟢 SCANNER ACTIVE</p>
   </div>
 
   <div class="mt-4 bg-white p-3 rounded-xl">
@@ -67,7 +69,7 @@
 
 <script>
 
-/* ================= FIREBASE CONFIG ================= */
+/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
   authDomain: "psychsoc-attendance-system.firebaseapp.com",
@@ -83,6 +85,11 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+/* ================= GLOBALS ================= */
+let html5QrCode = null;
+let count = 0;
+let scanned = new Set();
+
 /* ================= AUTH ================= */
 
 function login() {
@@ -96,10 +103,16 @@ function login() {
 }
 
 function logout() {
+  if (html5QrCode) {
+    html5QrCode.stop().then(() => {
+      html5QrCode.clear();
+    }).catch(() => {});
+  }
+
   auth.signOut();
 }
 
-/* ================= UI SWITCH ================= */
+/* ================= UI STATE ================= */
 
 auth.onAuthStateChanged(user => {
   if (user) {
@@ -114,44 +127,53 @@ auth.onAuthStateChanged(user => {
 
 /* ================= SCANNER ================= */
 
-let count = 0;
-let scanned = new Set();
-
 function startScanner() {
 
-  const html5QrCode = new Html5Qrcode("reader");
+  if (html5QrCode) {
+    html5QrCode.stop().catch(() => {});
+    html5QrCode.clear();
+  }
+
+  html5QrCode = new Html5Qrcode("reader");
 
   Html5Qrcode.getCameras().then(devices => {
-    if (devices.length) {
-      html5QrCode.start(
-        devices[0].id,
-        { fps: 10, qrbox: 250 },
-        onScanSuccess
-      );
-    }
-  });
+    if (!devices.length) return;
 
-  function onScanSuccess(decodedText) {
-
-    if (scanned.has(decodedText)) {
-      document.getElementById("result").innerText =
-        "⚠ Already scanned: " + decodedText;
-      return;
-    }
-
-    scanned.add(decodedText);
-
+    html5QrCode.start(
+      devices[0].id,
+      { fps: 10, qrbox: 250 },
+      onScanSuccess
+    );
+  }).catch(err => {
     document.getElementById("result").innerText =
-      "✔ " + decodedText;
+      "Camera error: " + err;
+  });
+}
 
-    count++;
-    document.getElementById("count").innerText = count;
+function onScanSuccess(decodedText) {
 
+  if (scanned.has(decodedText)) {
+    document.getElementById("result").innerText =
+      "⚠ Already scanned: " + decodedText;
+    return;
+  }
+
+  scanned.add(decodedText);
+
+  document.getElementById("result").innerText =
+    "✔ " + decodedText;
+
+  count++;
+  document.getElementById("count").innerText = count;
+
+  const user = auth.currentUser;
+
+  if (user) {
     db.collection("attendance").add({
       studentId: decodedText,
       event: "PsychSoc Attendance System",
       timestamp: new Date(),
-      scannedBy: auth.currentUser.email
+      scannedBy: user.email
     });
   }
 }
