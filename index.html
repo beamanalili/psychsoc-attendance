@@ -43,6 +43,23 @@
     </button>
   </div>
 
+  function logout() {
+  try {
+    if (html5QrCode) {
+      html5QrCode.stop().catch(()=>{});
+      html5QrCode.clear();
+    }
+  } catch (e) {}
+
+  // reset UI state
+  result.innerText = "Waiting...";
+  countEl.innerText = "0";
+  activeEvent = null;
+  count = 0;
+
+  auth.signOut();
+}
+
   <!-- ADMIN PANEL -->
   <div id="adminPanel" class="mt-4 bg-gray-800 p-4 rounded-xl hidden">
 
