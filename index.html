@@ -447,39 +447,59 @@
     window.addEventListener('online', () => document.getElementById('offline-banner').classList.add('hidden'));
     window.addEventListener('offline', () => document.getElementById('offline-banner').classList.remove('hidden'));
 
-        onAuthStateChanged(auth, async (user) => {
+            onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUser = user;
-            const userDoc = await getDoc(doc(db, "users", user.uid));
+            console.log("✅ User logged in:", user.email);
             
-            // Hide login, show user info
+            // 1. Always hide login view and show user info
+            document.getElementById('login-view').classList.add('hidden');
             document.getElementById('user-info').classList.remove('hidden');
             document.getElementById('user-email').innerText = user.email;
-            document.getElementById('login-view').classList.add('hidden');
             
-            if (userDoc.exists()) {
-                currentRole = userDoc.data().role;
-                document.getElementById('user-role-badge').innerText = currentRole;
+            // 2. Hide ALL dashboards initially to prevent overlap
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            document.getElementById('officer-dashboard').classList.add('hidden');
+            document.getElementById('student-dashboard').classList.add('hidden');
+
+            try {
+                // 3. Check if user has a role in Firestore
+                const userDoc = await getDoc(doc(db, "users", user.uid));
                 
-                if (currentRole === 'admin') {
-                    document.getElementById('admin-dashboard').classList.remove('hidden');
-                    renderEvents(); renderStudents(); renderUsers();
-                } else if (currentRole === 'officer') {
-                    document.getElementById('officer-dashboard').classList.remove('hidden');
-                } else if (currentRole === 'student') {
+                if (userDoc.exists()) {
+                    currentRole = userDoc.data().role;
+                    console.log("📂 Existing user role found:", currentRole);
+                    document.getElementById('user-role-badge').innerText = currentRole;
+                    
+                    if (currentRole === 'admin') {
+                        document.getElementById('admin-dashboard').classList.remove('hidden');
+                        renderEvents(); renderStudents(); renderUsers();
+                    } else if (currentRole === 'officer') {
+                        document.getElementById('officer-dashboard').classList.remove('hidden');
+                    } else if (currentRole === 'student') {
+                        document.getElementById('student-dashboard').classList.remove('hidden');
+                        loadStudentProfile(user.uid);
+                    }
+                } else {
+                    // 4. NEW USER: No role assigned yet. Show Student Registration.
+                    console.log("🆕 New user detected. Showing registration form.");
+                    currentRole = 'pending';
+                    document.getElementById('user-role-badge').innerText = 'New Student';
                     document.getElementById('student-dashboard').classList.remove('hidden');
-                    loadStudentProfile(user.uid);
+                    document.getElementById('student-registration-form').classList.remove('hidden');
+                    document.getElementById('student-id-card-view').classList.add('hidden');
                 }
-            } else {
-                // NEW USER: No role assigned yet. Show Student Registration.
-                currentRole = 'pending';
-                document.getElementById('user-role-badge').innerText = 'New Student';
+            } catch (error) {
+                console.error("❌ Error fetching user document:", error);
+                showToast("Error loading profile: " + error.message, "error");
+                
+                // Fallback: Force show registration form if database check fails
                 document.getElementById('student-dashboard').classList.remove('hidden');
                 document.getElementById('student-registration-form').classList.remove('hidden');
-                document.getElementById('student-id-card-view').classList.add('hidden');
             }
         } else {
-            // LOGGED OUT
+            // 5. LOGGED OUT
+            console.log("🚪 User logged out");
             currentUser = null;
             currentRole = null;
             document.getElementById('login-view').classList.remove('hidden');
@@ -487,8 +507,7 @@
             document.getElementById('officer-dashboard').classList.add('hidden');
             document.getElementById('student-dashboard').classList.add('hidden');
             document.getElementById('user-info').classList.add('hidden');
-            stopScanner();
-        }
+           
     });
 
         // Toggle between Login and Sign Up views
