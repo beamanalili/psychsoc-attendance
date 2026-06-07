@@ -43,22 +43,6 @@
     </button>
   </div>
 
-  function logout() {
-  try {
-    if (html5QrCode) {
-      html5QrCode.stop().catch(()=>{});
-      html5QrCode.clear();
-    }
-  } catch (e) {}
-
-  // reset UI state
-  result.innerText = "Waiting...";
-  countEl.innerText = "0";
-  activeEvent = null;
-  count = 0;
-
-  auth.signOut();
-}
 
   <!-- ADMIN PANEL -->
   <div id="adminPanel" class="mt-4 bg-gray-800 p-4 rounded-xl hidden">
@@ -147,6 +131,23 @@ function logout() {
     html5QrCode.stop().catch(()=>{});
     html5QrCode.clear();
   }
+  auth.signOut();
+}
+
+  function logout() {
+  try {
+    if (html5QrCode) {
+      html5QrCode.stop().catch(()=>{});
+      html5QrCode.clear();
+      html5QrCode = null;
+    }
+  } catch (e) {}
+
+  result.innerText = "Waiting...";
+  count = 0;
+  countEl.innerText = "0";
+  activeEvent = null;
+
   auth.signOut();
 }
 
