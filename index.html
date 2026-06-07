@@ -365,23 +365,32 @@
                 </div>
             </div>
 
-            <!-- My Attendance View -->
+                        <!-- My Attendance View -->
             <div id="student-tab-attendance" class="student-tab-content hidden">
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-xl font-bold text-suNavy mb-4 flex items-center">
                         <i class="fas fa-history mr-2"></i> My Attendance History
                     </h3>
                     
+                    <!-- Loading State -->
                     <div id="student-attendance-loading" class="text-center py-8 text-gray-500 hidden">
-                        <svg class="animate-spin h-6 w-6 mx-auto text-suNavy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <p class="mt-2">Loading your attendance records...</p>
+                        <svg class="animate-spin h-8 w-8 mx-auto text-suNavy mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p>Loading your records...</p>
                     </div>
                     
-                    <div id="student-attendance-empty" class="text-center py-8 text-gray-500 hidden">
-                        <i class="fas fa-calendar-times text-4xl mb-3 text-gray-300"></i>
-                        <p>You haven't attended any events yet.</p>
+                    <!-- NEW: Explicit Empty State -->
+                    <div id="student-attendance-empty" class="text-center py-12 hidden">
+                        <div class="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-clipboard-list text-3xl text-gray-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-700">No attendance history</h3>
+                        <p class="text-gray-500 mt-1">You haven't scanned into any events yet.</p>
                     </div>
                     
+                    <!-- Attendance Table -->
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse hidden" id="student-attendance-table">
                             <thead>
@@ -396,7 +405,6 @@
                     </div>
                 </div>
             </div>
-        </div>
 
             <!-- Digital ID Card (Shown after registration) -->
             <div id="student-id-card-view" class="hidden">
@@ -1236,7 +1244,7 @@
         }
     };
 
-    // Load and Display Student Attendance History
+        // Load and Display Student Attendance History
     async function loadStudentAttendance() {
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
         if (!userDoc.exists() || !userDoc.data().studentId) return;
@@ -1247,22 +1255,24 @@
         const tableEl = document.getElementById('student-attendance-table');
         const tbody = document.getElementById('student-attendance-body');
 
+        // 1. Show loading, hide everything else
         loadingEl.classList.remove('hidden');
         emptyEl.classList.add('hidden');
         tableEl.classList.add('hidden');
         tbody.innerHTML = '';
 
         try {
-            // Fetch attendance records for this specific student, newest first
+            // 2. Fetch records for this student, newest first
             const q = query(collection(db, "attendance"), where("studentId", "==", studentId), orderBy("timestamp", "desc"));
             const snap = await getDocs(q);
             
-            loadingEl.classList.add('hidden');
+            loadingEl.classList.add('hidden'); // Stop loading
 
+            // 3. Check if there are any records
             if (snap.empty) {
-                emptyEl.classList.remove('hidden');
+                emptyEl.classList.remove('hidden'); // Show "No attendance history"
             } else {
-                tableEl.classList.remove('hidden');
+                tableEl.classList.remove('hidden'); // Show the table
                 snap.forEach(docSnap => {
                     const data = docSnap.data();
                     const date = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : 'Just now';
@@ -1281,6 +1291,7 @@
         } catch (err) {
             console.error("Error loading attendance:", err);
             loadingEl.classList.add('hidden');
+            emptyEl.classList.remove('hidden'); // Fallback to empty state on error
             showToast("Failed to load attendance history.", "error");
         }
     }
