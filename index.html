@@ -3,703 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUPS Y Attendance Tracker</title>
-    
-    <!-- Tailwind CSS -->
+    <title>SU Psychology Society Attendance System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Firebase SDK (Compat version) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    
-    <!-- QR Code Generator -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    
-    <!-- Html5Qrcode Scanner -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { suNavy: '#0B1F4D', suGray: '#F3F4F6' }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Custom styles for Psych Card and Print */
-        .psych-card {
-            width: 350px;
-            height: 220px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            color: white;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .psych-card::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-        }
-        .psych-card-content {
-            position: relative;
-            z-index: 1;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        .psych-card-header {
-            font-size: 11px;
-            opacity: 0.8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }
-        .psych-card-body {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .psych-card-photo {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: 3px solid rgba(255,255,255,0.5);
-            object-fit: cover;
-            background: white;
-        }
-        .psych-card-info h2 {
-            font-size: 18px;
-            font-weight: bold;
-            margin: 0;
-        }
-        .psych-card-info p {
-            font-size: 14px;
-            margin: 2px 0;
-            opacity: 0.9;
-        }
-        .psych-card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-top: 10px;
-        }
-        .psych-card-id {
-            font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-        #qrcode-display img, #qrcode-display canvas {
-            border-radius: 5px;
-            background: white;
-            padding: 5px;
-        }
-
-        /* Print Styles for Psych Card */
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            .psych-card, .psych-card * {
-                visibility: visible;
-            }
-            .psych-card {
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-                box-shadow: none;
-                border: 2px solid #ccc; 
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                width: 450px;
-                height: 280px;
-            }
-            .no-print {
-                display: none !important;
-            }
+            .no-print { display: none !important; }
+            .print-only { display: grid !important; }
+            body { background: white; }
         }
+        .print-only { display: none; }
+        #reader { width: 100%; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-suGray text-gray-800 font-sans min-h-screen flex flex-col">
+    <!-- Offline Banner -->
+    <div id="offline-banner" class="hidden bg-red-600 text-white text-center py-2 text-sm font-semibold no-print">
+        <i class="fas fa-wifi-slash mr-2"></i> You are offline. Some features may be limited.
+   3>
 
-    <!-- ================= LOGIN PAGE ================= -->
-    <div id="loginPage" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-            <h1 class="text-2xl font-bold text-center mb-2 text-purple-700">Silliman University Psychology Society</h1>
-            <p class="text-center text-gray-500 mb-6">Attendance Tracker S.Y. 2026-2027</p>
-            <input type="email" id="email" placeholder="Email" class="w-full p-3 border rounded mb-3 focus:ring-2 focus:ring-purple-500 outline-none">
-            <input type="password" id="password" placeholder="Password" class="w-full p-3 border rounded mb-3 focus:ring-2 focus:ring-purple-500 outline-none">
-            <p id="loginError" class="text-red-500 text-sm mb-3"></p>
-            <button onclick="login()" class="w-full bg-purple-600 text-white p-3 rounded hover:bg-purple-700 transition font-semibold">Login</button>
-        </div>
-    </div>
-
-    <!-- ================= MAIN APP ================= -->
-    <div id="app" class="hidden h-screen flex">
-        <!-- Sidebar -->
-        <div class="w-64 bg-white shadow-md flex flex-col">
-            <div class="p-6 border-b">
-                <h1 class="text-xl font-bold text-purple-700">SUPSY</h1>
-                <p class="text-xs text-gray-500">Attendance System</p>
-            </div>
-            <nav class="flex-1 p-4">
-                <button onclick="switchTab('dashboard')" class="tab-btn w-full text-left p-3 rounded hover:bg-purple-50 mb-2 flex items-center gap-3" data-tab="dashboard">
-                    <span>📊</span> Dashboard
-                </button>
-                <button onclick="switchTab('students')" class="tab-btn w-full text-left p-3 rounded hover:bg-purple-50 mb-2 flex items-center gap-3" data-tab="students">
-                    <span>🎓</span> Students & Psych Cards
-                </button>
-                <button onclick="switchTab('events')" class="tab-btn w-full text-left p-3 rounded hover:bg-purple-50 mb-2 flex items-center gap-3 admin-only" data-tab="events">
-                    <span>📅</span> Events
-                </button>
-            </nav>
-            <div class="p-4 border-t">
-                <button onclick="logout()" class="w-full text-left p-3 rounded hover:bg-red-50 text-red-600 flex items-center gap-3">
-                    <span>🚪</span> Logout
-                </button>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top Bar -->
-            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
-                <h2 id="pageTitle" class="text-xl font-semibold">Dashboard</h2>
-                <div class="text-sm text-gray-600">
-                    Logged in as: <span id="userEmail" class="font-medium"></span>
+    <!-- Header -->
+    <header class="bg-suNavy text-white shadow-lg no-print">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                <div class="bg-white text-suNavy p-2 rounded-full"><i class="fas fa-university text-2xl"></i></div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold">SU Psychology Society Attendance System</h1>
+                    <p class="text-sm text-gray-300">Silliman University • School Year 2026–2027</p>
                 </div>
-            </header>
+            </div>
+            <div id="user-info" class="hidden flex items-center space-x-4">
+                <span id="user-role-badge" class="px-3 py-1 bg-blue-600 rounded-full text-xs font-semibold uppercase"></span>
+                <span id="user-email" class="text-sm hidden md:inline"></span>
+                <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
+            </div>
+        </div>
+    </header>
 
-            <!-- Content Area -->
-            <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
-                <!-- Dashboard Tab -->
-                <div id="tab-dashboard" class="tab-content">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h3 class="text-gray-500 text-sm">Active Event</h3>
-                            <p id="activeEventText" class="text-2xl font-bold text-purple-700 mt-2">No active event</p>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h3 class="text-gray-500 text-sm">Total Attendees</h3>
-                            <p id="count" class="text-2xl font-bold text-green-600 mt-2">0</p>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h3 class="text-gray-500 text-sm">Status</h3>
-                            <p id="result" class="text-lg font-medium mt-2">Waiting...</p>
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- Login View -->
+        <div id="login-view" class="max-w-md mx-auto bg-white rounded-xl shadow-md p-8 fade-in">
+            <h2 class="text-2xl font-bold text-suNavy mb-6 text-center">System Login</h2>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="login-email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="login-password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                </div>
+                <button type="submit" class="w-full bg-suNavy text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition flex justify-center items-center">
+                    <span id="login-spinner" class="hidden animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></span>
+                    Login
+                </button>
+            </form>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="admin-dashboard" class="hidden fade-in">
+            <div class="flex space-x-2 mb-6 overflow-x-auto pb-2 no-print">
+                <button onclick="switchTab('events')" class="tab-btn px-4 py-2 bg-suNavy text-white rounded-lg font-medium">Events</button>
+                <button onclick="switchTab('students')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Students</button>
+                <button onclick="switchTab('users')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Manage Users</button>
+                <button onclick="switchTab('analytics')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Analytics</button>
+                <button onclick="switchTab('export')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Export</button>
+            </div>
+
+            <!-- Events Tab -->
+            <div id="tab-events" class="tab-content">
+                <div class="bg-white rounded-xl shadow p-6 mb-6">
+                    <h3 class="text-lg font-bold text-suNavy mb-4">Create New Event</h3>
+                    <form id="create-event-form" class="flex flex-col md:flex-row gap-4">
+                        <input type="text" id="event-name" placeholder="Event Name" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <button type="submit" class="bg-suNavy text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-900 transition">Create Event</button>
+                    </form>
+                </div>
+                <div id="events-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- Students Tab -->
+            <div id="tab-students" class="tab-content hidden">
+                <div class="bg-white rounded-xl shadow p-6 mb-6">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                        <h3 class="text-lg font-bold text-suNavy">Student Management</h3>
+                        <div class="flex gap-2 flex-wrap">
+                            <input type="text" id="student-search" placeholder="Search by name or ID..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <button onclick="openStudentModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition"><i class="fas fa-plus mr-2"></i>Add Student</button>
+                            <button onclick="showPrintableQRs()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"><i class="fas fa-print mr-2"></i>Print QRs</button>
                         </div>
                     </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-700">
+                                    <th class="p-3 border-b">Student ID</th>
+                                    <th class="p-3 border-b">Name</th>
+                                    <th class="p-3 border-b">Year</th>
+                                    <th class="p-3 border-b">Status</th>
+                                    <th class="p-3 border-b">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h3 class="text-lg font-semibold mb-4">QR Scanner</h3>
-                            <div id="reader" class="w-full rounded-lg overflow-hidden bg-gray-200" style="height: 300px;"></div>
-                            <button onclick="startScanner()" class="mt-4 w-full bg-purple-600 text-white p-2 rounded hover:bg-purple-700">Restart Scanner</button>
+            <!-- Manage Users Tab -->
+            <div id="tab-users" class="tab-content hidden">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h3 class="text-lg font-bold text-suNavy mb-2">Manage Officers & Admins</h3>
+                    <p class="text-sm text-gray-600 mb-4">Note: Firebase Auth accounts must be created in the Firebase Console. This tool assigns their database role.</p>
+                    <form id="add-user-form" class="flex flex-col md:flex-row gap-4 mb-6">
+                        <input type="email" id="new-user-email" placeholder="User Email" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg">
+                        <select id="new-user-role" class="px-4 py-2 border border-gray-300 rounded-lg">
+                            <option value="officer">Officer</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        <button type="submit" class="bg-suNavy text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-900 transition">Assign Role</button>
+                    </form>
+                    <div id="users-list" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="tab-analytics" class="tab-content hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Total Members</p><p id="stat-total" class="text-3xl font-bold text-suNavy">0</p></div>
+                    <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Present (Active Event)</p><p id="stat-present" class="text-3xl font-bold text-green-600">0</p></div>
+                    <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Absent</p><p id="stat-absent" class="text-3xl font-bold text-red-600">0</p></div>
+                    <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Attendance Rate</p><p id="stat-rate" class="text-3xl font-bold text-blue-600">0%</p></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow"><h4 class="font-bold text-suNavy mb-4">Year Level Breakdown</h4><canvas id="yearChart"></canvas></div>
+                    <div class="bg-white p-6 rounded-xl shadow"><h4 class="font-bold text-suNavy mb-4">Attendance Status</h4><canvas id="statusChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Export Tab -->
+            <div id="tab-export" class="tab-content hidden">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h3 class="text-lg font-bold text-suNavy mb-4">Export Attendance Data</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-semibold mb-2">Current Active Event</h4>
+                            <p id="export-current-event-name" class="text-sm text-gray-500 mb-4">No active event</p>
+                            <div class="flex gap-2">
+                                <button onclick="exportData('current', 'csv')" class="flex-1 bg-gray-800 text-white py-2 rounded hover:bg-gray-900">Export CSV</button>
+                                <button onclick="exportData('current', 'excel')" class="flex-1 bg-green-700 text-white py-2 rounded hover:bg-green-800">Export Excel</button>
+                            </div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow flex flex-col">
-                            <h3 class="text-lg font-semibold mb-4">Live Attendance</h3>
-                            <div id="attendanceList" class="flex-1 overflow-y-auto space-y-2">
-                                <p class="text-gray-500 text-sm">No attendees yet</p>
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-semibold mb-2">All Events</h4>
+                            <p class="text-sm text-gray-500 mb-4">Includes historical data from all events.</p>
+                            <div class="flex gap-2">
+                                <button onclick="exportData('all', 'csv')" class="flex-1 bg-gray-800 text-white py-2 rounded hover:bg-gray-900">Export CSV</button>
+                                <button onclick="exportData('all', 'excel')" class="flex-1 bg-green-700 text-white py-2 rounded hover:bg-green-800">Export Excel</button>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Students Tab -->
-                <div id="tab-students" class="tab-content hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-semibold">Student Directory & Psych Cards</h3>
-                        <button onclick="document.getElementById('addStudentModal').classList.remove('hidden')" class="admin-only bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">+ Add Student</button>
-                    </div>
-                    <div id="studentList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Student cards injected here -->
-                    </div>
-                </div>
-
-                <!-- Events Tab -->
-                <div id="tab-events" class="tab-content hidden">
-                    <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <h3 class="text-lg font-semibold mb-4">Create New Event</h3>
-                        <div class="flex gap-3">
-                            <input type="text" id="eventName" placeholder="Event Name" class="flex-1 p-2 border rounded focus:ring-2 focus:ring-purple-500 outline-none">
-                            <button onclick="createNewEvent()" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Create</button>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold">Manage Events</h3>
-                            <button onclick="endEvent()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 admin-only">End Active Event</button>
-                        </div>
-                        <div id="eventList" class="space-y-2">
-                            <p class="text-gray-500">No events created yet</p>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
-
-    <!-- ================= MODALS ================= -->
-    
-    <!-- Add Student Modal -->
-    <div id="addStudentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">Add New Student</h3>
-            <input type="text" id="studentName" placeholder="Full Name" class="w-full p-2 border rounded mb-3 focus:ring-2 focus:ring-purple-500 outline-none">
-            <select id="studentYear" class="w-full p-2 border rounded mb-3 focus:ring-2 focus:ring-purple-500 outline-none">
-                <option value="1st Year">1st Year</option>
-                <option value="2nd Year">2nd Year</option>
-                <option value="3rd Year">3rd Year</option>
-                <option value="4th Year">4th Year</option>
-            </select>
-            <input type="file" id="studentPhoto" accept="image/*" class="w-full p-2 border rounded mb-3">
-            <div class="flex justify-end gap-3">
-                <button onclick="document.getElementById('addStudentModal').classList.add('hidden')" class="px-4 py-2 border rounded hover:bg-gray-100">Cancel</button>
-                <button onclick="addStudent()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Save</button>
             </div>
         </div>
-    </div>
 
-    <!-- Psych Card Modal -->
-    <div id="psychCardModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md flex flex-col items-center">
-            <h3 class="text-xl font-bold mb-4 no-print">Psych Card</h3>
-            <div id="psychCard" class="psych-card">
-                <div class="psych-card-content">
-                    <div class="psych-card-header">Silliman University Psychology Society</div>
-                    <div class="psych-card-body">
-                        <img id="pcPhoto" src="" alt="Student" class="psych-card-photo">
-                        <div class="psych-card-info">
-                            <h2 id="pcName">Student Name</h2>
-                            <p id="pcYear">Year Level</p>
-                        </div>
+        <!-- Officer Dashboard -->
+        <div id="officer-dashboard" class="hidden fade-in">
+            <div class="flex space-x-2 mb-6 overflow-x-auto pb-2 no-print">
+                <button onclick="switchOfficerTab('scanner')" class="officer-tab-btn px-4 py-2 bg-suNavy text-white rounded-lg font-medium">QR Scanner</button>
+                <button onclick="switchOfficerTab('live')" class="officer-tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Live Attendance</button>
+            </div>
+
+            <!-- Scanner Tab -->
+            <div id="officer-tab-scanner" class="officer-tab-content">
+                <div class="bg-white rounded-xl shadow p-6 text-center">
+                    <h3 class="text-lg font-bold text-suNavy mb-4">Scan Student QR Code</h3>
+                    <div id="reader" class="w-full max-w-md mx-auto rounded-lg overflow-hidden shadow-lg border border-gray-300 mb-4"></div>
+                    <p class="text-sm text-gray-500">Point the camera at the student's QR code. Ensure good lighting.</p>
+                    <button id="toggle-scanner-btn" onclick="toggleScanner()" class="mt-4 bg-suNavy text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-900 transition">Start Camera</button>
+                </div>
+            </div>
+
+            <!-- Live Attendance Tab -->
+            <div id="officer-tab-live" class="officer-tab-content hidden">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-suNavy">Live Attendance Feed</h3>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+                            Count: <span id="live-attendance-count">0</span>
+                        </span>
                     </div>
-                    <div class="psych-card-footer">
-                        <div class="psych-card-id" id="pcId">PSY-26-0000</div>
-                        <div id="qrcode-display"></div>
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="sticky top-0 bg-gray-100">
+                                <tr class="text-gray-700">
+                                    <th class="p-3 border-b">Time</th>
+                                    <th class="p-3 border-b">Student ID</th>
+                                    <th class="p-3 border-b">Name</th>
+                                    <th class="p-3 border-b">Year</th>
+                                </tr>
+                            </thead>
+                            <tbody id="live-attendance-body"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-            <div class="mt-6 flex gap-3 no-print">
-                <button onclick="window.print()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Print Card</button>
-                <button onclick="document.getElementById('psychCardModal').classList.add('hidden')" class="px-4 py-2 border rounded hover:bg-gray-100">Close</button>
-            </div>
+        </div>
+    </main>
+
+    <!-- Student Modal -->
+    <div id="student-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md fade-in">
+            <h3 class="text-xl font-bold text-suNavy mb-4" id="modal-title">Add Student</h3>
+            <form id="student-form" class="space-y-4">
+                <input type="hidden" id="edit-student-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
+                    <input type="text" id="form-student-id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="form-student-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Year Level</label>
+                    <select id="form-student-year" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="form-student-active" checked class="h-4 w-4 text-suNavy focus:ring-suNavy border-gray-300 rounded">
+                    <label class="ml-2 block text-sm text-gray-700">Active</label>
+                </div>
+                <div class="flex justify-end gap-2 mt-6">
+                    <button type="button" onclick="closeStudentModal()" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-suNavy text-white rounded-lg hover:bg-blue-900">Save Student</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- ================= JAVASCRIPT ================= -->
-    <script>
-        /* ================= FIREBASE ================= */
-        const firebaseConfig = {
-            apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
-            authDomain: "psychsoc-attendance-system.firebaseapp.com",
-            projectId: "psychsoc-attendance-system",
-            storageBucket: "psychsoc-attendance-system.firebasestorage.app",
-            messagingSenderId: "93131590758",
-            appId: "1:93131590758:web:bfea89644381b1972af1a7",
-            measurementId: "G-C5SH1EEQP2"
-        };
+    <!-- QR Modal -->
+    <div id="qr-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center fade-in">
+            <h3 class="text-xl font-bold text-suNavy mb-2">Student QR Code</h3>
+            <p id="qr-student-name" class="text-gray-600 mb-4"></p>
+            <div id="qr-code-display" class="flex justify-center mb-4"></div>
+            <p id="qr-student-id" class="text-sm font-mono text-gray-500 mb-4"></p>
+            <button onclick="document.getElementById('qr-modal').classList.add('hidden')" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Close</button>
+        </div>
+    </div>
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+    <!-- Printable QR Container -->
+    <div id="print-qr-container" class="print-only grid grid-cols-2 md:grid-cols-4 gap-4 p-4"></div>
 
-        /* ================= DOM ================= */
-        const loginPage = document.getElementById("loginPage");
-        const app = document.getElementById("app");
-        const eventName = document.getElementById("eventName");
-        const activeEventText = document.getElementById("activeEventText");
-        const result = document.getElementById("result");
-        const countEl = document.getElementById("count");
-        const email = document.getElementById("email");
-        const password = document.getElementById("password");
-        const loginError = document.getElementById("loginError");
-
-        /* ================= STATE ================= */
-        let html5QrCode = null;
-        let userRole = null;
-        let activeEvent = null;
-        let count = 0;
-        let attendanceUnsubscribe = null;
-        let scanLock = false;
-
-        /* ================= UTILITY FUNCTIONS ================= */
-        function formatTimestamp(isoString) {
-            try {
-                const date = new Date(isoString);
-                return date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-            } catch (e) { return isoString; }
-        }
-
-        /* ================= UI NAVIGATION ================= */
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-purple-100', 'text-purple-700', 'font-semibold');
-                if (btn.dataset.tab === tabName) {
-                    btn.classList.add('bg-purple-100', 'text-purple-700', 'font-semibold');
-                }
-            });
-
-            document.getElementById('pageTitle').innerText = tabName.charAt(0).toUpperCase() + tabName.slice(1);
-
-            if (tabName === 'students') {
-                loadStudents();
-            } else if (tabName === 'dashboard') {
-                setTimeout(() => startScanner(), 300);
-            } else {
-                stopScanner();
-            }
-        }
-
-        /* ================= AUTH ================= */
-        async function login() {
-            loginError.innerText = "";
-            if (!email.value || !password.value) {
-                loginError.innerText = "Please enter both email and password";
-                return;
-            }
-            try {
-                await auth.signInWithEmailAndPassword(email.value, password.value);
-            } catch (err) {
-                loginError.innerText = err.message;
-            }
-        }
-
-        async function logout() {
-            try {
-                await stopScanner();
-                if (attendanceUnsubscribe) attendanceUnsubscribe();
-                result.innerText = "Waiting...";
-                count = 0;
-                countEl.innerText = "0";
-                activeEvent = null;
-                await auth.signOut();
-            } catch (error) { console.error("Logout error:", error); }
-        }
-
-        async function loadUserRole(user) {
-            try {
-                const doc = await db.collection("users").doc(user.uid).get();
-                userRole = doc.exists ? doc.data().role : "user";
-                document.getElementById('userEmail').innerText = user.email;
-                
-                // Toggle admin-only elements
-                document.querySelectorAll('.admin-only').forEach(el => {
-                    el.style.display = userRole === 'admin' ? '' : 'none';
-                });
-            } catch (error) {
-                console.error("Error loading user role:", error);
-                userRole = "user";
-            }
-        }
-
-        /* ================= SCANNER ================= */
-        async function stopScanner() {
-            if (html5QrCode) {
-                try { await html5QrCode.stop(); html5QrCode.clear(); } catch (e) { console.warn("Scanner stop error:", e); }
-                html5QrCode = null;
-            }
-        }
-
-        async function startScanner() {
-            await stopScanner();
-            try {
-                html5QrCode = new Html5Qrcode("reader");
-                const devices = await Html5Qrcode.getCameras();
-                if (!devices || devices.length === 0) { result.innerText = "❌ No camera found"; return; }
-                
-                const backCamera = devices.find(device => device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('rear'));
-                const cameraId = backCamera ? backCamera.id : devices[0].id;
-
-                await html5QrCode.start(cameraId, { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 }, onScan, () => {});
-                result.innerText = "📷 Scanner ready - Scan Psych Card";
-            } catch (error) {
-                console.error("Scanner start error:", error);
-                result.innerText = "❌ Camera error: " + error.message;
-            }
-        }
-
-        async function onScan(decodedText) {
-            if (scanLock) return;
-            scanLock = true;
-            result.innerText = "⏳ Processing...";
-            setTimeout(() => { scanLock = false; }, 2000);
-
-            if (!activeEvent) { result.innerText = "❌ No active event"; return; }
-
-            try {
-                const studentDoc = await db.collection("students").doc(decodedText).get();
-                if (!studentDoc.exists) { result.innerText = "❌ Student not found"; return; }
-
-                const student = studentDoc.data();
-                if (!student.active) { result.innerText = "❌ Student account inactive"; return; }
-
-                const ref = db.collection("attendance").doc(activeEvent).collection("records");
-                const dup = await ref.where("studentId", "==", decodedText).get();
-                if (!dup.empty) { result.innerText = "⚠️ Already scanned"; return; }
-
-                const timestamp = new Date().toISOString();
-                const currentUserEmail = auth.currentUser?.email || "unknown";
-
-                await ref.add({
-                    studentId: decodedText,
-                    name: student.name,
-                    year: student.year,
-                    timestamp: timestamp,
-                    scannedBy: currentUserEmail
-                });
-
-                result.innerText = "✔️ " + student.name;
-                sendToGoogleSheets({ eventId: activeEvent, studentId: decodedText, name: student.name, year: student.year, timestamp: timestamp, scannedBy: currentUserEmail });
-            } catch (error) {
-                console.error("Scan error:", error);
-                result.innerText = "❌ Error: " + error.message;
-            }
-        }
-
-        async function sendToGoogleSheets(data) {
-            try {
-                await fetch("https://script.google.com/macros/s/AKfycbwWnhp4kVnc_StNi_J6D71Llc5ui63LNyB37AyPXn2vWGL2aNdavqMH17JFX_MsvaY/exec", {
-                    method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data)
-                });
-            } catch (error) { console.error("Google Sheets sync failed:", error); }
-        }
-
-        /* ================= EVENTS ================= */
-        async function loadEvents() {
-            try {
-                const snap = await db.collection("events").orderBy("createdAt", "desc").get();
-                const list = document.getElementById("eventList");
-                list.innerHTML = "";
-                if (snap.empty) { list.innerHTML = "<p class='text-gray-500'>No events created yet</p>"; return; }
-
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    const btn = document.createElement("button");
-                    btn.innerText = (data.active ? "🟢 " : "⚪ ") + data.name;
-                    btn.className = "w-full p-3 border rounded mb-2 text-left hover:bg-purple-50 transition flex justify-between items-center";
-                    
-                    if (userRole !== "admin") { btn.disabled = true; btn.classList.add("opacity-50", "cursor-not-allowed"); }
-                    btn.onclick = () => { if (userRole === "admin") setActiveEvent(doc.id); };
-                    list.appendChild(btn);
-                });
-            } catch (error) { console.error("Error loading events:", error); }
-        }
-
-        async function loadActiveEvent() {
-            try {
-                const snap = await db.collection("events").where("active", "==", true).limit(1).get();
-                if (snap.empty) {
-                    activeEvent = null;
-                    if (activeEventText) activeEventText.innerText = "No active event";
-                    return;
-                }
-                const doc = snap.docs[0];
-                activeEvent = doc.id;
-                if (activeEventText) activeEventText.innerText = "Active: " + doc.data().name;
-                listenToAttendance();
-            } catch (error) { console.error("Error loading active event:", error); }
-        }
-
-        async function createNewEvent() {
-            if (userRole !== "admin") return alert("Only admins can create events");
-            if (!eventName.value.trim()) return alert("Enter event name");
-            try {
-                await db.collection("events").add({ name: eventName.value.trim(), active: false, createdBy: auth.currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-                eventName.value = "";
-                await loadEvents();
-                alert("Event created successfully!");
-            } catch (error) { alert("Failed to create event: " + error.message); }
-        }
-
-        async function setActiveEvent(eventId) {
-            if (userRole !== "admin") return;
-            try {
-                const all = await db.collection("events").get();
-                const batch = db.batch();
-                all.forEach(doc => batch.update(doc.ref, { active: false }));
-                batch.update(db.collection("events").doc(eventId), { active: true });
-                await batch.commit();
-                await loadActiveEvent();
-                await loadEvents();
-                alert("Event activated successfully!");
-            } catch (error) { alert("Failed to activate event: " + error.message); }
-        }
-
-        async function endEvent() {
-            if (userRole !== "admin") return;
-            try {
-                const snap = await db.collection("events").where("active", "==", true).get();
-                if (snap.empty) return alert("No active event to end");
-                const batch = db.batch();
-                snap.forEach(doc => batch.update(doc.ref, { active: false }));
-                await batch.commit();
-                activeEvent = null;
-                if (activeEventText) activeEventText.innerText = "No active event";
-                if (attendanceUnsubscribe) attendanceUnsubscribe();
-                alert("Event ended successfully!");
-            } catch (error) { alert("Failed to end event: " + error.message); }
-        }
-
-        /* ================= LIVE DASHBOARD ================= */
-        function listenToAttendance() {
-            if (attendanceUnsubscribe) attendanceUnsubscribe();
-            if (!activeEvent) return;
-
-            attendanceUnsubscribe = db.collection("attendance").doc(activeEvent).collection("records").orderBy("timestamp", "desc").onSnapshot(snapshot => {
-                const list = document.getElementById("attendanceList");
-                list.innerHTML = "";
-                if (snapshot.empty) { list.innerHTML = "<p class='text-gray-500 text-sm'>No attendees yet</p>"; return; }
-
-                snapshot.forEach(doc => {
-                    const d = doc.data();
-                    const row = document.createElement("div");
-                    row.className = "p-3 border rounded text-sm mb-1 bg-white shadow-sm";
-                    row.innerHTML = `
-                        <div class="font-semibold">${d.name || 'Unknown'}</div>
-                        <div class="text-gray-500">${d.studentId || 'N/A'} • ${d.year || 'N/A'}</div>
-                        <div class="text-xs text-gray-400">${formatTimestamp(d.timestamp)}</div>
-                    `;
-                    list.appendChild(row);
-                });
-                count = snapshot.size;
-                countEl.innerText = count;
-            }, error => console.error("Attendance listener error:", error));
-        }
-
-        /* ================= STUDENTS & PSYCH CARDS ================= */
-        async function loadStudents() {
-            try {
-                const snap = await db.collection("students").orderBy("name").get();
-                const list = document.getElementById("studentList");
-                list.innerHTML = "";
-
-                if (snap.empty) {
-                    list.innerHTML = "<p class='text-gray-500 col-span-3 text-center py-10'>No students added yet.</p>";
-                    return;
-                }
-
-                snap.forEach(doc => {
-                    const s = doc.data();
-                    const card = document.createElement("div");
-                    card.className = "bg-white p-4 rounded-lg shadow flex items-center gap-4 hover:shadow-md transition cursor-pointer";
-                    card.onclick = () => showPsychCard(doc.id);
-                    
-                    card.innerHTML = `
-                        <img src="${s.photoUrl}" alt="${s.name}" class="w-16 h-16 rounded-full object-cover border-2 border-purple-200">
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-gray-800">${s.name}</h4>
-                            <p class="text-sm text-gray-500">${s.year}</p>
-                            <p class="text-xs text-purple-600 font-mono">${s.id}</p>
-                        </div>
-                        <button class="text-purple-600 hover:text-purple-800 text-xl" title="View Psych Card">🎫</button>
-                    `;
-                    list.appendChild(card);
-                });
-            } catch (error) { console.error("Error loading students:", error); }
-        }
-
-        async function addStudent() {
-            const name = document.getElementById('studentName').value.trim();
-            const year = document.getElementById('studentYear').value;
-            const photoFile = document.getElementById('studentPhoto').files[0];
-
-            if (!name || !year || !photoFile) return alert("Please fill all fields and upload a photo.");
-
-            try {
-                // Generate unique ID (Format: PSY-26-XXXX)
-                const uniqueId = "PSY-26-" + Math.floor(1000 + Math.random() * 9000);
-                
-                // Check if ID exists (rare but possible)
-                const existingDoc = await db.collection("students").doc(uniqueId).get();
-                if (existingDoc.exists) return alert("Generated ID already exists. Please try again.");
-
-                // Upload photo to Firebase Storage
-                const photoRef = storage.ref(`students/${uniqueId}.jpg`);
-                await photoRef.put(photoFile);
-                const photoUrl = await photoRef.getDownloadURL();
-
-                // Save to Firestore
-                await db.collection("students").doc(uniqueId).set({
-                    id: uniqueId,
-                    name: name,
-                    year: year,
-                    photoUrl: photoUrl,
-                    active: true,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                alert("Student added successfully!");
-                document.getElementById('addStudentModal').classList.add('hidden');
-                document.getElementById('studentName').value = "";
-                document.getElementById('studentPhoto').value = "";
-                loadStudents();
-            } catch (error) {
-                console.error("Error adding student:", error);
-                alert("Failed to add student: " + error.message);
-            }
-        }
-
-        function showPsychCard(studentId) {
-            db.collection("students").doc(studentId).get().then(doc => {
-                if (doc.exists) {
-                    const student = doc.data();
-                    document.getElementById('pcName').innerText = student.name;
-                    document.getElementById('pcYear').innerText = student.year;
-                    document.getElementById('pcId').innerText = student.id;
-                    document.getElementById('pcPhoto').src = student.photoUrl;
-                    
-                    // Generate QR Code
-                    const qrContainer = document.getElementById('qrcode-display');
-                    qrContainer.innerHTML = ""; 
-                    new QRCode(qrContainer, {
-                        text: student.id,
-                        width: 80,
-                        height: 80,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.H
-                    });
-
-                    document.getElementById('psychCardModal').classList.remove('hidden');
-                }
-            });
-        }
-
-        /* ================= AUTH STATE LISTENER ================= */
-        auth.onAuthStateChanged(async user => {
-            if (user) {
-                loginPage.classList.add("hidden");
-                app.classList.remove("hidden");
-                await loadUserRole(user);
-                await loadActiveEvent();
-                await loadEvents();
-                setTimeout(() => startScanner(), 500);
-            } else {
-                loginPage.classList.remove("hidden");
-                app.classList.add("hidden");
-                await stopScanner();
-                if (attendanceUnsubscribe) attendanceUnsubscribe();
-            }
-        });
-
-        /* ================= WINDOW EXPORTS ================= */
-        window.login = login;
-        window.logout = logout;
-        window.createNewEvent = createNewEvent;
-        window.startScanner = startScanner;
-        window.endEvent = endEvent;
-        window.setActiveEvent = setActiveEvent;
-        window.switchTab = switchTab;
-        window.addStudent = addStudent;
-        window.showPsychCard = showPsychCard;
-    </script>
+    <!-- Firebase & App Logic -->
+    <script type="module" src="app.js"></script>
 </body>
 </html>
