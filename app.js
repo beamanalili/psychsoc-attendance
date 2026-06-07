@@ -1,4 +1,4 @@
-console.log("App.js loaded successfully!");
+console.log("SU Psychology System Loaded");
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
