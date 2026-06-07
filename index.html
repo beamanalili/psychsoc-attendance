@@ -355,7 +355,7 @@
                     <button onclick="downloadIDCard()" class="bg-suNavy text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition flex items-center justify-center shadow-lg">
                         <i class="fas fa-download mr-2"></i> Download ID Card
                     </button>
-                    <button onclick="signOut(auth)" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition flex items-center justify-center">
+                    <button onclick="handleLogout()" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition flex items-center justify-center">
                         <i class="fas fa-sign-out-alt mr-2"></i> Logout
                     </button>
                 </div>
@@ -585,10 +585,14 @@
             }
         });
 
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            stopScanner();
-            signOut(auth);
-        });
+            // Global logout function so it can be called from HTML onclick attributes
+    window.handleLogout = () => {
+        stopScanner();
+        signOut(auth);
+    };
+
+    // Attach the global function to the header logout button as well
+    document.getElementById('logout-btn').addEventListener('click', window.handleLogout);
 
         window.switchTab = (tab) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
