@@ -201,7 +201,7 @@ async function createNewEvent() {
       name: eventName.value,
       active: false,
       createdBy: auth.currentUser.email,
-      createdAt: new Date()
+     createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
     alert("Event created");
@@ -218,29 +218,38 @@ async function createNewEvent() {
 async function startEvent() {
   if (userRole !== "admin") return;
 
-  const snap = await db.collection("events")
-    .orderBy("createdAt", "desc")
-    .limit(1)
-    .get();
+  const name = eventName.value.trim();
 
-  if (snap.empty) {
-    alert("No events found");
+  if (!name) {
+    alert("Enter event name to start");
     return;
   }
 
-  const eventDoc = snap.docs[0];
-
+  // turn off all events
   const all = await db.collection("events").get();
   all.forEach(doc => {
     db.collection("events").doc(doc.id).update({ active: false });
   });
+
+  // find event by name
+  const snap = await db.collection("events")
+    .where("name", "==", name)
+    .limit(1)
+    .get();
+
+  if (snap.empty) {
+    alert("Event not found");
+    return;
+  }
+
+  const eventDoc = snap.docs[0];
 
   await db.collection("events").doc(eventDoc.id).update({
     active: true
   });
 
   activeEvent = eventDoc.id;
-  activeEventText.innerText = "Active: " + eventDoc.data().name;
+  activeEventText.innerText = "Active: " + name;
 }
 
 /* ================= END EVENT ================= */
