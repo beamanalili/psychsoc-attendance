@@ -271,40 +271,132 @@
             </div>
         </div>
 
-        <!-- Student Dashboard -->
-        <div id="student-dashboard" class="hidden fade-in max-w-2xl mx-auto">
-            <!-- Registration Form (Shown to new students) -->
-            <div id="student-registration-form" class="bg-white rounded-xl shadow-lg p-8 mb-8">
-                <div class="text-center mb-6">
-                    <div class="mx-auto bg-suNavy text-white w-16 h-16 rounded-full flex items-center justify-center mb-3">
-                        <i class="fas fa-user-plus text-2xl"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-suNavy">Welcome, Student!</h2>
-                    <p class="text-gray-600 text-sm mt-1">Please complete your profile to generate your official QR ID.</p>
-                </div>
-                <form id="student-register-form" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Official Student ID</label>
-                        <input type="text" id="reg-student-id" placeholder="e.g., 20261234" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                        <input type="text" id="reg-student-name" placeholder="e.g., Juan Dela Cruz" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Year Level</label>
-                        <select id="reg-student-year" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                            <option value="1">1st Year</option>
-                            <option value="2">2nd Year</option>
-                            <option value="3">3rd Year</option>
-                            <option value="4">4th Year</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="w-full bg-suNavy text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition mt-4">
-                        Generate My ID Card
-                    </button>
-                </form>
+                <!-- Student Dashboard -->
+        <div id="student-dashboard" class="hidden fade-in max-w-3xl mx-auto">
+            <!-- Tab Navigation -->
+            <div class="flex space-x-2 mb-6 border-b border-gray-200 pb-2">
+                <button onclick="switchStudentTab('id')" id="student-tab-id-btn" class="px-4 py-2 bg-suNavy text-white rounded-t-lg font-medium transition flex items-center">
+                    <i class="fas fa-id-card mr-2"></i> My ID Card
+                </button>
+                <button onclick="switchStudentTab('attendance')" id="student-tab-attendance-btn" class="px-4 py-2 bg-white text-gray-700 rounded-t-lg font-medium hover:bg-gray-100 transition flex items-center">
+                    <i class="fas fa-history mr-2"></i> My Attendance
+                </button>
             </div>
+
+            <!-- My ID Card View -->
+            <div id="student-tab-id" class="student-tab-content">
+                <!-- Registration Form (Shown to new students) -->
+                <div id="student-registration-form" class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                    <div class="text-center mb-6">
+                        <div class="mx-auto bg-suNavy text-white w-16 h-16 rounded-full flex items-center justify-center mb-3">
+                            <i class="fas fa-user-plus text-2xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-suNavy">Welcome, Student!</h2>
+                        <p class="text-gray-600 text-sm mt-1">Please complete your profile to generate your official QR ID.</p>
+                    </div>
+                    <form id="student-register-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Official Student ID</label>
+                            <input type="text" id="reg-student-id" placeholder="e.g., 20261234" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                            <input type="text" id="reg-student-name" placeholder="e.g., Juan Dela Cruz" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Year Level</label>
+                            <select id="reg-student-year" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                                <option value="1">1st Year</option>
+                                <option value="2">2nd Year</option>
+                                <option value="3">3rd Year</option>
+                                <option value="4">4th Year</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-suNavy text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition mt-4">
+                            Generate My ID Card
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Digital ID Card (Shown after registration) -->
+                <div id="student-id-card-view" class="hidden">
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-bold text-suNavy">Your Digital ID</h2>
+                        <p class="text-gray-600 text-sm mt-1">Show this QR code to officers when attending events.</p>
+                    </div>
+
+                    <div id="student-id-card" class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200 mb-6">
+                        <div class="bg-suNavy p-4 flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <img src="school-logo.png" class="h-8 w-8 rounded-full bg-white p-0.5 object-contain">
+                                <img src="psych-logo.jpg" class="h-8 w-8 rounded-full bg-white p-0.5 object-contain">
+                            </div>
+                            <span class="text-white text-xs font-bold tracking-widest">OFFICIAL ID</span>
+                        </div>
+                        <div class="p-6 flex flex-col md:flex-row items-center gap-6">
+                            <div class="flex-grow text-center md:text-left">
+                                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Silliman University</p>
+                                <h3 id="card-name" class="text-2xl font-bold text-suNavy mt-1">Student Name</h3>
+                                <p class="text-sm text-gray-600 mt-1">Psychology Society Member</p>
+                                <div class="mt-4 space-y-1">
+                                    <p class="text-xs text-gray-500">Student ID</p>
+                                    <p id="card-id" class="font-mono font-bold text-lg text-gray-800">00000000</p>
+                                    <p class="text-xs text-gray-500 mt-2">Year Level</p>
+                                    <p id="card-year" class="font-semibold text-gray-800">1st Year</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-xl border border-gray-200">
+                                <div id="card-qr" class="w-32 h-32 flex items-center justify-center"></div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 px-6 py-2 text-center">
+                            <p class="text-[10px] text-gray-500">School Year 2026–2027 • If found, please return to SU Psych Soc.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button onclick="downloadIDCard()" class="bg-suNavy text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition flex items-center justify-center shadow-lg">
+                            <i class="fas fa-download mr-2"></i> Download ID Card
+                        </button>
+                        <button onclick="handleLogout()" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition flex items-center justify-center">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Attendance View -->
+            <div id="student-tab-attendance" class="student-tab-content hidden">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-suNavy mb-4 flex items-center">
+                        <i class="fas fa-history mr-2"></i> My Attendance History
+                    </h3>
+                    
+                    <div id="student-attendance-loading" class="text-center py-8 text-gray-500 hidden">
+                        <svg class="animate-spin h-6 w-6 mx-auto text-suNavy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <p class="mt-2">Loading your attendance records...</p>
+                    </div>
+                    
+                    <div id="student-attendance-empty" class="text-center py-8 text-gray-500 hidden">
+                        <i class="fas fa-calendar-times text-4xl mb-3 text-gray-300"></i>
+                        <p>You haven't attended any events yet.</p>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse hidden" id="student-attendance-table">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-700">
+                                    <th class="p-3 border-b">Date & Time</th>
+                                    <th class="p-3 border-b">Event Name</th>
+                                    <th class="p-3 border-b">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-attendance-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 
             <!-- Digital ID Card (Shown after registration) -->
             <div id="student-id-card-view" class="hidden">
@@ -869,74 +961,64 @@
             }
         };
 
-        async function onScanSuccess(decodedText) {
-            const now = Date.now();
-            if (now - lastScanTime < 2000) return;
-            lastScanTime = now;
-            await html5QrcodeScanner.pause();
+           async function onScanSuccess(decodedText) {
+        const now = Date.now();
+        if (now - lastScanTime < 2000) return;
+        lastScanTime = now;
+        await html5QrcodeScanner.pause();
 
-            try {
-                const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
-                if (eventSnap.empty) {
-                    showToast("❌ No active event found!", "error");
-                    html5QrcodeScanner.resume();
-                    return;
-                }
-                const activeEvent = eventSnap.docs[0];
-                const eventId = activeEvent.id;
-
-                const studentSnap = await getDoc(doc(db, "students", decodedText));
-                if (!studentSnap.exists() || !studentSnap.data().active) {
-                    showToast("❌ Invalid or Inactive Student", "error");
-                    html5QrcodeScanner.resume();
-                    return;
-                }
-                const sData = studentSnap.data();
-
-                const attSnap = await getDocs(query(collection(db, "attendance"), where("eventId", "==", eventId), where("studentId", "==", decodedText)));
-                if (!attSnap.empty) {
-                    showToast("⚠ Already Scanned for this event", "warning");
-                    html5QrcodeScanner.resume();
-                    return;
-                }
-
-                const newAttRef = doc(collection(db, "attendance"));
-                const attData = {
-                    eventId, studentId: decodedText, studentName: sData.name, studentYear: sData.year,
-                    timestamp: serverTimestamp(), scannedBy: currentUser.uid
-                };
-                await setDoc(newAttRef, attData);
-
-                sendToGoogleSheets({
-                    eventId, studentId: decodedText, name: sData.name, year: sData.year,
-                    timestamp: new Date().toISOString(), scannedBy: currentUser.email
-                });
-
-                showToast(`✔ ${sData.name} checked in!`, "success");
-            } catch (error) {
-                console.error(error);
-                showToast("❌ Scan failed.", "error");
-            } finally {
+        try {
+            const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
+            if (eventSnap.empty) {
+                showToast("❌ No active event found!", "error");
                 html5QrcodeScanner.resume();
-            }
-        }
-
-        function sendToGoogleSheets(data) {
-            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS")) {
-                console.error("❌ Google Sheets URL is not configured in index.html!");
                 return;
             }
-            console.log("📤 Sending to Google Sheets:", data);
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors", 
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(data)
-            })
-            .then(() => console.log("✅ Google Sheets request sent successfully."))
-            .catch(err => console.error("❌ Google Sheets sync failed:", err));
-        }
+            
+            const activeEvent = eventSnap.docs[0];
+            const eventId = activeEvent.id;
+            const eventName = activeEvent.data().name; // 👈 NEW: Get the event name
 
+            const studentSnap = await getDoc(doc(db, "students", decodedText));
+            if (!studentSnap.exists() || !studentSnap.data().active) {
+                showToast("❌ Invalid or Inactive Student", "error");
+                html5QrcodeScanner.resume();
+                return;
+            }
+            const sData = studentSnap.data();
+
+            const attSnap = await getDocs(query(collection(db, "attendance"), where("eventId", "==", eventId), where("studentId", "==", decodedText)));
+            if (!attSnap.empty) {
+                showToast("⚠ Already Scanned for this event", "warning");
+                html5QrcodeScanner.resume();
+                return;
+            }
+
+            const newAttRef = doc(collection(db, "attendance"));
+            const attData = {
+                eventId, 
+                eventName, // 👈 NEW: Save the event name to the database
+                studentId: decodedText, 
+                studentName: sData.name, 
+                studentYear: sData.year,
+                timestamp: serverTimestamp(), 
+                scannedBy: currentUser.uid
+            };
+            await setDoc(newAttRef, attData);
+
+            sendToGoogleSheets({
+                eventId, studentId: decodedText, name: sData.name, year: sData.year,
+                timestamp: new Date().toISOString(), scannedBy: currentUser.email
+            });
+
+            showToast(`✔ ${sData.name} checked in!`, "success");
+        } catch (error) {
+            console.error(error);
+            showToast("❌ Scan failed.", "error");
+        } finally {
+            html5QrcodeScanner.resume();
+        }
+    }
         window.startLiveAttendanceListener = async () => {
             const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
             if (eventSnap.empty) return;
@@ -1123,6 +1205,79 @@
                 showToast("ID Card Downloaded!", "success");
             });
         };
+
+            // Handle Student Dashboard Tab Switching
+    window.switchStudentTab = (tab) => {
+        document.querySelectorAll('.student-tab-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById(`student-tab-${tab}`).classList.remove('hidden');
+        
+        const idBtn = document.getElementById('student-tab-id-btn');
+        const attBtn = document.getElementById('student-tab-attendance-btn');
+        
+        if (tab === 'id') {
+            idBtn.classList.add('bg-suNavy', 'text-white');
+            idBtn.classList.remove('bg-white', 'text-gray-700');
+            attBtn.classList.remove('bg-suNavy', 'text-white');
+            attBtn.classList.add('bg-white', 'text-gray-700');
+        } else {
+            attBtn.classList.add('bg-suNavy', 'text-white');
+            attBtn.classList.remove('bg-white', 'text-gray-700');
+            idBtn.classList.remove('bg-suNavy', 'text-white');
+            idBtn.classList.add('bg-white', 'text-gray-700');
+            
+            // Automatically load attendance when the tab is clicked
+            loadStudentAttendance();
+        }
+    };
+
+    // Load and Display Student Attendance History
+    async function loadStudentAttendance() {
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        if (!userDoc.exists() || !userDoc.data().studentId) return;
+        
+        const studentId = userDoc.data().studentId;
+        const loadingEl = document.getElementById('student-attendance-loading');
+        const emptyEl = document.getElementById('student-attendance-empty');
+        const tableEl = document.getElementById('student-attendance-table');
+        const tbody = document.getElementById('student-attendance-body');
+
+        loadingEl.classList.remove('hidden');
+        emptyEl.classList.add('hidden');
+        tableEl.classList.add('hidden');
+        tbody.innerHTML = '';
+
+        try {
+            // Fetch attendance records for this specific student, newest first
+            const q = query(collection(db, "attendance"), where("studentId", "==", studentId), orderBy("timestamp", "desc"));
+            const snap = await getDocs(q);
+            
+            loadingEl.classList.add('hidden');
+
+            if (snap.empty) {
+                emptyEl.classList.remove('hidden');
+            } else {
+                tableEl.classList.remove('hidden');
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const date = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : 'Just now';
+                    const eventName = data.eventName || "Unknown Event";
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b hover:bg-gray-50";
+                    tr.innerHTML = `
+                        <td class="p-3 text-sm text-gray-600">${date}</td>
+                        <td class="p-3 font-medium text-suNavy">${eventName}</td>
+                        <td class="p-3"><span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">✔ Present</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        } catch (err) {
+            console.error("Error loading attendance:", err);
+            loadingEl.classList.add('hidden');
+            showToast("Failed to load attendance history.", "error");
+        }
+    }
 
         window.showToast = (message, type = 'info') => {
             const toast = document.createElement('div');
