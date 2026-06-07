@@ -442,11 +442,17 @@
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
+                                <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row gap-3 justify-center">
                     <button onclick="downloadIDCard()" class="bg-suNavy text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition flex items-center justify-center shadow-lg">
                         <i class="fas fa-download mr-2"></i> Download ID Card
                     </button>
+                    
+                    <!-- NEW: Button to jump to Attendance Tab -->
+                    <button onclick="switchStudentTab('attendance')" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center shadow-lg">
+                        <i class="fas fa-history mr-2"></i> View My Attendance
+                    </button>
+                    
                     <button onclick="handleLogout()" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition flex items-center justify-center">
                         <i class="fas fa-sign-out-alt mr-2"></i> Logout
                     </button>
