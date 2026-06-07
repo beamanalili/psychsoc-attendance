@@ -163,7 +163,25 @@ async function loadUserRole(user) {
 
 /* ================= EVENTS ================= */
 
-async function createEvent() {
+async function loadActiveEvent() {
+  const snap = await db.collection("events")
+    .where("active", "==", true)
+    .limit(1)
+    .get();
+
+  if (snap.empty) {
+    activeEvent = null;
+    activeEventText.innerText = "No active event";
+    return;
+  }
+
+  const doc = snap.docs[0];
+  activeEvent = doc.id;
+
+  activeEventText.innerText = "Active: " + doc.data().name;
+}
+
+  async function createEvent() {
   if (userRole !== "admin") return;
 
   await db.collection("events").add({
@@ -176,35 +194,49 @@ async function createEvent() {
   alert("Event created");
 }
 
-async function startEvent() {
+  async function startEvent() {
   if (userRole !== "admin") return;
 
+  const events = await db.collection("events").get();
+
+  // turn OFF all events first
+  events.forEach(doc => {
+    db.collection("events").doc(doc.id).update({ active: false });
+  });
+
+  // pick the event you want to start (by name input)
+  const name = eventName.value;
+
   const snap = await db.collection("events")
-    .orderBy("createdAt", "desc")
+    .where("name", "==", name)
     .limit(1)
     .get();
 
-  if (snap.empty) return;
+  if (snap.empty) {
+    alert("Event not found");
+    return;
+  }
 
-  const event = snap.docs[0];
+  const eventDoc = snap.docs[0];
 
-  const all = await db.collection("events").get();
-  all.forEach(d => db.collection("events").doc(d.id).update({ active: false }));
+  await db.collection("events").doc(eventDoc.id).update({
+    active: true
+  });
 
-  await db.collection("events").doc(event.id).update({ active: true });
-
-  activeEvent = event.id;
-  activeEventText.innerText = "Active: " + event.data().name;
+  activeEvent = eventDoc.id;
+  activeEventText.innerText = "Active: " + name;
 }
 
-async function endEvent() {
+  async function endEvent() {
   if (userRole !== "admin") return;
 
   const snap = await db.collection("events")
     .where("active", "==", true)
     .get();
 
-  snap.forEach(d => db.collection("events").doc(d.id).update({ active: false }));
+  snap.forEach(doc => {
+    db.collection("events").doc(doc.id).update({ active: false });
+  });
 
   activeEvent = null;
   activeEventText.innerText = "No active event";
