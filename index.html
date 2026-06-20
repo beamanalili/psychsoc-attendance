@@ -174,9 +174,10 @@
                         <input type="text" id="new-user-name" placeholder="Full Name (e.g., Juan Dela Cruz)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
                         <input type="email" id="new-user-email" placeholder="User Email (Must match Firebase Auth)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
                         <select id="new-user-role" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                            <option value="officer">Officer</option>
-                            <option value="admin">Admin</option>
-                        </select>
+    <option value="officer">Officer</option>
+    <option value="admin">Admin</option>
+    <option value="treasurer">Treasurer</option>
+</select>
                         <button type="submit" class="bg-suNavy text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-900 transition whitespace-nowrap">Assign Role</button>
                     </form>
                     <div id="users-list" class="space-y-2"></div>
@@ -333,6 +334,68 @@
                 </div>
             </div>
         </div>
+
+        <!-- Treasurer Dashboard -->
+<div id="treasurer-dashboard" class="hidden fade-in">
+    <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-lg font-bold text-suNavy mb-4">Society Fee Payment Management</h3>
+        
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <p class="text-sm text-blue-600 font-medium">Total Students</p>
+                <p id="treasurer-total" class="text-2xl font-bold text-suNavy">0</p>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                <p class="text-sm text-green-600 font-medium">Paid</p>
+                <p id="treasurer-paid" class="text-2xl font-bold text-green-700">0</p>
+            </div>
+            <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                <p class="text-sm text-red-600 font-medium">Unpaid</p>
+                <p id="treasurer-unpaid" class="text-2xl font-bold text-red-700">0</p>
+            </div>
+            <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                <p class="text-sm text-yellow-600 font-medium">Early Bird</p>
+                <p id="treasurer-earlybird" class="text-2xl font-bold text-yellow-700">0</p>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-3 mb-4">
+            <select id="treasurer-filter-status" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                <option value="all">All Status</option>
+                <option value="paid">Paid Only</option>
+                <option value="unpaid">Unpaid Only</option>
+            </select>
+            <select id="treasurer-filter-type" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                <option value="all">All Types</option>
+                <option value="early-bird">Early Bird</option>
+                <option value="regular">Regular</option>
+            </select>
+            <button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+                <i class="fas fa-download mr-2"></i>Export Payments
+            </button>
+        </div>
+
+        <!-- Payments Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-700">
+                        <th class="p-3 border-b">Student ID</th>
+                        <th class="p-3 border-b">Name</th>
+                        <th class="p-3 border-b">Year</th>
+                        <th class="p-3 border-b">Status</th>
+                        <th class="p-3 border-b">Type</th>
+                        <th class="p-3 border-b">Date Paid</th>
+                        <th class="p-3 border-b">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="treasurer-payments-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
                 <!-- Student Dashboard -->
         <div id="student-dashboard" class="hidden fade-in max-w-3xl mx-auto">
@@ -995,10 +1058,16 @@ window.switchStudentTab = (tab) => {
             try {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 
-                if (userDoc.exists()) {
+                                if (userDoc.exists()) {
                     currentRole = userDoc.data().role;
                     console.log("📂 Existing user role found:", currentRole);
                     document.getElementById('user-role-badge').innerText = currentRole;
+                    
+                    // Hide all dashboards first
+                    document.getElementById('admin-dashboard').classList.add('hidden');
+                    document.getElementById('officer-dashboard').classList.add('hidden');
+                    document.getElementById('student-dashboard').classList.add('hidden');
+                    document.getElementById('treasurer-dashboard').classList.add('hidden');
                     
                     if (currentRole === 'admin') {
                         document.getElementById('admin-dashboard').classList.remove('hidden');
@@ -1008,7 +1077,12 @@ window.switchStudentTab = (tab) => {
                     } else if (currentRole === 'student') {
                         document.getElementById('student-dashboard').classList.remove('hidden');
                         loadStudentProfile(user.uid);
+                    } else if (currentRole === 'treasurer') {
+                        // NEW: Treasurer role
+                        document.getElementById('treasurer-dashboard').classList.remove('hidden');
+                        renderTreasurerPayments();
                     }
+                }
                 } else {
                     console.log("🆕 New user detected. Showing registration form.");
                     currentRole = 'pending';
@@ -1736,6 +1810,105 @@ window.switchStudentTab = (tab) => {
             showToast("Failed to load attendance history.", "error");
         }
     }
+
+        // Render treasurer payments table
+window.renderTreasurerPayments = async () => {
+    const statusFilter = document.getElementById('treasurer-filter-status').value;
+    const typeFilter = document.getElementById('treasurer-filter-type').value;
+    
+    const snap = await getDocs(collection(db, "students"));
+    const tbody = document.getElementById('treasurer-payments-body');
+    tbody.innerHTML = "";
+    
+    let total = 0, paid = 0, unpaid = 0, earlybird = 0;
+    
+    snap.forEach(docSnap => {
+        const data = docSnap.data();
+        total++;
+        
+        const status = data.paymentStatus || 'unpaid';
+        const type = data.paymentType || 'none';
+        
+        if (status === 'paid') paid++;
+        else unpaid++;
+        
+        if (type === 'early-bird') earlybird++;
+        
+        // Apply filters
+        if (statusFilter !== 'all' && status !== statusFilter) return;
+        if (typeFilter !== 'all' && type !== typeFilter) return;
+        
+        const tr = document.createElement('tr');
+        tr.className = "border-b hover:bg-gray-50";
+        
+        const statusBadge = status === 'paid' 
+            ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">Paid</span>'
+            : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Unpaid</span>';
+        
+        const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : '-';
+        const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : '-';
+        
+        tr.innerHTML = `
+            <td class="p-3 font-mono text-sm">${docSnap.id}</td>
+            <td class="p-3">${data.name}</td>
+            <td class="p-3">${data.year}</td>
+            <td class="p-3">${statusBadge}</td>
+            <td class="p-3">${typeDisplay}</td>
+            <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
+            <td class="p-3">
+                <button onclick="treasurerMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
+                    ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Update'}
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    // Update summary cards
+    document.getElementById('treasurer-total').innerText = total;
+    document.getElementById('treasurer-paid').innerText = paid;
+    document.getElementById('treasurer-unpaid').innerText = unpaid;
+    document.getElementById('treasurer-earlybird').innerText = earlybird;
+};
+
+// Treasurer mark as paid (simplified modal)
+window.treasurerMarkPaid = async (studentId) => {
+    const snap = await getDoc(doc(db, "students", studentId));
+    const data = snap.data();
+    
+    if (data.paymentStatus === 'paid') {
+        // Already paid, show simple update prompt
+        const newType = prompt(`Current: ${data.paymentType}\n\nEnter new payment type (early-bird/regular/none):`, data.paymentType);
+        if (newType && ['early-bird', 'regular', 'none'].includes(newType)) {
+            await updateDoc(doc(db, "students", studentId), {
+                paymentType: newType,
+                paymentDate: serverTimestamp()
+            });
+            showToast("Payment updated!", "success");
+            renderTreasurerPayments();
+        }
+    } else {
+        // Mark as unpaid, ask for type
+        const paymentType = prompt("Select payment type:\n1. Early Bird (₱150)\n2. Regular (₱200)\n\nEnter 1 or 2:", "2");
+        
+        if (paymentType === '1') {
+            await updateDoc(doc(db, "students", studentId), {
+                paymentStatus: 'paid',
+                paymentType: 'early-bird',
+                paymentDate: serverTimestamp()
+            });
+            showToast(`${data.name} marked as Early Bird paid!`, "success");
+        } else if (paymentType === '2') {
+            await updateDoc(doc(db, "students", studentId), {
+                paymentStatus: 'paid',
+                paymentType: 'regular',
+                paymentDate: serverTimestamp()
+            });
+            showToast(`${data.name} marked as Regular paid!`, "success");
+        }
+        renderTreasurerPayments();
+    }
+};
 
     window.showToast = (message, type = 'info') => {
         const toast = document.createElement('div');
