@@ -740,7 +740,7 @@
     <!-- ========================================== -->
     <!-- ALL JAVASCRIPT LOGIC EMBEDDED HERE         -->
     <!-- ========================================== -->
-    <script type="module">
+   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -774,262 +774,6 @@
     window.addEventListener('online', () => document.getElementById('offline-banner').classList.add('hidden'));
     window.addEventListener('offline', () => document.getElementById('offline-banner').classList.remove('hidden'));
 
-        // Update student form to include payment data
-document.getElementById('student-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    const originalText = btn.innerHTML;
-    setButtonLoading(btn, true);
-
-    const id = document.getElementById('edit-student-id').value || document.getElementById('form-student-id').value;
-    const name = document.getElementById('form-student-name').value;
-    const year = parseInt(document.getElementById('form-student-year').value);
-    const active = document.getElementById('form-student-active').checked;
-    
-    // NEW: Payment fields
-    const paymentStatus = document.getElementById('form-payment-status').value;
-    const paymentType = document.getElementById('form-payment-type').value;
-    const paymentDate = paymentStatus === 'paid' ? (document.getElementById('edit-student-id').value ? serverTimestamp() : null) : null;
-
-    try {
-        const studentData = { 
-            name, 
-            year, 
-            active, 
-            qrCode: id,
-            paymentStatus,
-            paymentType
-        };
-        
-        // Only update payment date if marking as paid for the first time
-        if (paymentStatus === 'paid' && paymentDate) {
-            studentData.paymentDate = serverTimestamp();
-        }
-        
-        await setDoc(doc(db, "students", id), studentData, { merge: true });
-        showToast("Student saved!", "success");
-        closeStudentModal();
-        renderStudents();
-        renderPayments();
-    } catch (err) { 
-        showToast("Error saving student", "error"); 
-    } finally { 
-        setButtonLoading(btn, false, originalText); 
-    }
-});
-
-// Load payment data when editing student
-window.editStudent = async (id) => {
-    const snap = await getDoc(doc(db, "students", id));
-    const data = snap.data();
-    document.getElementById('edit-student-id').value = id;
-    document.getElementById('form-student-id').value = id;
-    document.getElementById('form-student-id').disabled = true;
-    document.getElementById('form-student-name').value = data.name;
-    document.getElementById('form-student-year').value = data.year;
-    document.getElementById('form-student-active').checked = data.active;
-    
-    // NEW: Load payment data
-    document.getElementById('form-payment-status').value = data.paymentStatus || 'unpaid';
-    document.getElementById('form-payment-type').value = data.paymentType || 'none';
-    
-    document.getElementById('modal-title').innerText = "Edit Student";
-    document.getElementById('student-modal').classList.remove('hidden');
-    document.getElementById('student-modal').classList.add('flex');
-};
-
-// Render payments table
-window.renderPayments = async () => {
-    const statusFilter = document.getElementById('payment-filter-status').value;
-    const typeFilter = document.getElementById('payment-filter-type').value;
-    
-    const snap = await getDocs(collection(db, "students"));
-    const tbody = document.getElementById('payments-table-body');
-    tbody.innerHTML = "";
-    
-    let total = 0, paid = 0, unpaid = 0, earlybird = 0;
-    
-    snap.forEach(docSnap => {
-        const data = docSnap.data();
-        total++;
-        
-        const status = data.paymentStatus || 'unpaid';
-        const type = data.paymentType || 'none';
-        
-        if (status === 'paid') paid++;
-        else unpaid++;
-        
-        if (type === 'early-bird') earlybird++;
-        
-        // Apply filters
-        if (statusFilter !== 'all' && status !== statusFilter) return;
-        if (typeFilter !== 'all' && type !== typeFilter) return;
-        
-        const tr = document.createElement('tr');
-        tr.className = "border-b hover:bg-gray-50";
-        
-        const statusBadge = status === 'paid' 
-            ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">Paid</span>'
-            : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Unpaid</span>';
-        
-        const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : '-';
-        const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : '-';
-        
-        tr.innerHTML = `
-            <td class="p-3 font-mono text-sm">${docSnap.id}</td>
-            <td class="p-3">${data.name}</td>
-            <td class="p-3">${data.year}</td>
-            <td class="p-3">${statusBadge}</td>
-            <td class="p-3">${typeDisplay}</td>
-            <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
-            <td class="p-3">
-                <button onclick="quickMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
-                    ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Edit'}
-                </button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-    
-    // Update summary cards
-    document.getElementById('payment-total').innerText = total;
-    document.getElementById('payment-paid').innerText = paid;
-    document.getElementById('payment-unpaid').innerText = unpaid;
-    document.getElementById('payment-earlybird').innerText = earlybird;
-};
-
-// Quick mark as paid
-window.quickMarkPaid = async (studentId) => {
-    const snap = await getDoc(doc(db, "students", studentId));
-    const data = snap.data();
-    
-    if (data.paymentStatus === 'paid') {
-        // Already paid, open edit modal
-        editStudent(studentId);
-    } else {
-        // Mark as paid with regular payment
-        await updateDoc(doc(db, "students", studentId), {
-            paymentStatus: 'paid',
-            paymentType: 'regular',
-            paymentDate: serverTimestamp()
-        });
-        showToast(`${data.name} marked as paid!`, "success");
-        renderPayments();
-    }
-};
-
-// Export payments
-window.exportPayments = async () => {
-    showToast("Preparing export...", "info");
-    const snap = await getDocs(collection(db, "students"));
-    const data = [];
-    
-    snap.forEach(docSnap => {
-        const student = docSnap.data();
-        data.push({
-            "Student ID": docSnap.id,
-            "Name": student.name,
-            "Year": student.year,
-            "Payment Status": student.paymentStatus || 'unpaid',
-            "Payment Type": student.paymentType || 'none',
-            "Amount": student.paymentType === 'early-bird' ? 150 : student.paymentType === 'regular' ? 200 : 0,
-            "Date Paid": student.paymentDate ? new Date(student.paymentDate.seconds * 1000).toLocaleDateString() : ''
-        });
-    });
-    
-    if (data.length === 0) {
-        showToast("No payment data to export.", "warning");
-        return;
-    }
-    
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Payments");
-    XLSX.writeFile(wb, `Society_Fee_Payments_${new Date().toISOString().split('T')[0]}.xlsx`);
-    showToast("Payment data exported!", "success");
-};
-
-// Load student payment status
-async function loadStudentPayment() {
-    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-    if (!userDoc.exists() || !userDoc.data().studentId) return;
-    
-    const studentId = userDoc.data().studentId;
-    const loadingEl = document.getElementById('student-payment-loading');
-    const infoEl = document.getElementById('student-payment-info');
-    
-    loadingEl.classList.remove('hidden');
-    infoEl.classList.add('hidden');
-    
-    try {
-        const studentDoc = await getDoc(doc(db, "students", studentId));
-        if (studentDoc.exists()) {
-            const data = studentDoc.data();
-            const status = data.paymentStatus || 'unpaid';
-            const type = data.paymentType || 'none';
-            
-            // Update status card styling
-            const statusCard = document.getElementById('payment-status-card');
-            const statusBadge = document.getElementById('payment-status-badge');
-            
-            if (status === 'paid') {
-                statusCard.className = 'rounded-xl p-6 mb-4 border-2 bg-green-50 border-green-300';
-                statusBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-green-600 text-white';
-                statusBadge.innerText = '✓ PAID';
-            } else {
-                statusCard.className = 'rounded-xl p-6 mb-4 border-2 bg-red-50 border-red-300';
-                statusBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-red-600 text-white';
-                statusBadge.innerText = '✗ UNPAID';
-            }
-            
-            // Update payment details
-            const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : 'Not Applicable';
-            const amount = type === 'early-bird' ? '₱150' : type === 'regular' ? '₱200' : '₱0';
-            const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : 'Not yet paid';
-            
-            document.getElementById('payment-type-display').innerText = typeDisplay;
-            document.getElementById('payment-amount-display').innerText = amount;
-            document.getElementById('payment-date-display').innerText = dateDisplay;
-            
-            loadingEl.classList.add('hidden');
-            infoEl.classList.remove('hidden');
-        }
-    } catch (err) {
-        console.error("Error loading payment status:", err);
-        loadingEl.classList.add('hidden');
-        showToast("Failed to load payment status.", "error");
-    }
-}
-
-// Update switchStudentTab to handle payment tab
-window.switchStudentTab = (tab) => {
-    document.querySelectorAll('.student-tab-content').forEach(el => el.classList.add('hidden'));
-    document.getElementById(`student-tab-${tab}`).classList.remove('hidden');
-    
-    const idBtn = document.getElementById('student-tab-id-btn');
-    const attBtn = document.getElementById('student-tab-attendance-btn');
-    const payBtn = document.getElementById('student-tab-payment-btn');
-    
-    [idBtn, attBtn, payBtn].forEach(btn => {
-        btn.classList.remove('bg-suNavy', 'text-white');
-        btn.classList.add('bg-white', 'text-gray-700');
-    });
-    
-    if (tab === 'id') {
-        idBtn.classList.add('bg-suNavy', 'text-white');
-        idBtn.classList.remove('bg-white', 'text-gray-700');
-    } else if (tab === 'attendance') {
-        attBtn.classList.add('bg-suNavy', 'text-white');
-        attBtn.classList.remove('bg-white', 'text-gray-700');
-        loadStudentAttendance();
-    } else if (tab === 'payment') {
-        payBtn.classList.add('bg-suNavy', 'text-white');
-        payBtn.classList.remove('bg-white', 'text-gray-700');
-        loadStudentPayment();
-    }
-};
-
-    // Helper function to disable buttons and show a spinner while processing
     function setButtonLoading(btn, isLoading, originalText) {
         if (isLoading) {
             btn.disabled = true;
@@ -1054,20 +798,15 @@ window.switchStudentTab = (tab) => {
             document.getElementById('admin-dashboard').classList.add('hidden');
             document.getElementById('officer-dashboard').classList.add('hidden');
             document.getElementById('student-dashboard').classList.add('hidden');
+            document.getElementById('treasurer-dashboard').classList.add('hidden');
 
             try {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 
-                                if (userDoc.exists()) {
+                if (userDoc.exists()) {
                     currentRole = userDoc.data().role;
                     console.log("📂 Existing user role found:", currentRole);
                     document.getElementById('user-role-badge').innerText = currentRole;
-                    
-                    // Hide all dashboards first
-                    document.getElementById('admin-dashboard').classList.add('hidden');
-                    document.getElementById('officer-dashboard').classList.add('hidden');
-                    document.getElementById('student-dashboard').classList.add('hidden');
-                    document.getElementById('treasurer-dashboard').classList.add('hidden');
                     
                     if (currentRole === 'admin') {
                         document.getElementById('admin-dashboard').classList.remove('hidden');
@@ -1078,11 +817,9 @@ window.switchStudentTab = (tab) => {
                         document.getElementById('student-dashboard').classList.remove('hidden');
                         loadStudentProfile(user.uid);
                     } else if (currentRole === 'treasurer') {
-                        // NEW: Treasurer role
                         document.getElementById('treasurer-dashboard').classList.remove('hidden');
                         renderTreasurerPayments();
                     }
-                }
                 } else {
                     console.log("🆕 New user detected. Showing registration form.");
                     currentRole = 'pending';
@@ -1094,10 +831,17 @@ window.switchStudentTab = (tab) => {
                     
                     const idBtn = document.getElementById('student-tab-id-btn');
                     const attBtn = document.getElementById('student-tab-attendance-btn');
-                    idBtn.classList.add('bg-suNavy', 'text-white');
-                    idBtn.classList.remove('bg-white', 'text-gray-700');
-                    attBtn.classList.remove('bg-suNavy', 'text-white');
-                    attBtn.classList.add('bg-white', 'text-gray-700');
+                    const payBtn = document.getElementById('student-tab-payment-btn');
+                    if (idBtn && attBtn) {
+                        idBtn.classList.add('bg-suNavy', 'text-white');
+                        idBtn.classList.remove('bg-white', 'text-gray-700');
+                        attBtn.classList.remove('bg-suNavy', 'text-white');
+                        attBtn.classList.add('bg-white', 'text-gray-700');
+                        if (payBtn) {
+                            payBtn.classList.remove('bg-suNavy', 'text-white');
+                            payBtn.classList.add('bg-white', 'text-gray-700');
+                        }
+                    }
 
                     document.getElementById('student-registration-form').classList.remove('hidden');
                     document.getElementById('student-id-card-view').classList.add('hidden');
@@ -1116,6 +860,7 @@ window.switchStudentTab = (tab) => {
             document.getElementById('admin-dashboard').classList.add('hidden');
             document.getElementById('officer-dashboard').classList.add('hidden');
             document.getElementById('student-dashboard').classList.add('hidden');
+            document.getElementById('treasurer-dashboard').classList.add('hidden');
             document.getElementById('user-info').classList.add('hidden');
             stopScanner();
         }
@@ -1196,19 +941,19 @@ window.switchStudentTab = (tab) => {
     document.getElementById('logout-btn').addEventListener('click', window.handleLogout);
 
     window.switchTab = (tab) => {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-    document.getElementById(`tab-${tab}`).classList.remove('hidden');
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-suNavy', 'text-white');
-        btn.classList.add('bg-white', 'text-gray-700');
-    });
-    event.target.classList.remove('bg-white', 'text-gray-700');
-    event.target.classList.add('bg-suNavy', 'text-white');
-    
-    if (tab === 'analytics') loadAnalytics();
-    if (tab === 'export') updateExportUI();
-    if (tab === 'payments') renderPayments(); // NEW: Load payments
-};
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById(`tab-${tab}`).classList.remove('hidden');
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('bg-suNavy', 'text-white');
+            btn.classList.add('bg-white', 'text-gray-700');
+        });
+        event.target.classList.remove('bg-white', 'text-gray-700');
+        event.target.classList.add('bg-suNavy', 'text-white');
+        if (tab === 'analytics') loadAnalytics();
+        if (tab === 'export') updateExportUI();
+        if (tab === 'payments') renderPayments();
+    };
+
     window.switchOfficerTab = (tab) => {
         document.querySelectorAll('.officer-tab-content').forEach(el => el.classList.add('hidden'));
         document.getElementById(`officer-tab-${tab}`).classList.remove('hidden');
@@ -1228,18 +973,32 @@ window.switchStudentTab = (tab) => {
         
         const idBtn = document.getElementById('student-tab-id-btn');
         const attBtn = document.getElementById('student-tab-attendance-btn');
+        const payBtn = document.getElementById('student-tab-payment-btn');
+        
+        [idBtn, attBtn, payBtn].forEach(btn => {
+            if (btn) {
+                btn.classList.remove('bg-suNavy', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-700');
+            }
+        });
         
         if (tab === 'id') {
-            idBtn.classList.add('bg-suNavy', 'text-white');
-            idBtn.classList.remove('bg-white', 'text-gray-700');
-            attBtn.classList.remove('bg-suNavy', 'text-white');
-            attBtn.classList.add('bg-white', 'text-gray-700');
-        } else {
-            attBtn.classList.add('bg-suNavy', 'text-white');
-            attBtn.classList.remove('bg-white', 'text-gray-700');
-            idBtn.classList.remove('bg-suNavy', 'text-white');
-            idBtn.classList.add('bg-white', 'text-gray-700');
+            if (idBtn) {
+                idBtn.classList.add('bg-suNavy', 'text-white');
+                idBtn.classList.remove('bg-white', 'text-gray-700');
+            }
+        } else if (tab === 'attendance') {
+            if (attBtn) {
+                attBtn.classList.add('bg-suNavy', 'text-white');
+                attBtn.classList.remove('bg-white', 'text-gray-700');
+            }
             loadStudentAttendance();
+        } else if (tab === 'payment') {
+            if (payBtn) {
+                payBtn.classList.add('bg-suNavy', 'text-white');
+                payBtn.classList.remove('bg-white', 'text-gray-700');
+            }
+            loadStudentPayment();
         }
     };
 
@@ -1255,8 +1014,11 @@ window.switchStudentTab = (tab) => {
             showToast("Event created!", "success");
             document.getElementById('event-name').value = "";
             renderEvents();
-        } catch (err) { showToast("Error creating event", "error"); } 
-        finally { setButtonLoading(btn, false, originalText); }
+        } catch (err) { 
+            showToast("Error creating event", "error"); 
+        } finally { 
+            setButtonLoading(btn, false, originalText); 
+        }
     });
 
     window.renderEvents = async () => {
@@ -1294,7 +1056,9 @@ window.switchStudentTab = (tab) => {
             await batch.commit();
             showToast("Event activated!", "success");
             renderEvents();
-        } catch (err) { showToast("Failed to activate", "error"); }
+        } catch (err) { 
+            showToast("Failed to activate", "error"); 
+        }
     };
 
     window.endEvent = async (eventId) => {
@@ -1302,7 +1066,9 @@ window.switchStudentTab = (tab) => {
             await updateDoc(doc(db, "events", eventId), { active: false });
             showToast("Event ended.", "success");
             renderEvents();
-        } catch (err) { showToast("Failed to end event", "error"); }
+        } catch (err) { 
+            showToast("Failed to end event", "error"); 
+        }
     };
 
     window.renderStudents = async () => {
@@ -1356,6 +1122,8 @@ window.switchStudentTab = (tab) => {
         document.getElementById('form-student-name').value = data.name;
         document.getElementById('form-student-year').value = data.year;
         document.getElementById('form-student-active').checked = data.active;
+        document.getElementById('form-payment-status').value = data.paymentStatus || 'unpaid';
+        document.getElementById('form-payment-type').value = data.paymentType || 'none';
         document.getElementById('modal-title').innerText = "Edit Student";
         document.getElementById('student-modal').classList.remove('hidden');
         document.getElementById('student-modal').classList.add('flex');
@@ -1371,13 +1139,24 @@ window.switchStudentTab = (tab) => {
         const name = document.getElementById('form-student-name').value;
         const year = parseInt(document.getElementById('form-student-year').value);
         const active = document.getElementById('form-student-active').checked;
+        const paymentStatus = document.getElementById('form-payment-status').value;
+        const paymentType = document.getElementById('form-payment-type').value;
+        
         try {
-            await setDoc(doc(db, "students", id), { name, year, active, qrCode: id });
+            const studentData = { name, year, active, qrCode: id, paymentStatus, paymentType };
+            if (paymentStatus === 'paid') {
+                studentData.paymentDate = serverTimestamp();
+            }
+            await setDoc(doc(db, "students", id), studentData, { merge: true });
             showToast("Student saved!", "success");
             closeStudentModal();
             renderStudents();
-        } catch (err) { showToast("Error saving student", "error"); } 
-        finally { setButtonLoading(btn, false, originalText); }
+            renderPayments();
+        } catch (err) { 
+            showToast("Error saving student", "error"); 
+        } finally { 
+            setButtonLoading(btn, false, originalText); 
+        }
     });
 
     window.toggleStudentActive = async (id, status) => {
@@ -1451,8 +1230,11 @@ window.switchStudentTab = (tab) => {
             showToast("Role assigned successfully!", "success");
             document.getElementById('add-user-form').reset();
             renderUsers();
-        } catch (err) { showToast("Error assigning role: " + err.message, "error"); } 
-        finally { setButtonLoading(btn, false, originalText); }
+        } catch (err) { 
+            showToast("Error assigning role: " + err.message, "error"); 
+        } finally { 
+            setButtonLoading(btn, false, originalText); 
+        }
     });
 
     window.toggleScanner = async () => {
@@ -1682,6 +1464,203 @@ window.switchStudentTab = (tab) => {
         showToast("Export successful!", "success");
     };
 
+    window.renderPayments = async () => {
+        const statusFilter = document.getElementById('payment-filter-status').value;
+        const typeFilter = document.getElementById('payment-filter-type').value;
+        
+        const snap = await getDocs(collection(db, "students"));
+        const tbody = document.getElementById('payments-table-body');
+        tbody.innerHTML = "";
+        
+        let total = 0, paid = 0, unpaid = 0, earlybird = 0;
+        
+        snap.forEach(docSnap => {
+            const data = docSnap.data();
+            total++;
+            
+            const status = data.paymentStatus || 'unpaid';
+            const type = data.paymentType || 'none';
+            
+            if (status === 'paid') paid++;
+            else unpaid++;
+            
+            if (type === 'early-bird') earlybird++;
+            
+            if (statusFilter !== 'all' && status !== statusFilter) return;
+            if (typeFilter !== 'all' && type !== typeFilter) return;
+            
+            const tr = document.createElement('tr');
+            tr.className = "border-b hover:bg-gray-50";
+            
+            const statusBadge = status === 'paid' 
+                ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">Paid</span>'
+                : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Unpaid</span>';
+            
+            const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : '-';
+            const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : '-';
+            
+            tr.innerHTML = `
+                <td class="p-3 font-mono text-sm">${docSnap.id}</td>
+                <td class="p-3">${data.name}</td>
+                <td class="p-3">${data.year}</td>
+                <td class="p-3">${statusBadge}</td>
+                <td class="p-3">${typeDisplay}</td>
+                <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
+                <td class="p-3">
+                    <button onclick="quickMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
+                        ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Edit'}
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+        document.getElementById('payment-total').innerText = total;
+        document.getElementById('payment-paid').innerText = paid;
+        document.getElementById('payment-unpaid').innerText = unpaid;
+        document.getElementById('payment-earlybird').innerText = earlybird;
+    };
+
+    window.quickMarkPaid = async (studentId) => {
+        const snap = await getDoc(doc(db, "students", studentId));
+        const data = snap.data();
+        
+        if (data.paymentStatus === 'paid') {
+            editStudent(studentId);
+        } else {
+            await updateDoc(doc(db, "students", studentId), {
+                paymentStatus: 'paid',
+                paymentType: 'regular',
+                paymentDate: serverTimestamp()
+            });
+            showToast(`${data.name} marked as paid!`, "success");
+            renderPayments();
+        }
+    };
+
+    window.exportPayments = async () => {
+        showToast("Preparing export...", "info");
+        const snap = await getDocs(collection(db, "students"));
+        const data = [];
+        
+        snap.forEach(docSnap => {
+            const student = docSnap.data();
+            data.push({
+                "Student ID": docSnap.id,
+                "Name": student.name,
+                "Year": student.year,
+                "Payment Status": student.paymentStatus || 'unpaid',
+                "Payment Type": student.paymentType || 'none',
+                "Amount": student.paymentType === 'early-bird' ? 150 : student.paymentType === 'regular' ? 200 : 0,
+                "Date Paid": student.paymentDate ? new Date(student.paymentDate.seconds * 1000).toLocaleDateString() : ''
+            });
+        });
+        
+        if (data.length === 0) {
+            showToast("No payment data to export.", "warning");
+            return;
+        }
+        
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Payments");
+        XLSX.writeFile(wb, `Society_Fee_Payments_${new Date().toISOString().split('T')[0]}.xlsx`);
+        showToast("Payment data exported!", "success");
+    };
+
+    window.renderTreasurerPayments = async () => {
+        const statusFilter = document.getElementById('treasurer-filter-status').value;
+        const typeFilter = document.getElementById('treasurer-filter-type').value;
+        
+        const snap = await getDocs(collection(db, "students"));
+        const tbody = document.getElementById('treasurer-payments-body');
+        tbody.innerHTML = "";
+        
+        let total = 0, paid = 0, unpaid = 0, earlybird = 0;
+        
+        snap.forEach(docSnap => {
+            const data = docSnap.data();
+            total++;
+            
+            const status = data.paymentStatus || 'unpaid';
+            const type = data.paymentType || 'none';
+            
+            if (status === 'paid') paid++;
+            else unpaid++;
+            
+            if (type === 'early-bird') earlybird++;
+            
+            if (statusFilter !== 'all' && status !== statusFilter) return;
+            if (typeFilter !== 'all' && type !== typeFilter) return;
+            
+            const tr = document.createElement('tr');
+            tr.className = "border-b hover:bg-gray-50";
+            
+            const statusBadge = status === 'paid' 
+                ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">Paid</span>'
+                : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Unpaid</span>';
+            
+            const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : '-';
+            const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : '-';
+            
+            tr.innerHTML = `
+                <td class="p-3 font-mono text-sm">${docSnap.id}</td>
+                <td class="p-3">${data.name}</td>
+                <td class="p-3">${data.year}</td>
+                <td class="p-3">${statusBadge}</td>
+                <td class="p-3">${typeDisplay}</td>
+                <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
+                <td class="p-3">
+                    <button onclick="treasurerMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
+                        ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Update'}
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+        document.getElementById('treasurer-total').innerText = total;
+        document.getElementById('treasurer-paid').innerText = paid;
+        document.getElementById('treasurer-unpaid').innerText = unpaid;
+        document.getElementById('treasurer-earlybird').innerText = earlybird;
+    };
+
+    window.treasurerMarkPaid = async (studentId) => {
+        const snap = await getDoc(doc(db, "students", studentId));
+        const data = snap.data();
+        
+        if (data.paymentStatus === 'paid') {
+            const newType = prompt(`Current: ${data.paymentType}\n\nEnter new payment type (early-bird/regular/none):`, data.paymentType);
+            if (newType && ['early-bird', 'regular', 'none'].includes(newType)) {
+                await updateDoc(doc(db, "students", studentId), {
+                    paymentType: newType,
+                    paymentDate: serverTimestamp()
+                });
+                showToast("Payment updated!", "success");
+                renderTreasurerPayments();
+            }
+        } else {
+            const paymentType = prompt("Select payment type:\n1. Early Bird (₱150)\n2. Regular (₱200)\n\nEnter 1 or 2:", "2");
+            
+            if (paymentType === '1') {
+                await updateDoc(doc(db, "students", studentId), {
+                    paymentStatus: 'paid',
+                    paymentType: 'early-bird',
+                    paymentDate: serverTimestamp()
+                });
+                showToast(`${data.name} marked as Early Bird paid!`, "success");
+            } else if (paymentType === '2') {
+                await updateDoc(doc(db, "students", studentId), {
+                    paymentStatus: 'paid',
+                    paymentType: 'regular',
+                    paymentDate: serverTimestamp()
+                });
+                showToast(`${data.name} marked as Regular paid!`, "success");
+            }
+            renderTreasurerPayments();
+        }
+    };
+
     document.getElementById('student-register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = e.target.querySelector('button[type="submit"]');
@@ -1811,104 +1790,54 @@ window.switchStudentTab = (tab) => {
         }
     }
 
-        // Render treasurer payments table
-window.renderTreasurerPayments = async () => {
-    const statusFilter = document.getElementById('treasurer-filter-status').value;
-    const typeFilter = document.getElementById('treasurer-filter-type').value;
-    
-    const snap = await getDocs(collection(db, "students"));
-    const tbody = document.getElementById('treasurer-payments-body');
-    tbody.innerHTML = "";
-    
-    let total = 0, paid = 0, unpaid = 0, earlybird = 0;
-    
-    snap.forEach(docSnap => {
-        const data = docSnap.data();
-        total++;
+    async function loadStudentPayment() {
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        if (!userDoc.exists() || !userDoc.data().studentId) return;
         
-        const status = data.paymentStatus || 'unpaid';
-        const type = data.paymentType || 'none';
+        const studentId = userDoc.data().studentId;
+        const loadingEl = document.getElementById('student-payment-loading');
+        const infoEl = document.getElementById('student-payment-info');
         
-        if (status === 'paid') paid++;
-        else unpaid++;
+        loadingEl.classList.remove('hidden');
+        infoEl.classList.add('hidden');
         
-        if (type === 'early-bird') earlybird++;
-        
-        // Apply filters
-        if (statusFilter !== 'all' && status !== statusFilter) return;
-        if (typeFilter !== 'all' && type !== typeFilter) return;
-        
-        const tr = document.createElement('tr');
-        tr.className = "border-b hover:bg-gray-50";
-        
-        const statusBadge = status === 'paid' 
-            ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">Paid</span>'
-            : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Unpaid</span>';
-        
-        const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : '-';
-        const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : '-';
-        
-        tr.innerHTML = `
-            <td class="p-3 font-mono text-sm">${docSnap.id}</td>
-            <td class="p-3">${data.name}</td>
-            <td class="p-3">${data.year}</td>
-            <td class="p-3">${statusBadge}</td>
-            <td class="p-3">${typeDisplay}</td>
-            <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
-            <td class="p-3">
-                <button onclick="treasurerMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
-                    ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Update'}
-                </button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-    
-    // Update summary cards
-    document.getElementById('treasurer-total').innerText = total;
-    document.getElementById('treasurer-paid').innerText = paid;
-    document.getElementById('treasurer-unpaid').innerText = unpaid;
-    document.getElementById('treasurer-earlybird').innerText = earlybird;
-};
-
-// Treasurer mark as paid (simplified modal)
-window.treasurerMarkPaid = async (studentId) => {
-    const snap = await getDoc(doc(db, "students", studentId));
-    const data = snap.data();
-    
-    if (data.paymentStatus === 'paid') {
-        // Already paid, show simple update prompt
-        const newType = prompt(`Current: ${data.paymentType}\n\nEnter new payment type (early-bird/regular/none):`, data.paymentType);
-        if (newType && ['early-bird', 'regular', 'none'].includes(newType)) {
-            await updateDoc(doc(db, "students", studentId), {
-                paymentType: newType,
-                paymentDate: serverTimestamp()
-            });
-            showToast("Payment updated!", "success");
-            renderTreasurerPayments();
+        try {
+            const studentDoc = await getDoc(doc(db, "students", studentId));
+            if (studentDoc.exists()) {
+                const data = studentDoc.data();
+                const status = data.paymentStatus || 'unpaid';
+                const type = data.paymentType || 'none';
+                
+                const statusCard = document.getElementById('payment-status-card');
+                const statusBadge = document.getElementById('payment-status-badge');
+                
+                if (status === 'paid') {
+                    statusCard.className = 'rounded-xl p-6 mb-4 border-2 bg-green-50 border-green-300';
+                    statusBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-green-600 text-white';
+                    statusBadge.innerText = '✓ PAID';
+                } else {
+                    statusCard.className = 'rounded-xl p-6 mb-4 border-2 bg-red-50 border-red-300';
+                    statusBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-red-600 text-white';
+                    statusBadge.innerText = '✗ UNPAID';
+                }
+                
+                const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : 'Not Applicable';
+                const amount = type === 'early-bird' ? '₱150' : type === 'regular' ? '₱200' : '₱0';
+                const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : 'Not yet paid';
+                
+                document.getElementById('payment-type-display').innerText = typeDisplay;
+                document.getElementById('payment-amount-display').innerText = amount;
+                document.getElementById('payment-date-display').innerText = dateDisplay;
+                
+                loadingEl.classList.add('hidden');
+                infoEl.classList.remove('hidden');
+            }
+        } catch (err) {
+            console.error("Error loading payment status:", err);
+            loadingEl.classList.add('hidden');
+            showToast("Failed to load payment status.", "error");
         }
-    } else {
-        // Mark as unpaid, ask for type
-        const paymentType = prompt("Select payment type:\n1. Early Bird (₱150)\n2. Regular (₱200)\n\nEnter 1 or 2:", "2");
-        
-        if (paymentType === '1') {
-            await updateDoc(doc(db, "students", studentId), {
-                paymentStatus: 'paid',
-                paymentType: 'early-bird',
-                paymentDate: serverTimestamp()
-            });
-            showToast(`${data.name} marked as Early Bird paid!`, "success");
-        } else if (paymentType === '2') {
-            await updateDoc(doc(db, "students", studentId), {
-                paymentStatus: 'paid',
-                paymentType: 'regular',
-                paymentDate: serverTimestamp()
-            });
-            showToast(`${data.name} marked as Regular paid!`, "success");
-        }
-        renderTreasurerPayments();
     }
-};
 
     window.showToast = (message, type = 'info') => {
         const toast = document.createElement('div');
