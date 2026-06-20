@@ -771,6 +771,22 @@
     let yearChartInstance = null;
     let statusChartInstance = null;
 
+           // Global toggle function for login/signup forms
+    window.toggleAuthMode = function() {
+        const loginContainer = document.getElementById('login-form-container');
+        const signupContainer = document.getElementById('signup-form-container');
+        
+        if (loginContainer && signupContainer) {
+            if (loginContainer.classList.contains('hidden')) {
+                loginContainer.classList.remove('hidden');
+                signupContainer.classList.add('hidden');
+            } else {
+                loginContainer.classList.add('hidden');
+                signupContainer.classList.remove('hidden');
+            }
+        }
+    };
+
     window.addEventListener('online', () => document.getElementById('offline-banner').classList.add('hidden'));
     window.addEventListener('offline', () => document.getElementById('offline-banner').classList.remove('hidden'));
 
