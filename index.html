@@ -820,28 +820,42 @@
                         document.getElementById('treasurer-dashboard').classList.remove('hidden');
                         renderTreasurerPayments();
                     }
-                } else {
+                                } else {
+                    // 4. NEW USER: No role assigned yet. Show registration form.
                     console.log("🆕 New user detected. Showing registration form.");
                     currentRole = 'pending';
                     document.getElementById('user-role-badge').innerText = 'New Student';
                     document.getElementById('student-dashboard').classList.remove('hidden');
                     
+                    // Hide all tab content first
                     document.querySelectorAll('.student-tab-content').forEach(el => el.classList.add('hidden'));
+                    
+                    // Show ONLY the ID tab (which contains the registration form)
                     document.getElementById('student-tab-id').classList.remove('hidden');
                     
-                    const idBtn = document.getElementById('student-tab-id-btn');
+                    // Hide the ID card view, show the registration form
+                    document.getElementById('student-id-card-view').classList.add('hidden');
+                    document.getElementById('student-registration-form').classList.remove('hidden');
+                    
+                    // Disable other tabs until registration is complete
                     const attBtn = document.getElementById('student-tab-attendance-btn');
                     const payBtn = document.getElementById('student-tab-payment-btn');
-                    if (idBtn && attBtn) {
+                    if (attBtn) {
+                        attBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                        attBtn.disabled = true;
+                    }
+                    if (payBtn) {
+                        payBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                        payBtn.disabled = true;
+                    }
+                    
+                    // Set ID button as active
+                    const idBtn = document.getElementById('student-tab-id-btn');
+                    if (idBtn) {
                         idBtn.classList.add('bg-suNavy', 'text-white');
                         idBtn.classList.remove('bg-white', 'text-gray-700');
-                        attBtn.classList.remove('bg-suNavy', 'text-white');
-                        attBtn.classList.add('bg-white', 'text-gray-700');
-                        if (payBtn) {
-                            payBtn.classList.remove('bg-suNavy', 'text-white');
-                            payBtn.classList.add('bg-white', 'text-gray-700');
-                        }
                     }
+                }
 
                     document.getElementById('student-registration-form').classList.remove('hidden');
                     document.getElementById('student-id-card-view').classList.add('hidden');
@@ -1679,15 +1693,25 @@
                 email: currentUser.email, role: 'student', studentId: studentId
             });
             
-            showToast("Profile created! Generating ID...", "success");
+                        showToast("Profile created! Generating ID...", "success");
             
+            // Re-enable other tabs
+            const attBtn = document.getElementById('student-tab-attendance-btn');
+            const payBtn = document.getElementById('student-tab-payment-btn');
+            if (attBtn) {
+                attBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                attBtn.disabled = false;
+            }
+            if (payBtn) {
+                payBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                payBtn.disabled = false;
+            }
+            
+            // Switch to ID tab and show the card
             switchStudentTab('id');
-            
             document.getElementById('student-registration-form').classList.add('hidden');
             document.getElementById('student-id-card-view').classList.remove('hidden');
-            
             document.getElementById('user-role-badge').innerText = 'student';
-            
             renderIDCard(studentId, name, year);
             
         } catch (err) {
@@ -1698,16 +1722,32 @@
         }
     });
 
-    async function loadStudentProfile(uid) {
+        async function loadStudentProfile(uid) {
         const userDoc = await getDoc(doc(db, "users", uid));
+        
         if (userDoc.exists()) {
-            const studentId = userDoc.data().studentId;
-            const studentDoc = await getDoc(doc(db, "students", studentId));
-            if (studentDoc.exists()) {
-                const data = studentDoc.data();
-                document.getElementById('student-registration-form').classList.add('hidden');
-                document.getElementById('student-id-card-view').classList.remove('hidden');
-                renderIDCard(studentId, data.name, data.year);
+            const userData = userDoc.data();
+            const studentId = userData.studentId;
+            
+            // Check if student already has a profile
+            if (studentId) {
+                const studentDoc = await getDoc(doc(db, "students", studentId));
+                
+                if (studentDoc.exists()) {
+                    const data = studentDoc.data();
+                    
+                    // Hide registration form completely
+                    document.getElementById('student-registration-form').classList.add('hidden');
+                    
+                    // Show the ID card view
+                    document.getElementById('student-id-card-view').classList.remove('hidden');
+                    
+                    // Render the ID card with their data
+                    renderIDCard(studentId, data.name, data.year);
+                    
+                    // Make sure we're on the ID tab
+                    switchStudentTab('id');
+                }
             }
         }
     }
