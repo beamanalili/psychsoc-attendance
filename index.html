@@ -117,6 +117,7 @@
         <!-- Admin Dashboard -->
         <div id="admin-dashboard" class="hidden fade-in">
             <div class="flex space-x-2 mb-6 overflow-x-auto pb-2 no-print">
+                <button onclick="switchTab('payments')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Payments</button>
                 <button onclick="switchTab('events')" class="tab-btn px-4 py-2 bg-suNavy text-white rounded-lg font-medium">Events</button>
                 <button onclick="switchTab('students')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Students</button>
                 <button onclick="switchTab('users')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Manage Users</button>
@@ -228,6 +229,68 @@
             </div>
         </div>
 
+        <!-- Payments Tab -->
+<div id="tab-payments" class="tab-content hidden">
+    <div class="bg-white rounded-xl shadow p-6 mb-6">
+        <h3 class="text-lg font-bold text-suNavy mb-4">Society Fee Payment Summary</h3>
+        
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <p class="text-sm text-blue-600 font-medium">Total Students</p>
+                <p id="payment-total" class="text-2xl font-bold text-suNavy">0</p>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                <p class="text-sm text-green-600 font-medium">Paid</p>
+                <p id="payment-paid" class="text-2xl font-bold text-green-700">0</p>
+            </div>
+            <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                <p class="text-sm text-red-600 font-medium">Unpaid</p>
+                <p id="payment-unpaid" class="text-2xl font-bold text-red-700">0</p>
+            </div>
+            <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                <p class="text-sm text-yellow-600 font-medium">Early Bird</p>
+                <p id="payment-earlybird" class="text-2xl font-bold text-yellow-700">0</p>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-3 mb-4">
+            <select id="payment-filter-status" onchange="renderPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                <option value="all">All Status</option>
+                <option value="paid">Paid Only</option>
+                <option value="unpaid">Unpaid Only</option>
+            </select>
+            <select id="payment-filter-type" onchange="renderPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                <option value="all">All Types</option>
+                <option value="early-bird">Early Bird</option>
+                <option value="regular">Regular</option>
+            </select>
+            <button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+                <i class="fas fa-download mr-2"></i>Export Payments
+            </button>
+        </div>
+
+        <!-- Payments Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-700">
+                        <th class="p-3 border-b">Student ID</th>
+                        <th class="p-3 border-b">Name</th>
+                        <th class="p-3 border-b">Year</th>
+                        <th class="p-3 border-b">Status</th>
+                        <th class="p-3 border-b">Type</th>
+                        <th class="p-3 border-b">Date Paid</th>
+                        <th class="p-3 border-b">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="payments-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
         <!-- Officer Dashboard -->
         <div id="officer-dashboard" class="hidden fade-in">
             <div class="flex space-x-2 mb-6 overflow-x-auto pb-2 no-print">
@@ -281,6 +344,9 @@
                 <button onclick="switchStudentTab('attendance')" id="student-tab-attendance-btn" class="px-4 py-2 bg-white text-gray-700 rounded-t-lg font-medium hover:bg-gray-100 transition flex items-center">
                     <i class="fas fa-history mr-2"></i> My Attendance
                 </button>
+                <button onclick="switchStudentTab('payment')" id="student-tab-payment-btn" class="px-4 py-2 bg-white text-gray-700 rounded-t-lg font-medium hover:bg-gray-100 transition flex items-center">
+    <i class="fas fa-money-bill-wave mr-2"></i> Payment Status
+</button>
             </div>
 
             <!-- My ID Card View -->
@@ -406,6 +472,55 @@
                 </div>
             </div>
 
+            <!-- Payment Status View -->
+<div id="student-tab-payment" class="student-tab-content hidden">
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-suNavy mb-4 flex items-center">
+            <i class="fas fa-money-bill-wave mr-2"></i> Society Fee Payment Status
+        </h3>
+        
+        <div id="student-payment-loading" class="text-center py-8 text-gray-500 hidden">
+            <svg class="animate-spin h-8 w-8 mx-auto text-suNavy mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p>Loading payment status...</p>
+        </div>
+        
+        <div id="student-payment-info" class="hidden">
+            <!-- Payment Status Card -->
+            <div id="payment-status-card" class="rounded-xl p-6 mb-4 border-2">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="text-lg font-bold">Payment Status</h4>
+                    <span id="payment-status-badge" class="px-4 py-2 rounded-full text-sm font-bold"></span>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center py-2 border-b">
+                        <span class="text-gray-600">Payment Type:</span>
+                        <span id="payment-type-display" class="font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b">
+                        <span class="text-gray-600">Amount:</span>
+                        <span id="payment-amount-display" class="font-semibold text-lg"></span>
+                    </div>
+                    <div class="flex justify-between items-center py-2">
+                        <span class="text-gray-600">Date Paid:</span>
+                        <span id="payment-date-display" class="font-semibold"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p class="text-sm text-blue-800">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    If you believe there's an error with your payment status, please contact the treasurer.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
             <!-- Digital ID Card (Shown after registration) -->
             <div id="student-id-card-view" class="hidden">
                 <div class="text-center mb-6">
@@ -470,40 +585,60 @@
     </main>
 
     <!-- Student Modal -->
-    <div id="student-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
-        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md fade-in">
-            <h3 class="text-xl font-bold text-suNavy mb-4" id="modal-title">Add Student</h3>
-            <form id="student-form" class="space-y-4">
-                <input type="hidden" id="edit-student-id">
+<div id="student-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
+    <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md fade-in">
+        <h3 class="text-xl font-bold text-suNavy mb-4" id="modal-title">Add Student</h3>
+        <form id="student-form" class="space-y-4">
+            <input type="hidden" id="edit-student-id">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
+                <input type="text" id="form-student-id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input type="text" id="form-student-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Year Level</label>
+                <select id="form-student-year" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                </select>
+            </div>
+            
+            <!-- NEW: Payment Fields -->
+            <div class="border-t pt-4 mt-4">
+                <h4 class="font-semibold text-suNavy mb-3">Payment Information</h4>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
-                    <input type="text" id="form-student-id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <input type="text" id="form-student-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Year Level</label>
-                    <select id="form-student-year" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                        <option value="1">1st Year</option>
-                        <option value="2">2nd Year</option>
-                        <option value="3">3rd Year</option>
-                        <option value="4">4th Year</option>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
+                    <select id="form-payment-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <option value="unpaid">Unpaid</option>
+                        <option value="paid">Paid</option>
                     </select>
                 </div>
-                <div class="flex items-center">
-                    <input type="checkbox" id="form-student-active" checked class="h-4 w-4 text-suNavy focus:ring-suNavy border-gray-300 rounded">
-                    <label class="ml-2 block text-sm text-gray-700">Active</label>
+                <div class="mt-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Payment Type</label>
+                    <select id="form-payment-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <option value="none">Not Applicable</option>
+                        <option value="early-bird">Early Bird (₱150)</option>
+                        <option value="regular">Regular (₱200)</option>
+                    </select>
                 </div>
-                <div class="flex justify-end gap-2 mt-6">
-                    <button type="button" onclick="closeStudentModal()" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-suNavy text-white rounded-lg hover:bg-blue-900">Save Student</button>
-                </div>
-            </form>
-        </div>
+            </div>
+            
+            <div class="flex items-center">
+                <input type="checkbox" id="form-student-active" checked class="h-4 w-4 text-suNavy focus:ring-suNavy border-gray-300 rounded">
+                <label class="ml-2 block text-sm text-gray-700">Active</label>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button type="button" onclick="closeStudentModal()" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-suNavy text-white rounded-lg hover:bg-blue-900">Save Student</button>
+            </div>
+        </form>
     </div>
-
+</div>
     <!-- QR Modal -->
     <div id="qr-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
         <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center fade-in">
@@ -575,6 +710,261 @@
 
     window.addEventListener('online', () => document.getElementById('offline-banner').classList.add('hidden'));
     window.addEventListener('offline', () => document.getElementById('offline-banner').classList.remove('hidden'));
+
+        // Update student form to include payment data
+document.getElementById('student-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    setButtonLoading(btn, true);
+
+    const id = document.getElementById('edit-student-id').value || document.getElementById('form-student-id').value;
+    const name = document.getElementById('form-student-name').value;
+    const year = parseInt(document.getElementById('form-student-year').value);
+    const active = document.getElementById('form-student-active').checked;
+    
+    // NEW: Payment fields
+    const paymentStatus = document.getElementById('form-payment-status').value;
+    const paymentType = document.getElementById('form-payment-type').value;
+    const paymentDate = paymentStatus === 'paid' ? (document.getElementById('edit-student-id').value ? serverTimestamp() : null) : null;
+
+    try {
+        const studentData = { 
+            name, 
+            year, 
+            active, 
+            qrCode: id,
+            paymentStatus,
+            paymentType
+        };
+        
+        // Only update payment date if marking as paid for the first time
+        if (paymentStatus === 'paid' && paymentDate) {
+            studentData.paymentDate = serverTimestamp();
+        }
+        
+        await setDoc(doc(db, "students", id), studentData, { merge: true });
+        showToast("Student saved!", "success");
+        closeStudentModal();
+        renderStudents();
+        renderPayments();
+    } catch (err) { 
+        showToast("Error saving student", "error"); 
+    } finally { 
+        setButtonLoading(btn, false, originalText); 
+    }
+});
+
+// Load payment data when editing student
+window.editStudent = async (id) => {
+    const snap = await getDoc(doc(db, "students", id));
+    const data = snap.data();
+    document.getElementById('edit-student-id').value = id;
+    document.getElementById('form-student-id').value = id;
+    document.getElementById('form-student-id').disabled = true;
+    document.getElementById('form-student-name').value = data.name;
+    document.getElementById('form-student-year').value = data.year;
+    document.getElementById('form-student-active').checked = data.active;
+    
+    // NEW: Load payment data
+    document.getElementById('form-payment-status').value = data.paymentStatus || 'unpaid';
+    document.getElementById('form-payment-type').value = data.paymentType || 'none';
+    
+    document.getElementById('modal-title').innerText = "Edit Student";
+    document.getElementById('student-modal').classList.remove('hidden');
+    document.getElementById('student-modal').classList.add('flex');
+};
+
+// Render payments table
+window.renderPayments = async () => {
+    const statusFilter = document.getElementById('payment-filter-status').value;
+    const typeFilter = document.getElementById('payment-filter-type').value;
+    
+    const snap = await getDocs(collection(db, "students"));
+    const tbody = document.getElementById('payments-table-body');
+    tbody.innerHTML = "";
+    
+    let total = 0, paid = 0, unpaid = 0, earlybird = 0;
+    
+    snap.forEach(docSnap => {
+        const data = docSnap.data();
+        total++;
+        
+        const status = data.paymentStatus || 'unpaid';
+        const type = data.paymentType || 'none';
+        
+        if (status === 'paid') paid++;
+        else unpaid++;
+        
+        if (type === 'early-bird') earlybird++;
+        
+        // Apply filters
+        if (statusFilter !== 'all' && status !== statusFilter) return;
+        if (typeFilter !== 'all' && type !== typeFilter) return;
+        
+        const tr = document.createElement('tr');
+        tr.className = "border-b hover:bg-gray-50";
+        
+        const statusBadge = status === 'paid' 
+            ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">Paid</span>'
+            : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Unpaid</span>';
+        
+        const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : '-';
+        const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : '-';
+        
+        tr.innerHTML = `
+            <td class="p-3 font-mono text-sm">${docSnap.id}</td>
+            <td class="p-3">${data.name}</td>
+            <td class="p-3">${data.year}</td>
+            <td class="p-3">${statusBadge}</td>
+            <td class="p-3">${typeDisplay}</td>
+            <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
+            <td class="p-3">
+                <button onclick="quickMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
+                    ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Edit'}
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    // Update summary cards
+    document.getElementById('payment-total').innerText = total;
+    document.getElementById('payment-paid').innerText = paid;
+    document.getElementById('payment-unpaid').innerText = unpaid;
+    document.getElementById('payment-earlybird').innerText = earlybird;
+};
+
+// Quick mark as paid
+window.quickMarkPaid = async (studentId) => {
+    const snap = await getDoc(doc(db, "students", studentId));
+    const data = snap.data();
+    
+    if (data.paymentStatus === 'paid') {
+        // Already paid, open edit modal
+        editStudent(studentId);
+    } else {
+        // Mark as paid with regular payment
+        await updateDoc(doc(db, "students", studentId), {
+            paymentStatus: 'paid',
+            paymentType: 'regular',
+            paymentDate: serverTimestamp()
+        });
+        showToast(`${data.name} marked as paid!`, "success");
+        renderPayments();
+    }
+};
+
+// Export payments
+window.exportPayments = async () => {
+    showToast("Preparing export...", "info");
+    const snap = await getDocs(collection(db, "students"));
+    const data = [];
+    
+    snap.forEach(docSnap => {
+        const student = docSnap.data();
+        data.push({
+            "Student ID": docSnap.id,
+            "Name": student.name,
+            "Year": student.year,
+            "Payment Status": student.paymentStatus || 'unpaid',
+            "Payment Type": student.paymentType || 'none',
+            "Amount": student.paymentType === 'early-bird' ? 150 : student.paymentType === 'regular' ? 200 : 0,
+            "Date Paid": student.paymentDate ? new Date(student.paymentDate.seconds * 1000).toLocaleDateString() : ''
+        });
+    });
+    
+    if (data.length === 0) {
+        showToast("No payment data to export.", "warning");
+        return;
+    }
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Payments");
+    XLSX.writeFile(wb, `Society_Fee_Payments_${new Date().toISOString().split('T')[0]}.xlsx`);
+    showToast("Payment data exported!", "success");
+};
+
+// Load student payment status
+async function loadStudentPayment() {
+    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+    if (!userDoc.exists() || !userDoc.data().studentId) return;
+    
+    const studentId = userDoc.data().studentId;
+    const loadingEl = document.getElementById('student-payment-loading');
+    const infoEl = document.getElementById('student-payment-info');
+    
+    loadingEl.classList.remove('hidden');
+    infoEl.classList.add('hidden');
+    
+    try {
+        const studentDoc = await getDoc(doc(db, "students", studentId));
+        if (studentDoc.exists()) {
+            const data = studentDoc.data();
+            const status = data.paymentStatus || 'unpaid';
+            const type = data.paymentType || 'none';
+            
+            // Update status card styling
+            const statusCard = document.getElementById('payment-status-card');
+            const statusBadge = document.getElementById('payment-status-badge');
+            
+            if (status === 'paid') {
+                statusCard.className = 'rounded-xl p-6 mb-4 border-2 bg-green-50 border-green-300';
+                statusBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-green-600 text-white';
+                statusBadge.innerText = '✓ PAID';
+            } else {
+                statusCard.className = 'rounded-xl p-6 mb-4 border-2 bg-red-50 border-red-300';
+                statusBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-red-600 text-white';
+                statusBadge.innerText = '✗ UNPAID';
+            }
+            
+            // Update payment details
+            const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : 'Not Applicable';
+            const amount = type === 'early-bird' ? '₱150' : type === 'regular' ? '₱200' : '₱0';
+            const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : 'Not yet paid';
+            
+            document.getElementById('payment-type-display').innerText = typeDisplay;
+            document.getElementById('payment-amount-display').innerText = amount;
+            document.getElementById('payment-date-display').innerText = dateDisplay;
+            
+            loadingEl.classList.add('hidden');
+            infoEl.classList.remove('hidden');
+        }
+    } catch (err) {
+        console.error("Error loading payment status:", err);
+        loadingEl.classList.add('hidden');
+        showToast("Failed to load payment status.", "error");
+    }
+}
+
+// Update switchStudentTab to handle payment tab
+window.switchStudentTab = (tab) => {
+    document.querySelectorAll('.student-tab-content').forEach(el => el.classList.add('hidden'));
+    document.getElementById(`student-tab-${tab}`).classList.remove('hidden');
+    
+    const idBtn = document.getElementById('student-tab-id-btn');
+    const attBtn = document.getElementById('student-tab-attendance-btn');
+    const payBtn = document.getElementById('student-tab-payment-btn');
+    
+    [idBtn, attBtn, payBtn].forEach(btn => {
+        btn.classList.remove('bg-suNavy', 'text-white');
+        btn.classList.add('bg-white', 'text-gray-700');
+    });
+    
+    if (tab === 'id') {
+        idBtn.classList.add('bg-suNavy', 'text-white');
+        idBtn.classList.remove('bg-white', 'text-gray-700');
+    } else if (tab === 'attendance') {
+        attBtn.classList.add('bg-suNavy', 'text-white');
+        attBtn.classList.remove('bg-white', 'text-gray-700');
+        loadStudentAttendance();
+    } else if (tab === 'payment') {
+        payBtn.classList.add('bg-suNavy', 'text-white');
+        payBtn.classList.remove('bg-white', 'text-gray-700');
+        loadStudentPayment();
+    }
+};
 
     // Helper function to disable buttons and show a spinner while processing
     function setButtonLoading(btn, isLoading, originalText) {
@@ -732,18 +1122,19 @@
     document.getElementById('logout-btn').addEventListener('click', window.handleLogout);
 
     window.switchTab = (tab) => {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-        document.getElementById(`tab-${tab}`).classList.remove('hidden');
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('bg-suNavy', 'text-white');
-            btn.classList.add('bg-white', 'text-gray-700');
-        });
-        event.target.classList.remove('bg-white', 'text-gray-700');
-        event.target.classList.add('bg-suNavy', 'text-white');
-        if (tab === 'analytics') loadAnalytics();
-        if (tab === 'export') updateExportUI();
-    };
-
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.getElementById(`tab-${tab}`).classList.remove('hidden');
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-suNavy', 'text-white');
+        btn.classList.add('bg-white', 'text-gray-700');
+    });
+    event.target.classList.remove('bg-white', 'text-gray-700');
+    event.target.classList.add('bg-suNavy', 'text-white');
+    
+    if (tab === 'analytics') loadAnalytics();
+    if (tab === 'export') updateExportUI();
+    if (tab === 'payments') renderPayments(); // NEW: Load payments
+};
     window.switchOfficerTab = (tab) => {
         document.querySelectorAll('.officer-tab-content').forEach(el => el.classList.add('hidden'));
         document.getElementById(`officer-tab-${tab}`).classList.remove('hidden');
