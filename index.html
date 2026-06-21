@@ -1282,21 +1282,32 @@
         }
 
         function sendToGoogleSheets(data) {
-            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS")) {
-                console.error("❌ Google Sheets URL is not configured in index.html!");
-                return;
-            }
-            console.log("📤 Sending to Google Sheets:", data);
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors", 
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(data)
-            })
-            .then(() => console.log("✅ Google Sheets request sent successfully."))
-            .catch(err => console.error("❌ Google Sheets sync failed:", err));
-        }
-
+    if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS")) {
+        console.error("❌ Google Sheets URL is not configured in index.html!");
+        showToast("Google Sheets not configured!", "error");
+        return;
+    }
+    
+    console.log("📤 Sending to Google Sheets:", data);
+    console.log("🔗 URL:", GOOGLE_SCRIPT_URL);
+    
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors", 
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        console.log("✅ Google Sheets request sent. Response:", response);
+        // Note: With mode: "no-cors", we can't see the actual response
+        // But if we get here, the request was sent
+        showToast("Attendance logged to Google Sheets", "success");
+    })
+    .catch(err => {
+        console.error("❌ Google Sheets sync failed:", err);
+        showToast("Failed to sync to Google Sheets", "error");
+    });
+}
         window.startLiveAttendanceListener = async () => {
     const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
     if (eventSnap.empty) {
