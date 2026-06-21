@@ -1719,8 +1719,11 @@
                 paymentStatus: 'unpaid', paymentType: 'none'
             });
             await setDoc(doc(db, "users", currentUser.uid), {
-                email: currentUser.email, role: 'student', studentId: studentId
-            });
+    email: currentUser.email, 
+    role: 'student', 
+    studentId: studentId,
+    name: name  // 👈 NEW: Save the student's name
+});
             
             showToast("Profile created! Generating ID...", "success");
             
@@ -1899,6 +1902,32 @@
             showToast("Failed to load payment status.", "error");
         }
     }
+
+       // ONE-TIME FIX: Run this in the browser console to fix existing users
+window.fixUnnamedUsers = async () => {
+    const usersSnap = await getDocs(collection(db, "users"));
+    let fixed = 0;
+    
+    for (const userDoc of usersSnap.docs) {
+        const userData = userDoc.data();
+        
+        // If user has no name but has a studentId, fetch it from students collection
+        if (!userData.name && userData.studentId) {
+            try {
+                const studentDoc = await getDoc(doc(db, "students", userData.studentId));
+                if (studentDoc.exists()) {
+                    await updateDoc(userDoc.ref, { name: studentDoc.data().name });
+                    fixed++;
+                }
+            } catch (err) {
+                console.error("Error fixing user:", userDoc.id, err);
+            }
+        }
+    }
+    
+    console.log(`✅ Fixed ${fixed} unnamed users!`);
+    showToast(`Fixed ${fixed} unnamed users!`, "success");
+};
 
     window.showToast = (message, type = 'info') => {
         const toast = document.createElement('div');
