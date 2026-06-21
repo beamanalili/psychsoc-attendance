@@ -147,13 +147,20 @@
             <div id="tab-students" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow p-6 mb-6">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-                        <h3 class="text-lg font-bold text-suNavy">Student Management</h3>
-                        <div class="flex gap-2 flex-wrap">
-                            <input type="text" id="student-search" placeholder="Search by name or ID..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                            <button onclick="openStudentModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition"><i class="fas fa-plus mr-2"></i>Add Student</button>
-                            <button onclick="showPrintableQRs()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"><i class="fas fa-print mr-2"></i>Print QRs</button>
-                        </div>
-                    </div>
+    <h3 class="text-lg font-bold text-suNavy">Student Management</h3>
+    <div class="flex gap-2 flex-wrap">
+        <input type="text" id="student-search" placeholder="Search by name or ID..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+        <select id="student-year-filter" onchange="renderStudents()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+            <option value="all">All Years</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+        </select>
+        <button onclick="openStudentModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition"><i class="fas fa-plus mr-2"></i>Add Student</button>
+        <button onclick="showPrintableQRs()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"><i class="fas fa-print mr-2"></i>Print QRs</button>
+    </div>
+</div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
@@ -174,21 +181,26 @@
             <!-- Manage Users Tab -->
             <div id="tab-users" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow p-6">
-                    <h3 class="text-lg font-bold text-suNavy mb-2">Manage Officers & Admins</h3>
-                    <p class="text-sm text-gray-600 mb-4">Note: Firebase Auth accounts must be created in the Firebase Console. This tool assigns their database role.</p>
-                    <form id="add-user-form" class="flex flex-col md:flex-row gap-4 mb-6">
-                        <input type="text" id="new-user-name" placeholder="Full Name (e.g., Juan Dela Cruz)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                        <input type="email" id="new-user-email" placeholder="User Email (Must match Firebase Auth)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                        <select id="new-user-role" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-    <option value="officer">Officer</option>
-    <option value="admin">Admin</option>
-    <option value="treasurer">Treasurer</option>
-</select>
-                        <button type="submit" class="bg-suNavy text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-900 transition whitespace-nowrap">Assign Role</button>
-                    </form>
-                    <div id="users-list" class="space-y-2"></div>
-                </div>
-            </div>
+    <h3 class="text-lg font-bold text-suNavy mb-2">Manage Officers & Admins</h3>
+    <p class="text-sm text-gray-600 mb-4">Note: Firebase Auth accounts must be created in the Firebase Console (Contact Bea Manalili). This tool assigns their database role.</p>
+    <form id="add-user-form" class="flex flex-col md:flex-row gap-4 mb-6">
+        <input type="text" id="new-user-name" placeholder="Full Name (e.g., Juan Dela Cruz)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+        <input type="email" id="new-user-email" placeholder="User Email (Must match Firebase Auth)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+        <select id="new-user-role" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+            <option value="officer">Officer</option>
+            <option value="admin">Admin</option>
+            <option value="treasurer">Treasurer</option>
+        </select>
+        <button type="submit" class="bg-suNavy text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-900 transition whitespace-nowrap">Assign Role</button>
+    </form>
+    
+    <!-- NEW: Search input for users -->
+    <div class="mb-4">
+        <input type="text" id="user-search" placeholder="Search by name or email..." oninput="renderUsers()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+    </div>
+    
+    <div id="users-list" class="space-y-2"></div>
+</div>
 
             <!-- Analytics Tab -->
             <div id="tab-analytics" class="tab-content hidden">
@@ -1087,31 +1099,38 @@
     };
 
     window.renderStudents = async () => {
-        const search = document.getElementById('student-search').value.toLowerCase();
-        const snap = await getDocs(collection(db, "students"));
-        const tbody = document.getElementById('students-table-body');
-        tbody.innerHTML = "";
-        snap.forEach(docSnap => {
-            const data = docSnap.data();
-            if (search && !data.name.toLowerCase().includes(search) && !docSnap.id.toLowerCase().includes(search)) return;
-            const tr = document.createElement('tr');
-            tr.className = "border-b hover:bg-gray-50";
-            tr.innerHTML = `
-                <td class="p-3 font-mono text-sm">${docSnap.id}</td>
-                <td class="p-3">${data.name}</td>
-                <td class="p-3">${data.year}</td>
-                <td class="p-3"><span class="px-2 py-1 text-xs rounded-full ${data.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${data.active ? 'Active' : 'Inactive'}</span></td>
-                <td class="p-3 flex gap-2">
-                    <button onclick="showQR('${docSnap.id}', '${data.name}')" class="text-suNavy hover:text-blue-800"><i class="fas fa-qrcode"></i></button>
-                    <button onclick="editStudent('${docSnap.id}')" class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
-                    <button onclick="toggleStudentActive('${docSnap.id}', ${!data.active})" class="text-${data.active ? 'red' : 'green'}-600 hover:text-${data.active ? 'red' : 'green'}-800">
-                        <i class="fas fa-${data.active ? 'ban' : 'check'}"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    };
+    const search = document.getElementById('student-search').value.toLowerCase();
+    const yearFilter = document.getElementById('student-year-filter').value;
+    const snap = await getDocs(collection(db, "students"));
+    const tbody = document.getElementById('students-table-body');
+    tbody.innerHTML = "";
+    snap.forEach(docSnap => {
+        const data = docSnap.data();
+        
+        // Apply search filter
+        if (search && !data.name.toLowerCase().includes(search) && !docSnap.id.toLowerCase().includes(search)) return;
+        
+        // Apply year filter
+        if (yearFilter !== 'all' && data.year.toString() !== yearFilter) return;
+        
+        const tr = document.createElement('tr');
+        tr.className = "border-b hover:bg-gray-50";
+        tr.innerHTML = `
+            <td class="p-3 font-mono text-sm">${docSnap.id}</td>
+            <td class="p-3">${data.name}</td>
+            <td class="p-3">${data.year}</td>
+            <td class="p-3"><span class="px-2 py-1 text-xs rounded-full ${data.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${data.active ? 'Active' : 'Inactive'}</span></td>
+            <td class="p-3 flex gap-2">
+                <button onclick="showQR('${docSnap.id}', '${data.name}')" class="text-suNavy hover:text-blue-800"><i class="fas fa-qrcode"></i></button>
+                <button onclick="editStudent('${docSnap.id}')" class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                <button onclick="toggleStudentActive('${docSnap.id}', ${!data.active})" class="text-${data.active ? 'red' : 'green'}-600 hover:text-${data.active ? 'red' : 'green'}-800">
+                    <i class="fas fa-${data.active ? 'ban' : 'check'}"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+};
 
     document.getElementById('student-search').addEventListener('input', renderStudents);
 
@@ -1210,27 +1229,34 @@
     };
 
     window.renderUsers = async () => {
-        const snap = await getDocs(collection(db, "users"));
-        const container = document.getElementById('users-list');
-        container.innerHTML = "";
-        snap.forEach(docSnap => {
-            const data = docSnap.data();
-            const div = document.createElement('div');
-            div.className = "flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100";
-            const displayName = data.name ? data.name : "Unnamed User";
-            const roleColor = data.role === 'admin' ? 'bg-suNavy text-white' : 'bg-blue-100 text-blue-800';
-            div.innerHTML = `
-                <div>
-                    <p class="font-bold text-suNavy">${displayName}</p>
-                    <p class="text-sm text-gray-500">${data.email}</p>
-                </div>
-                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${roleColor}">
-                    ${data.role}
-                </span>
-            `;
-            container.appendChild(div);
-        });
-    };
+    const search = document.getElementById('user-search') ? document.getElementById('user-search').value.toLowerCase() : '';
+    const snap = await getDocs(collection(db, "users"));
+    const container = document.getElementById('users-list');
+    container.innerHTML = "";
+    snap.forEach(docSnap => {
+        const data = docSnap.data();
+        
+        // Apply search filter
+        const displayName = data.name ? data.name : "Unnamed User";
+        const email = data.email || '';
+        
+        if (search && !displayName.toLowerCase().includes(search) && !email.toLowerCase().includes(search)) return;
+        
+        const div = document.createElement('div');
+        div.className = "flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100";
+        const roleColor = data.role === 'admin' ? 'bg-suNavy text-white' : data.role === 'treasurer' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800';
+        div.innerHTML = `
+            <div>
+                <p class="font-bold text-suNavy">${displayName}</p>
+                <p class="text-sm text-gray-500">${email}</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${roleColor}">
+                ${data.role}
+            </span>
+        `;
+        container.appendChild(div);
+    });
+};
 
     document.getElementById('add-user-form').addEventListener('submit', async (e) => {
         e.preventDefault();
