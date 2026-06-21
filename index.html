@@ -774,7 +774,7 @@
         measurementId: "G-C5SH1EEQP2"
     };
 
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWnhp4kVnc_StNi_J6D71Llc5ui63LNyB37AyPXn2vWGL2aNdavqMH17JFX_MsvaY/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHDMMEqOIl9vuT_ryf3N79r_BefZUrJV4v_EpStwjVDcSRAE32gZGi8yIQJa8rP0zx/exec";
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -1361,10 +1361,14 @@
             await setDoc(newAttRef, attData);
 
             sendToGoogleSheets({
-                eventId, studentId: decodedText, name: sData.name, year: sData.year,
-                timestamp: new Date().toISOString(), scannedBy: currentUser.email
-            });
-
+    eventId, 
+    eventName,  //
+    studentId: decodedText, 
+    name: sData.name, 
+    year: sData.year,
+    timestamp: new Date().toISOString(), 
+    scannedBy: currentUser.email
+});
             showToast(`✔ ${sData.name} checked in!`, "success");
         } catch (error) {
             console.error(error);
