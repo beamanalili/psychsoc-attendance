@@ -61,72 +61,72 @@
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-8">
         <!-- Login View -->
-<div id="login-view" class="max-w-md mx-auto bg-white rounded-xl shadow-md p-8 fade-in">
-    <!-- Login Form -->
-    <div id="login-form-container">
-        <h2 class="text-2xl font-bold text-suNavy mb-6 text-center">System Login</h2>
-        <form id="login-form" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" id="login-email" placeholder="your.name@su.edu.ph" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                <p class="text-xs text-gray-500 mt-1.5 flex items-center">
-                    <i class="fas fa-university mr-1.5 text-suNavy"></i> Please use your official Silliman University email
-                </p>
+        <div id="login-view" class="max-w-md mx-auto bg-white rounded-xl shadow-md p-8 fade-in">
+            <!-- Login Form -->
+            <div id="login-form-container">
+                <h2 class="text-2xl font-bold text-suNavy mb-6 text-center">System Login</h2>
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="login-email" placeholder="your.name@su.edu.ph" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <p class="text-xs text-gray-500 mt-1.5 flex items-center">
+                            <i class="fas fa-university mr-1.5 text-suNavy"></i> Please use your official Silliman University email
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="login-password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-suNavy text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition flex justify-center items-center">
+                        <span id="login-spinner" class="hidden animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></span>
+                        Log In
+                    </button>
+                </form>
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">
+                        Don't have an account? 
+                        <button onclick="toggleAuthMode()" class="text-suNavy font-semibold hover:underline">Create Student Account</button>
+                    </p>
+                </div>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input type="password" id="login-password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-            </div>
-            <button type="submit" class="w-full bg-suNavy text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition flex justify-center items-center">
-                <span id="login-spinner" class="hidden animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></span>
-                Log In
-            </button>
-        </form>
-        <div class="mt-6 text-center">
-            <p class="text-sm text-gray-600">
-                Don't have an account? 
-                <button onclick="toggleAuthMode()" class="text-suNavy font-semibold hover:underline">Create Student Account</button>
-            </p>
-        </div>
-    </div>
 
-    <!-- Sign Up Form (Hidden by default) -->
-    <div id="signup-form-container" class="hidden">
-        <h2 class="text-2xl font-bold text-suNavy mb-2 text-center">Create Account</h2>
-        <p class="text-sm text-gray-500 text-center mb-6">For SU Psychology Society Members</p>
-        <form id="signup-form" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" id="signup-email" placeholder="your.name@su.edu.ph" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                <p class="text-xs text-gray-500 mt-1.5 flex items-center">
-                    <i class="fas fa-university mr-1.5 text-suNavy"></i> Please use your official Silliman University email
-                </p>
+            <!-- Sign Up Form -->
+            <div id="signup-form-container" class="hidden">
+                <h2 class="text-2xl font-bold text-suNavy mb-2 text-center">Create Account</h2>
+                <p class="text-sm text-gray-500 text-center mb-6">For SU Psychology Society Members</p>
+                <form id="signup-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="signup-email" placeholder="your.name@su.edu.ph" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <p class="text-xs text-gray-500 mt-1.5 flex items-center">
+                            <i class="fas fa-university mr-1.5 text-suNavy"></i> Please use your official Silliman University email
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="signup-password" placeholder="At least 6 characters" required minlength="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition flex justify-center items-center">
+                        <span id="signup-spinner" class="hidden animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></span>
+                        Create Account
+                    </button>
+                </form>
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">
+                        Already have an account? 
+                        <button onclick="toggleAuthMode()" class="text-suNavy font-semibold hover:underline">Log In</button>
+                    </p>
+                </div>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input type="password" id="signup-password" placeholder="At least 6 characters" required minlength="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-            </div>
-            <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition flex justify-center items-center">
-                <span id="signup-spinner" class="hidden animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></span>
-                Create Account
-            </button>
-        </form>
-        <div class="mt-6 text-center">
-            <p class="text-sm text-gray-600">
-                Already have an account? 
-                <button onclick="toggleAuthMode()" class="text-suNavy font-semibold hover:underline">Log In</button>
-            </p>
         </div>
-    </div>
-</div>
 
         <!-- Admin Dashboard -->
         <div id="admin-dashboard" class="hidden fade-in">
             <div class="flex space-x-2 mb-6 overflow-x-auto pb-2 no-print">
-                <button onclick="switchTab('payments')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Payments</button>
                 <button onclick="switchTab('events')" class="tab-btn px-4 py-2 bg-suNavy text-white rounded-lg font-medium">Events</button>
                 <button onclick="switchTab('students')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Students</button>
                 <button onclick="switchTab('users')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Manage Users</button>
+                <button onclick="switchTab('payments')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Payments</button>
                 <button onclick="switchTab('analytics')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Analytics</button>
                 <button onclick="switchTab('export')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Export</button>
             </div>
@@ -147,20 +147,20 @@
             <div id="tab-students" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow p-6 mb-6">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-    <h3 class="text-lg font-bold text-suNavy">Student Management</h3>
-    <div class="flex gap-2 flex-wrap">
-        <input type="text" id="student-search" placeholder="Search by name or ID..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-        <select id="student-year-filter" onchange="renderStudents()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-            <option value="all">All Years</option>
-            <option value="1">1st Year</option>
-            <option value="2">2nd Year</option>
-            <option value="3">3rd Year</option>
-            <option value="4">4th Year</option>
-        </select>
-        <button onclick="openStudentModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition"><i class="fas fa-plus mr-2"></i>Add Student</button>
-        <button onclick="showPrintableQRs()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"><i class="fas fa-print mr-2"></i>Print QRs</button>
-    </div>
-</div>
+                        <h3 class="text-lg font-bold text-suNavy">Student Management</h3>
+                        <div class="flex gap-2 flex-wrap">
+                            <input type="text" id="student-search" placeholder="Search by name or ID..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <select id="student-year-filter" onchange="renderStudents()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                                <option value="all">All Years</option>
+                                <option value="1">1st Year</option>
+                                <option value="2">2nd Year</option>
+                                <option value="3">3rd Year</option>
+                                <option value="4">4th Year</option>
+                            </select>
+                            <button onclick="openStudentModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition"><i class="fas fa-plus mr-2"></i>Add Student</button>
+                            <button onclick="showPrintableQRs()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"><i class="fas fa-print mr-2"></i>Print QRs</button>
+                        </div>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
@@ -181,133 +181,126 @@
             <!-- Manage Users Tab -->
             <div id="tab-users" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow p-6">
-    <h3 class="text-lg font-bold text-suNavy mb-2">Manage Officers & Admins</h3>
-    <p class="text-sm text-gray-600 mb-4">Note: Firebase Auth accounts must be created in the Firebase Console (Contact Bea Manalili). This tool assigns their database role.</p>
-    <form id="add-user-form" class="flex flex-col md:flex-row gap-4 mb-6">
-        <input type="text" id="new-user-name" placeholder="Full Name (e.g., Juan Dela Cruz)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-        <input type="email" id="new-user-email" placeholder="User Email (Must match Firebase Auth)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-        <select id="new-user-role" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-            <option value="officer">Officer</option>
-            <option value="admin">Admin</option>
-            <option value="treasurer">Treasurer</option>
-        </select>
-        <button type="submit" class="bg-suNavy text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-900 transition whitespace-nowrap">Assign Role</button>
-    </form>
-    
-    <!-- NEW: Search input for users -->
-    <div class="mb-4">
-        <input type="text" id="user-search" placeholder="Search by name or email..." oninput="renderUsers()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-    </div>
-    
-    <div id="users-list" class="space-y-2"></div>
-</div>
+                    <h3 class="text-lg font-bold text-suNavy mb-2">Manage Officers & Admins</h3>
+                    <p class="text-sm text-gray-600 mb-4">Note: Firebase Auth accounts must be created in the Firebase Console. This tool assigns their database role.</p>
+                    <form id="add-user-form" class="flex flex-col md:flex-row gap-4 mb-6">
+                        <input type="text" id="new-user-name" placeholder="Full Name (e.g., Juan Dela Cruz)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <input type="email" id="new-user-email" placeholder="User Email (Must match Firebase Auth)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <select id="new-user-role" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <option value="officer">Officer</option>
+                            <option value="admin">Admin</option>
+                            <option value="treasurer">Treasurer</option>
+                        </select>
+                        <button type="submit" class="bg-suNavy text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-900 transition whitespace-nowrap">Assign Role</button>
+                    </form>
+                    <div class="mb-4">
+                        <input type="text" id="user-search" placeholder="Search by name or email..." oninput="renderUsers()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                    </div>
+                    <div id="users-list" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- Payments Tab -->
+            <div id="tab-payments" class="tab-content hidden">
+                <div class="bg-white rounded-xl shadow p-6 mb-6">
+                    <h3 class="text-lg font-bold text-suNavy mb-4">Society Fee Payment Summary</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <p class="text-sm text-blue-600 font-medium">Total Students</p>
+                            <p id="payment-total" class="text-2xl font-bold text-suNavy">0</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                            <p class="text-sm text-green-600 font-medium">Paid</p>
+                            <p id="payment-paid" class="text-2xl font-bold text-green-700">0</p>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                            <p class="text-sm text-red-600 font-medium">Unpaid</p>
+                            <p id="payment-unpaid" class="text-2xl font-bold text-red-700">0</p>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                            <p class="text-sm text-yellow-600 font-medium">Early Bird</p>
+                            <p id="payment-earlybird" class="text-2xl font-bold text-yellow-700">0</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        <select id="payment-filter-status" onchange="renderPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <option value="all">All Status</option>
+                            <option value="paid">Paid Only</option>
+                            <option value="unpaid">Unpaid Only</option>
+                        </select>
+                        <select id="payment-filter-type" onchange="renderPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <option value="all">All Types</option>
+                            <option value="early-bird">Early Bird</option>
+                            <option value="regular">Regular</option>
+                        </select>
+                        <button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+                            <i class="fas fa-download mr-2"></i>Export Payments
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-700">
+                                    <th class="p-3 border-b">Student ID</th>
+                                    <th class="p-3 border-b">Name</th>
+                                    <th class="p-3 border-b">Year</th>
+                                    <th class="p-3 border-b">Status</th>
+                                    <th class="p-3 border-b">Type</th>
+                                    <th class="p-3 border-b">Date Paid</th>
+                                    <th class="p-3 border-b">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payments-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
             <!-- Analytics Tab -->
             <div id="tab-analytics" class="tab-content hidden">
-    <div class="bg-white p-4 rounded-xl shadow mb-6 flex flex-col md:flex-row items-center gap-4">
-        <label class="font-bold text-suNavy whitespace-nowrap">View Analytics For:</label>
-        <select id="analytics-event-select" onchange="loadAnalytics()" class="w-full md:w-auto flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none bg-gray-50">
-            <option value="all">All Time (All Events Combined)</option>
-        </select>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Total Members</p><p id="stat-total" class="text-3xl font-bold text-suNavy">0</p></div>
-        <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Present</p><p id="stat-present" class="text-3xl font-bold text-green-600">0</p></div>
-        <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Absent</p><p id="stat-absent" class="text-3xl font-bold text-red-600">0</p></div>
-        <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Attendance Rate</p><p id="stat-rate" class="text-3xl font-bold text-blue-600">0%</p></div>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white p-6 rounded-xl shadow"><h4 class="font-bold text-suNavy mb-4">Year Level Breakdown</h4><canvas id="yearChart"></canvas></div>
-        <div class="bg-white p-6 rounded-xl shadow"><h4 class="font-bold text-suNavy mb-4">Attendance Status</h4><canvas id="statusChart"></canvas></div>
-    </div>
-</div>
+                <div class="bg-white p-4 rounded-xl shadow mb-6 flex flex-col md:flex-row items-center gap-4">
+                    <label class="font-bold text-suNavy whitespace-nowrap">View Analytics For:</label>
+                    <select id="analytics-event-select" onchange="loadAnalytics()" class="w-full md:w-auto flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none bg-gray-50">
+                        <option value="all">All Time (All Events Combined)</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Total Members</p><p id="stat-total" class="text-3xl font-bold text-suNavy">0</p></div>
+                    <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Present</p><p id="stat-present" class="text-3xl font-bold text-green-600">0</p></div>
+                    <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Absent</p><p id="stat-absent" class="text-3xl font-bold text-red-600">0</p></div>
+                    <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Attendance Rate</p><p id="stat-rate" class="text-3xl font-bold text-blue-600">0%</p></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow"><h4 class="font-bold text-suNavy mb-4">Year Level Breakdown</h4><canvas id="yearChart"></canvas></div>
+                    <div class="bg-white p-6 rounded-xl shadow"><h4 class="font-bold text-suNavy mb-4">Attendance Status</h4><canvas id="statusChart"></canvas></div>
+                </div>
+            </div>
 
             <!-- Export Tab -->
-           <div id="tab-export" class="tab-content hidden">
-    <div class="bg-white rounded-xl shadow p-6">
-        <h3 class="text-lg font-bold text-suNavy mb-4">Export Attendance Data</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="border border-gray-200 rounded-lg p-4">
-                <h4 class="font-semibold mb-2">Current Active Event</h4>
-                <p id="export-current-event-name" class="text-sm text-gray-500 mb-4">No active event</p>
-                <div class="flex gap-2">
-                    <button onclick="exportData('current', 'csv')" class="flex-1 bg-gray-800 text-white py-2 rounded hover:bg-gray-900">Export CSV</button>
-                    <button onclick="exportData('current', 'excel')" class="flex-1 bg-green-700 text-white py-2 rounded hover:bg-green-800">Export Excel</button>
+            <div id="tab-export" class="tab-content hidden">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h3 class="text-lg font-bold text-suNavy mb-4">Export Attendance Data</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-semibold mb-2">Current Active Event</h4>
+                            <p id="export-current-event-name" class="text-sm text-gray-500 mb-4">No active event</p>
+                            <div class="flex gap-2">
+                                <button onclick="exportData('current', 'csv')" class="flex-1 bg-gray-800 text-white py-2 rounded hover:bg-gray-900">Export CSV</button>
+                                <button onclick="exportData('current', 'excel')" class="flex-1 bg-green-700 text-white py-2 rounded hover:bg-green-800">Export Excel</button>
+                            </div>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-semibold mb-2">All Events</h4>
+                            <p class="text-sm text-gray-500 mb-4">Includes historical data from all events.</p>
+                            <div class="flex gap-2">
+                                <button onclick="exportData('all', 'csv')" class="flex-1 bg-gray-800 text-white py-2 rounded hover:bg-gray-900">Export CSV</button>
+                                <button onclick="exportData('all', 'excel')" class="flex-1 bg-green-700 text-white py-2 rounded hover:bg-green-800">Export Excel</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="border border-gray-200 rounded-lg p-4">
-                <h4 class="font-semibold mb-2">All Events</h4>
-                <p class="text-sm text-gray-500 mb-4">Includes historical data from all events.</p>
-                <div class="flex gap-2">
-                    <button onclick="exportData('all', 'csv')" class="flex-1 bg-gray-800 text-white py-2 rounded hover:bg-gray-900">Export CSV</button>
-                    <button onclick="exportData('all', 'excel')" class="flex-1 bg-green-700 text-white py-2 rounded hover:bg-green-800">Export Excel</button>
-                </div>
-            </div>
         </div>
-    </div>
-</div>
-
-        <!-- Payments Tab -->
-<div id="tab-payments" class="tab-content hidden">
-    <div class="bg-white rounded-xl shadow p-6 mb-6">
-        <h3 class="text-lg font-bold text-suNavy mb-4">Society Fee Payment Summary</h3>
-        
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <p class="text-sm text-blue-600 font-medium">Total Students</p>
-                <p id="payment-total" class="text-2xl font-bold text-suNavy">0</p>
-            </div>
-            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
-                <p class="text-sm text-green-600 font-medium">Paid</p>
-                <p id="payment-paid" class="text-2xl font-bold text-green-700">0</p>
-            </div>
-            <div class="bg-red-50 p-4 rounded-lg border border-red-200">
-                <p class="text-sm text-red-600 font-medium">Unpaid</p>
-                <p id="payment-unpaid" class="text-2xl font-bold text-red-700">0</p>
-            </div>
-            <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                <p class="text-sm text-yellow-600 font-medium">Early Bird</p>
-                <p id="payment-earlybird" class="text-2xl font-bold text-yellow-700">0</p>
-            </div>
-        </div>
-
-        <!-- Filters -->
-        <div class="flex flex-wrap gap-3 mb-4">
-            <select id="payment-filter-status" onchange="renderPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                <option value="all">All Status</option>
-                <option value="paid">Paid Only</option>
-                <option value="unpaid">Unpaid Only</option>
-            </select>
-            <select id="payment-filter-type" onchange="renderPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                <option value="all">All Types</option>
-                <option value="early-bird">Early Bird</option>
-                <option value="regular">Regular</option>
-            </select>
-            <button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
-                <i class="fas fa-download mr-2"></i>Export Payments
-            </button>
-        </div>
-
-        <!-- Payments Table -->
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-100 text-gray-700">
-                        <th class="p-3 border-b">Student ID</th>
-                        <th class="p-3 border-b">Name</th>
-                        <th class="p-3 border-b">Year</th>
-                        <th class="p-3 border-b">Status</th>
-                        <th class="p-3 border-b">Type</th>
-                        <th class="p-3 border-b">Date Paid</th>
-                        <th class="p-3 border-b">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="payments-table-body"></tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
         <!-- Officer Dashboard -->
         <div id="officer-dashboard" class="hidden fade-in">
@@ -353,68 +346,62 @@
         </div>
 
         <!-- Treasurer Dashboard -->
-<div id="treasurer-dashboard" class="hidden fade-in">
-    <div class="bg-white rounded-xl shadow p-6">
-        <h3 class="text-lg font-bold text-suNavy mb-4">Society Fee Payment Management</h3>
-        
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <p class="text-sm text-blue-600 font-medium">Total Students</p>
-                <p id="treasurer-total" class="text-2xl font-bold text-suNavy">0</p>
-            </div>
-            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
-                <p class="text-sm text-green-600 font-medium">Paid</p>
-                <p id="treasurer-paid" class="text-2xl font-bold text-green-700">0</p>
-            </div>
-            <div class="bg-red-50 p-4 rounded-lg border border-red-200">
-                <p class="text-sm text-red-600 font-medium">Unpaid</p>
-                <p id="treasurer-unpaid" class="text-2xl font-bold text-red-700">0</p>
-            </div>
-            <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                <p class="text-sm text-yellow-600 font-medium">Early Bird</p>
-                <p id="treasurer-earlybird" class="text-2xl font-bold text-yellow-700">0</p>
+        <div id="treasurer-dashboard" class="hidden fade-in">
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="text-lg font-bold text-suNavy mb-4">Society Fee Payment Management</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <p class="text-sm text-blue-600 font-medium">Total Students</p>
+                        <p id="treasurer-total" class="text-2xl font-bold text-suNavy">0</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <p class="text-sm text-green-600 font-medium">Paid</p>
+                        <p id="treasurer-paid" class="text-2xl font-bold text-green-700">0</p>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                        <p class="text-sm text-red-600 font-medium">Unpaid</p>
+                        <p id="treasurer-unpaid" class="text-2xl font-bold text-red-700">0</p>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                        <p class="text-sm text-yellow-600 font-medium">Early Bird</p>
+                        <p id="treasurer-earlybird" class="text-2xl font-bold text-yellow-700">0</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-3 mb-4">
+                    <select id="treasurer-filter-status" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <option value="all">All Status</option>
+                        <option value="paid">Paid Only</option>
+                        <option value="unpaid">Unpaid Only</option>
+                    </select>
+                    <select id="treasurer-filter-type" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <option value="all">All Types</option>
+                        <option value="early-bird">Early Bird</option>
+                        <option value="regular">Regular</option>
+                    </select>
+                    <button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+                        <i class="fas fa-download mr-2"></i>Export Payments
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-700">
+                                <th class="p-3 border-b">Student ID</th>
+                                <th class="p-3 border-b">Name</th>
+                                <th class="p-3 border-b">Year</th>
+                                <th class="p-3 border-b">Status</th>
+                                <th class="p-3 border-b">Type</th>
+                                <th class="p-3 border-b">Date Paid</th>
+                                <th class="p-3 border-b">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="treasurer-payments-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- Filters -->
-        <div class="flex flex-wrap gap-3 mb-4">
-            <select id="treasurer-filter-status" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                <option value="all">All Status</option>
-                <option value="paid">Paid Only</option>
-                <option value="unpaid">Unpaid Only</option>
-            </select>
-            <select id="treasurer-filter-type" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                <option value="all">All Types</option>
-                <option value="early-bird">Early Bird</option>
-                <option value="regular">Regular</option>
-            </select>
-            <button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
-                <i class="fas fa-download mr-2"></i>Export Payments
-            </button>
-        </div>
-
-        <!-- Payments Table -->
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-100 text-gray-700">
-                        <th class="p-3 border-b">Student ID</th>
-                        <th class="p-3 border-b">Name</th>
-                        <th class="p-3 border-b">Year</th>
-                        <th class="p-3 border-b">Status</th>
-                        <th class="p-3 border-b">Type</th>
-                        <th class="p-3 border-b">Date Paid</th>
-                        <th class="p-3 border-b">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="treasurer-payments-body"></tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-                <!-- Student Dashboard -->
+        <!-- Student Dashboard -->
         <div id="student-dashboard" class="hidden fade-in max-w-3xl mx-auto">
             <!-- Tab Navigation -->
             <div class="flex space-x-2 mb-6 border-b border-gray-200 pb-2">
@@ -425,13 +412,13 @@
                     <i class="fas fa-history mr-2"></i> My Attendance
                 </button>
                 <button onclick="switchStudentTab('payment')" id="student-tab-payment-btn" class="px-4 py-2 bg-white text-gray-700 rounded-t-lg font-medium hover:bg-gray-100 transition flex items-center">
-    <i class="fas fa-money-bill-wave mr-2"></i> Payment Status
-</button>
+                    <i class="fas fa-money-bill-wave mr-2"></i> Payment Status
+                </button>
             </div>
 
             <!-- My ID Card View -->
             <div id="student-tab-id" class="student-tab-content">
-                <!-- Registration Form (Shown to new students) -->
+                <!-- Registration Form -->
                 <div id="student-registration-form" class="bg-white rounded-xl shadow-lg p-8 mb-8">
                     <div class="text-center mb-6">
                         <div class="mx-auto bg-suNavy text-white w-16 h-16 rounded-full flex items-center justify-center mb-3">
@@ -464,7 +451,7 @@
                     </form>
                 </div>
 
-                <!-- Digital ID Card (Shown after registration) -->
+                <!-- Digital ID Card -->
                 <div id="student-id-card-view" class="hidden">
                     <div class="text-center mb-6">
                         <h2 class="text-2xl font-bold text-suNavy">Your Digital ID</h2>
@@ -504,6 +491,9 @@
                         <button onclick="downloadIDCard()" class="bg-suNavy text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition flex items-center justify-center shadow-lg">
                             <i class="fas fa-download mr-2"></i> Download ID Card
                         </button>
+                        <button onclick="switchStudentTab('attendance')" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center shadow-lg">
+                            <i class="fas fa-history mr-2"></i> View My Attendance
+                        </button>
                         <button onclick="handleLogout()" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition flex items-center justify-center">
                             <i class="fas fa-sign-out-alt mr-2"></i> Logout
                         </button>
@@ -511,14 +501,12 @@
                 </div>
             </div>
 
-                        <!-- My Attendance View -->
+            <!-- My Attendance View -->
             <div id="student-tab-attendance" class="student-tab-content hidden">
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-xl font-bold text-suNavy mb-4 flex items-center">
                         <i class="fas fa-history mr-2"></i> My Attendance History
                     </h3>
-                    
-                    <!-- Loading State -->
                     <div id="student-attendance-loading" class="text-center py-8 text-gray-500 hidden">
                         <svg class="animate-spin h-8 w-8 mx-auto text-suNavy mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -526,8 +514,6 @@
                         </svg>
                         <p>Loading your records...</p>
                     </div>
-                    
-                    <!-- NEW: Explicit Empty State -->
                     <div id="student-attendance-empty" class="text-center py-12 hidden">
                         <div class="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-clipboard-list text-3xl text-gray-400"></i>
@@ -535,8 +521,6 @@
                         <h3 class="text-lg font-semibold text-gray-700">No attendance history</h3>
                         <p class="text-gray-500 mt-1">You haven't scanned into any events yet.</p>
                     </div>
-                    
-                    <!-- Attendance Table -->
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse hidden" id="student-attendance-table">
                             <thead>
@@ -553,172 +537,104 @@
             </div>
 
             <!-- Payment Status View -->
-<div id="student-tab-payment" class="student-tab-content hidden">
-    <div class="bg-white rounded-xl shadow-lg p-6">
-        <h3 class="text-xl font-bold text-suNavy mb-4 flex items-center">
-            <i class="fas fa-money-bill-wave mr-2"></i> Society Fee Payment Status
-        </h3>
-        
-        <div id="student-payment-loading" class="text-center py-8 text-gray-500 hidden">
-            <svg class="animate-spin h-8 w-8 mx-auto text-suNavy mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <p>Loading payment status...</p>
-        </div>
-        
-        <div id="student-payment-info" class="hidden">
-            <!-- Payment Status Card -->
-            <div id="payment-status-card" class="rounded-xl p-6 mb-4 border-2">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="text-lg font-bold">Payment Status</h4>
-                    <span id="payment-status-badge" class="px-4 py-2 rounded-full text-sm font-bold"></span>
-                </div>
-                
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center py-2 border-b">
-                        <span class="text-gray-600">Payment Type:</span>
-                        <span id="payment-type-display" class="font-semibold"></span>
+            <div id="student-tab-payment" class="student-tab-content hidden">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-suNavy mb-4 flex items-center">
+                        <i class="fas fa-money-bill-wave mr-2"></i> Society Fee Payment Status
+                    </h3>
+                    <div id="student-payment-loading" class="text-center py-8 text-gray-500 hidden">
+                        <svg class="animate-spin h-8 w-8 mx-auto text-suNavy mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p>Loading payment status...</p>
                     </div>
-                    <div class="flex justify-between items-center py-2 border-b">
-                        <span class="text-gray-600">Amount:</span>
-                        <span id="payment-amount-display" class="font-semibold text-lg"></span>
-                    </div>
-                    <div class="flex justify-between items-center py-2">
-                        <span class="text-gray-600">Date Paid:</span>
-                        <span id="payment-date-display" class="font-semibold"></span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p class="text-sm text-blue-800">
-                    <i class="fas fa-info-circle mr-2"></i>
-                    If you believe there's an error with your payment status, please contact your year-level treasurer.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
-
-            <!-- Digital ID Card (Shown after registration) -->
-            <div id="student-id-card-view" class="hidden">
-                <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold text-suNavy">Your Digital ID</h2>
-                    <p class="text-gray-600 text-sm mt-1">Show this QR code to officers when attending events.</p>
-                </div>
-
-                <!-- The Actual ID Card Layout -->
-                <div id="student-id-card" class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200 mb-6">
-                    <!-- Card Header -->
-                    <div class="bg-suNavy p-4 flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <img src="school-logo.png" class="h-8 w-8 rounded-full bg-white p-0.5 object-contain">
-                            <img src="psych-logo.jpg" class="h-8 w-8 rounded-full bg-white p-0.5 object-contain">
-                        </div>
-                        <span class="text-white text-xs font-bold tracking-widest">OFFICIAL ID</span>
-                    </div>
-                    
-                    <!-- Card Body -->
-                    <div class="p-6 flex flex-col md:flex-row items-center gap-6">
-                        <div class="flex-grow text-center md:text-left">
-                            <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Silliman University</p>
-                            <h3 id="card-name" class="text-2xl font-bold text-suNavy mt-1">Student Name</h3>
-                            <p class="text-sm text-gray-600 mt-1">Psychology Society Member</p>
-                            
-                            <div class="mt-4 space-y-1">
-                                <p class="text-xs text-gray-500">Student ID</p>
-                                <p id="card-id" class="font-mono font-bold text-lg text-gray-800">00000000</p>
-                                
-                                <p class="text-xs text-gray-500 mt-2">Year Level</p>
-                                <p id="card-year" class="font-semibold text-gray-800">1st Year</p>
+                    <div id="student-payment-info" class="hidden">
+                        <div id="payment-status-card" class="rounded-xl p-6 mb-4 border-2">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-lg font-bold">Payment Status</h4>
+                                <span id="payment-status-badge" class="px-4 py-2 rounded-full text-sm font-bold"></span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center py-2 border-b">
+                                    <span class="text-gray-600">Payment Type:</span>
+                                    <span id="payment-type-display" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between items-center py-2 border-b">
+                                    <span class="text-gray-600">Amount:</span>
+                                    <span id="payment-amount-display" class="font-semibold text-lg"></span>
+                                </div>
+                                <div class="flex justify-between items-center py-2">
+                                    <span class="text-gray-600">Date Paid:</span>
+                                    <span id="payment-date-display" class="font-semibold"></span>
+                                </div>
                             </div>
                         </div>
-                        <div class="bg-gray-50 p-3 rounded-xl border border-gray-200">
-                            <div id="card-qr" class="w-32 h-32 flex items-center justify-center"></div>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <p class="text-sm text-blue-800">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                If you believe there's an error with your payment status, please contact the treasurer.
+                            </p>
                         </div>
                     </div>
-                    
-                    <!-- Card Footer -->
-                    <div class="bg-gray-100 px-6 py-2 text-center">
-                        <p class="text-[10px] text-gray-500">School Year 2026–2027 • If found, please return to SU Psych Soc.</p>
-                    </div>
-                </div>
-
-                                <!-- Action Buttons -->
-                <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                    <button onclick="downloadIDCard()" class="bg-suNavy text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition flex items-center justify-center shadow-lg">
-                        <i class="fas fa-download mr-2"></i> Download ID Card
-                    </button>
-                    
-                    <!-- NEW: Button to jump to Attendance Tab -->
-                    <button onclick="switchStudentTab('attendance')" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center shadow-lg">
-                        <i class="fas fa-history mr-2"></i> View My Attendance
-                    </button>
-                    
-                    <button onclick="handleLogout()" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition flex items-center justify-center">
-                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                    </button>
                 </div>
             </div>
         </div>
     </main>
 
     <!-- Student Modal -->
-<div id="student-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
-    <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md fade-in">
-        <h3 class="text-xl font-bold text-suNavy mb-4" id="modal-title">Add Student</h3>
-        <form id="student-form" class="space-y-4">
-            <input type="hidden" id="edit-student-id">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
-                <input type="text" id="form-student-id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input type="text" id="form-student-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Year Level</label>
-                <select id="form-student-year" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                    <option value="1">1st Year</option>
-                    <option value="2">2nd Year</option>
-                    <option value="3">3rd Year</option>
-                    <option value="4">4th Year</option>
-                </select>
-            </div>
-            
-            <!-- NEW: Payment Fields -->
-            <div class="border-t pt-4 mt-4">
-                <h4 class="font-semibold text-suNavy mb-3">Payment Information</h4>
+    <div id="student-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md fade-in">
+            <h3 class="text-xl font-bold text-suNavy mb-4" id="modal-title">Add Student</h3>
+            <form id="student-form" class="space-y-4">
+                <input type="hidden" id="edit-student-id">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
-                    <select id="form-payment-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                        <option value="unpaid">Unpaid</option>
-                        <option value="paid">Paid</option>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
+                    <input type="text" id="form-student-id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="form-student-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Year Level</label>
+                    <select id="form-student-year" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
                     </select>
                 </div>
-                <div class="mt-3">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Payment Type</label>
-                    <select id="form-payment-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                        <option value="none">Not Applicable</option>
-                        <option value="early-bird">Early Bird (₱150)</option>
-                        <option value="regular">Regular (₱200)</option>
-                    </select>
+                <div class="border-t pt-4 mt-4">
+                    <h4 class="font-semibold text-suNavy mb-3">Payment Information</h4>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
+                        <select id="form-payment-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <option value="unpaid">Unpaid</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                    </div>
+                    <div class="mt-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Type</label>
+                        <select id="form-payment-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <option value="none">Not Applicable</option>
+                            <option value="early-bird">Early Bird (₱150)</option>
+                            <option value="regular">Regular (₱200)</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="flex items-center">
-                <input type="checkbox" id="form-student-active" checked class="h-4 w-4 text-suNavy focus:ring-suNavy border-gray-300 rounded">
-                <label class="ml-2 block text-sm text-gray-700">Active</label>
-            </div>
-            <div class="flex justify-end gap-2 mt-6">
-                <button type="button" onclick="closeStudentModal()" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-suNavy text-white rounded-lg hover:bg-blue-900">Save Student</button>
-            </div>
-        </form>
+                <div class="flex items-center">
+                    <input type="checkbox" id="form-student-active" checked class="h-4 w-4 text-suNavy focus:ring-suNavy border-gray-300 rounded">
+                    <label class="ml-2 block text-sm text-gray-700">Active</label>
+                </div>
+                <div class="flex justify-end gap-2 mt-6">
+                    <button type="button" onclick="closeStudentModal()" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-suNavy text-white rounded-lg hover:bg-blue-900">Save Student</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+
     <!-- QR Modal -->
     <div id="qr-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
         <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center fade-in">
@@ -754,1192 +670,1150 @@
         </div>
     </footer>
 
-    <!-- ========================================== -->
-    <!-- ALL JAVASCRIPT LOGIC EMBEDDED HERE         -->
-    <!-- ========================================== -->
-   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    console.log("🚀 SU Psychology System Loaded - " + new Date().toLocaleString());
+        console.log("🚀 SU Psychology System Loaded - " + new Date().toLocaleString());
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
-        authDomain: "psychsoc-attendance-system.firebaseapp.com",
-        projectId: "psychsoc-attendance-system",
-        storageBucket: "psychsoc-attendance-system.firebasestorage.app",
-        messagingSenderId: "93131590758",
-        appId: "1:93131590758:web:bfea89644381b1972af1a7",
-        measurementId: "G-C5SH1EEQP2"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTEYT5qUaVjMP3ZamaX7pRov51Dix_74w",
+            authDomain: "psychsoc-attendance-system.firebaseapp.com",
+            projectId: "psychsoc-attendance-system",
+            storageBucket: "psychsoc-attendance-system.firebasestorage.app",
+            messagingSenderId: "93131590758",
+            appId: "1:93131590758:web:bfea89644381b1972af1a7",
+            measurementId: "G-C5SH1EEQP2"
+        };
 
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHDMMEqOIl9vuT_ryf3N79r_BefZUrJV4v_EpStwjVDcSRAE32gZGi8yIQJa8rP0zx/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWnhp4kVnc_StNi_J6D71Llc5ui63LNyB37AyPXn2vWGL2aNdavqMH17JFX_MsvaY/exec";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    let currentUser = null;
-    let currentRole = null;
-    let html5QrcodeScanner = null;
-    let lastScanTime = 0;
-    let unsubscribeLiveAttendance = null;
-    let yearChartInstance = null;
-    let statusChartInstance = null;
+        let currentUser = null;
+        let currentRole = null;
+        let html5QrcodeScanner = null;
+        let lastScanTime = 0;
+        let unsubscribeLiveAttendance = null;
+        let yearChartInstance = null;
+        let statusChartInstance = null;
 
-    // Global toggle function for login/signup forms
-    window.toggleAuthMode = function() {
-        const loginContainer = document.getElementById('login-form-container');
-        const signupContainer = document.getElementById('signup-form-container');
-        
-        if (loginContainer && signupContainer) {
-            if (loginContainer.classList.contains('hidden')) {
-                loginContainer.classList.remove('hidden');
-                signupContainer.classList.add('hidden');
+        window.toggleAuthMode = function() {
+            const loginContainer = document.getElementById('login-form-container');
+            const signupContainer = document.getElementById('signup-form-container');
+            if (loginContainer && signupContainer) {
+                if (loginContainer.classList.contains('hidden')) {
+                    loginContainer.classList.remove('hidden');
+                    signupContainer.classList.add('hidden');
+                } else {
+                    loginContainer.classList.add('hidden');
+                    signupContainer.classList.remove('hidden');
+                }
+            }
+        };
+
+        window.addEventListener('online', () => document.getElementById('offline-banner').classList.add('hidden'));
+        window.addEventListener('offline', () => document.getElementById('offline-banner').classList.remove('hidden'));
+
+        function setButtonLoading(btn, isLoading, originalText) {
+            if (isLoading) {
+                btn.disabled = true;
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
             } else {
-                loginContainer.classList.add('hidden');
-                signupContainer.classList.remove('hidden');
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                btn.innerHTML = originalText;
             }
         }
-    };
 
-    window.addEventListener('online', () => document.getElementById('offline-banner').classList.add('hidden'));
-    window.addEventListener('offline', () => document.getElementById('offline-banner').classList.remove('hidden'));
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                console.log("✅ User logged in:", user.email);
+                
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('user-email').innerText = user.email;
+                
+                document.getElementById('admin-dashboard').classList.add('hidden');
+                document.getElementById('officer-dashboard').classList.add('hidden');
+                document.getElementById('student-dashboard').classList.add('hidden');
+                document.getElementById('treasurer-dashboard').classList.add('hidden');
 
-    function setButtonLoading(btn, isLoading, originalText) {
-        if (isLoading) {
-            btn.disabled = true;
-            btn.classList.add('opacity-75', 'cursor-not-allowed');
-            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
-        } else {
-            btn.disabled = false;
-            btn.classList.remove('opacity-75', 'cursor-not-allowed');
-            btn.innerHTML = originalText;
-        }
-    }
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    
+                    if (userDoc.exists()) {
+                        currentRole = userDoc.data().role;
+                        console.log("📂 Existing user role found:", currentRole);
+                        document.getElementById('user-role-badge').innerText = currentRole;
+                        
+                        if (currentRole === 'admin') {
+                            document.getElementById('admin-dashboard').classList.remove('hidden');
+                            renderEvents(); renderStudents(); renderUsers();
+                        } else if (currentRole === 'officer') {
+                            document.getElementById('officer-dashboard').classList.remove('hidden');
+                        } else if (currentRole === 'student') {
+                            document.getElementById('student-dashboard').classList.remove('hidden');
+                            loadStudentProfile(user.uid);
+                        } else if (currentRole === 'treasurer') {
+                            document.getElementById('treasurer-dashboard').classList.remove('hidden');
+                            renderTreasurerPayments();
+                        }
+                    } else {
+                        console.log("🆕 New user detected. Showing registration form.");
+                        currentRole = 'pending';
+                        document.getElementById('user-role-badge').innerText = 'New Student';
+                        document.getElementById('student-dashboard').classList.remove('hidden');
+                        
+                        document.querySelectorAll('.student-tab-content').forEach(el => el.classList.add('hidden'));
+                        document.getElementById('student-tab-id').classList.remove('hidden');
+                        
+                        const idBtn = document.getElementById('student-tab-id-btn');
+                        const attBtn = document.getElementById('student-tab-attendance-btn');
+                        const payBtn = document.getElementById('student-tab-payment-btn');
+                        if (idBtn) {
+                            idBtn.classList.add('bg-suNavy', 'text-white');
+                            idBtn.classList.remove('bg-white', 'text-gray-700');
+                        }
+                        if (attBtn) {
+                            attBtn.classList.remove('bg-suNavy', 'text-white');
+                            attBtn.classList.add('bg-white', 'text-gray-700');
+                            attBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            attBtn.disabled = true;
+                        }
+                        if (payBtn) {
+                            payBtn.classList.remove('bg-suNavy', 'text-white');
+                            payBtn.classList.add('bg-white', 'text-gray-700');
+                            payBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            payBtn.disabled = true;
+                        }
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            currentUser = user;
-            console.log("✅ User logged in:", user.email);
+                        document.getElementById('student-registration-form').classList.remove('hidden');
+                        document.getElementById('student-id-card-view').classList.add('hidden');
+                    }
+                } catch (error) {
+                    console.error("❌ Error fetching user document:", error);
+                    showToast("Error loading profile: " + error.message, "error");
+                    document.getElementById('student-dashboard').classList.remove('hidden');
+                    document.getElementById('student-registration-form').classList.remove('hidden');
+                }
+            } else {
+                console.log("🚪 User logged out");
+                currentUser = null;
+                currentRole = null;
+                document.getElementById('login-view').classList.remove('hidden');
+                document.getElementById('admin-dashboard').classList.add('hidden');
+                document.getElementById('officer-dashboard').classList.add('hidden');
+                document.getElementById('student-dashboard').classList.add('hidden');
+                document.getElementById('treasurer-dashboard').classList.add('hidden');
+                document.getElementById('user-info').classList.add('hidden');
+                stopScanner();
+            }
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
             
-            document.getElementById('login-view').classList.add('hidden');
-            document.getElementById('user-info').classList.remove('hidden');
-            document.getElementById('user-email').innerText = user.email;
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            setButtonLoading(btn, true);
             
-            document.getElementById('admin-dashboard').classList.add('hidden');
-            document.getElementById('officer-dashboard').classList.add('hidden');
-            document.getElementById('student-dashboard').classList.add('hidden');
-            document.getElementById('treasurer-dashboard').classList.add('hidden');
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                showToast("Account created! Please complete your profile.", "success");
+            } catch (error) {
+                let errorMsg = error.message;
+                if (error.code === 'auth/email-already-in-use') errorMsg = "This email is already registered. Please log in.";
+                else if (error.code === 'auth/weak-password') errorMsg = "Password should be at least 6 characters.";
+                showToast("Sign up failed: " + errorMsg, "error");
+            } finally {
+                setButtonLoading(btn, false, originalText);
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            setButtonLoading(btn, true);
 
             try {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
                 
-                if (userDoc.exists()) {
-                    currentRole = userDoc.data().role;
-                    console.log("📂 Existing user role found:", currentRole);
-                    document.getElementById('user-role-badge').innerText = currentRole;
-                    
-                    if (currentRole === 'admin') {
-                        document.getElementById('admin-dashboard').classList.remove('hidden');
-                        renderEvents(); renderStudents(); renderUsers();
-                    } else if (currentRole === 'officer') {
-                        document.getElementById('officer-dashboard').classList.remove('hidden');
-                    } else if (currentRole === 'student') {
-                        document.getElementById('student-dashboard').classList.remove('hidden');
-                        loadStudentProfile(user.uid);
-                    } else if (currentRole === 'treasurer') {
-                        document.getElementById('treasurer-dashboard').classList.remove('hidden');
-                        renderTreasurerPayments();
-                    }
+                if (!userDoc.exists()) {
+                    await signOut(auth);
+                    showToast("Account not found in database. Please create a new account first.", "error");
                 } else {
-                    console.log("🆕 New user detected. Showing registration form.");
-                    currentRole = 'pending';
-                    document.getElementById('user-role-badge').innerText = 'New Student';
-                    document.getElementById('student-dashboard').classList.remove('hidden');
-                    
-                    document.querySelectorAll('.student-tab-content').forEach(el => el.classList.add('hidden'));
-                    document.getElementById('student-tab-id').classList.remove('hidden');
-                    
-                    const idBtn = document.getElementById('student-tab-id-btn');
-                    const attBtn = document.getElementById('student-tab-attendance-btn');
-                    const payBtn = document.getElementById('student-tab-payment-btn');
-                    if (idBtn) {
-                        idBtn.classList.add('bg-suNavy', 'text-white');
-                        idBtn.classList.remove('bg-white', 'text-gray-700');
-                    }
-                    if (attBtn) {
-                        attBtn.classList.remove('bg-suNavy', 'text-white');
-                        attBtn.classList.add('bg-white', 'text-gray-700');
-                        attBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                        attBtn.disabled = true;
-                    }
-                    if (payBtn) {
-                        payBtn.classList.remove('bg-suNavy', 'text-white');
-                        payBtn.classList.add('bg-white', 'text-gray-700');
-                        payBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                        payBtn.disabled = true;
-                    }
-
-                    document.getElementById('student-registration-form').classList.remove('hidden');
-                    document.getElementById('student-id-card-view').classList.add('hidden');
+                    showToast("Login successful!", "success");
                 }
             } catch (error) {
-                console.error("❌ Error fetching user document:", error);
-                showToast("Error loading profile: " + error.message, "error");
-                document.getElementById('student-dashboard').classList.remove('hidden');
-                document.getElementById('student-registration-form').classList.remove('hidden');
+                let errorMsg = error.message;
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    errorMsg = "Invalid email or password.";
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMsg = "Too many failed attempts. Please try again later.";
+                }
+                showToast("Login failed: " + errorMsg, "error");
+            } finally {
+                setButtonLoading(btn, false, originalText);
             }
-        } else {
-            console.log("🚪 User logged out");
-            currentUser = null;
-            currentRole = null;
-            document.getElementById('login-view').classList.remove('hidden');
-            document.getElementById('admin-dashboard').classList.add('hidden');
-            document.getElementById('officer-dashboard').classList.add('hidden');
-            document.getElementById('student-dashboard').classList.add('hidden');
-            document.getElementById('treasurer-dashboard').classList.add('hidden');
-            document.getElementById('user-info').classList.add('hidden');
+        });
+
+        window.handleLogout = () => {
             stopScanner();
-        }
-    });
+            signOut(auth);
+        };
 
-    document.getElementById('signup-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('signup-email').value.trim();
-        const password = document.getElementById('signup-password').value;
-        
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        setButtonLoading(btn, true);
-        
-        try {
-            await createUserWithEmailAndPassword(auth, email, password);
-            showToast("Account created! Please complete your profile.", "success");
-        } catch (error) {
-            let errorMsg = error.message;
-            if (error.code === 'auth/email-already-in-use') errorMsg = "This email is already registered. Please log in.";
-            else if (error.code === 'auth/weak-password') errorMsg = "Password should be at least 6 characters.";
-            showToast("Sign up failed: " + errorMsg, "error");
-        } finally {
-            setButtonLoading(btn, false, originalText);
-        }
-    });
+        document.getElementById('logout-btn').addEventListener('click', window.handleLogout);
 
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        setButtonLoading(btn, true);
-
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
-            
-            if (!userDoc.exists()) {
-                await signOut(auth);
-                showToast("Account not found in database. Please create a new account first.", "error");
-            } else {
-                showToast("Login successful!", "success");
-            }
-        } catch (error) {
-            let errorMsg = error.message;
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                errorMsg = "Invalid email or password.";
-            } else if (error.code === 'auth/too-many-requests') {
-                errorMsg = "Too many failed attempts. Please try again later.";
-            }
-            showToast("Login failed: " + errorMsg, "error");
-        } finally {
-            setButtonLoading(btn, false, originalText);
-        }
-    });
-
-    window.handleLogout = () => {
-        stopScanner();
-        signOut(auth);
-    };
-
-    document.getElementById('logout-btn').addEventListener('click', window.handleLogout);
-
-    window.switchTab = (tab) => {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-        document.getElementById(`tab-${tab}`).classList.remove('hidden');
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('bg-suNavy', 'text-white');
-            btn.classList.add('bg-white', 'text-gray-700');
-        });
-        event.target.classList.remove('bg-white', 'text-gray-700');
-        event.target.classList.add('bg-suNavy', 'text-white');
-        if (tab === 'analytics') loadAnalytics();
-        if (tab === 'export') updateExportUI();
-        if (tab === 'payments') renderPayments();
-    };
-
-    window.switchOfficerTab = (tab) => {
-        document.querySelectorAll('.officer-tab-content').forEach(el => el.classList.add('hidden'));
-        document.getElementById(`officer-tab-${tab}`).classList.remove('hidden');
-        document.querySelectorAll('.officer-tab-btn').forEach(btn => {
-            btn.classList.remove('bg-suNavy', 'text-white');
-            btn.classList.add('bg-white', 'text-gray-700');
-        });
-        event.target.classList.remove('bg-white', 'text-gray-700');
-        event.target.classList.add('bg-suNavy', 'text-white');
-        if (tab === 'live') startLiveAttendanceListener();
-        else stopLiveAttendanceListener();
-    };
-
-    window.switchStudentTab = (tab) => {
-        document.querySelectorAll('.student-tab-content').forEach(el => el.classList.add('hidden'));
-        document.getElementById(`student-tab-${tab}`).classList.remove('hidden');
-        
-        const idBtn = document.getElementById('student-tab-id-btn');
-        const attBtn = document.getElementById('student-tab-attendance-btn');
-        const payBtn = document.getElementById('student-tab-payment-btn');
-        
-        [idBtn, attBtn, payBtn].forEach(btn => {
-            if (btn && !btn.disabled) {
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('bg-suNavy', 'text-white');
                 btn.classList.add('bg-white', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-white', 'text-gray-700');
+            event.target.classList.add('bg-suNavy', 'text-white');
+            if (tab === 'analytics') loadAnalytics();
+            if (tab === 'export') updateExportUI();
+            if (tab === 'payments') renderPayments();
+        };
+
+        window.switchOfficerTab = (tab) => {
+            document.querySelectorAll('.officer-tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`officer-tab-${tab}`).classList.remove('hidden');
+            document.querySelectorAll('.officer-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-suNavy', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-white', 'text-gray-700');
+            event.target.classList.add('bg-suNavy', 'text-white');
+            if (tab === 'live') startLiveAttendanceListener();
+            else stopLiveAttendanceListener();
+        };
+
+        window.switchStudentTab = (tab) => {
+            document.querySelectorAll('.student-tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`student-tab-${tab}`).classList.remove('hidden');
+            
+            const idBtn = document.getElementById('student-tab-id-btn');
+            const attBtn = document.getElementById('student-tab-attendance-btn');
+            const payBtn = document.getElementById('student-tab-payment-btn');
+            
+            [idBtn, attBtn, payBtn].forEach(btn => {
+                if (btn && !btn.disabled) {
+                    btn.classList.remove('bg-suNavy', 'text-white');
+                    btn.classList.add('bg-white', 'text-gray-700');
+                }
+            });
+            
+            if (tab === 'id') {
+                if (idBtn) {
+                    idBtn.classList.add('bg-suNavy', 'text-white');
+                    idBtn.classList.remove('bg-white', 'text-gray-700');
+                }
+            } else if (tab === 'attendance') {
+                if (attBtn && !attBtn.disabled) {
+                    attBtn.classList.add('bg-suNavy', 'text-white');
+                    attBtn.classList.remove('bg-white', 'text-gray-700');
+                }
+                loadStudentAttendance();
+            } else if (tab === 'payment') {
+                if (payBtn && !payBtn.disabled) {
+                    payBtn.classList.add('bg-suNavy', 'text-white');
+                    payBtn.classList.remove('bg-white', 'text-gray-700');
+                }
+                loadStudentPayment();
             }
-        });
-        
-        if (tab === 'id') {
-            if (idBtn) {
-                idBtn.classList.add('bg-suNavy', 'text-white');
-                idBtn.classList.remove('bg-white', 'text-gray-700');
-            }
-        } else if (tab === 'attendance') {
-            if (attBtn && !attBtn.disabled) {
-                attBtn.classList.add('bg-suNavy', 'text-white');
-                attBtn.classList.remove('bg-white', 'text-gray-700');
-            }
-            loadStudentAttendance();
-        } else if (tab === 'payment') {
-            if (payBtn && !payBtn.disabled) {
-                payBtn.classList.add('bg-suNavy', 'text-white');
-                payBtn.classList.remove('bg-white', 'text-gray-700');
-            }
-            loadStudentPayment();
-        }
-    };
+        };
 
-    document.getElementById('create-event-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        setButtonLoading(btn, true);
+        document.getElementById('create-event-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            setButtonLoading(btn, true);
 
-        const name = document.getElementById('event-name').value;
-        try {
-            await setDoc(doc(collection(db, "events")), { name, active: false, createdBy: currentUser.uid, createdAt: serverTimestamp() });
-            showToast("Event created!", "success");
-            document.getElementById('event-name').value = "";
-            renderEvents();
-        } catch (err) { 
-            showToast("Error creating event", "error"); 
-        } finally { 
-            setButtonLoading(btn, false, originalText); 
-        }
-    });
-
-    window.renderEvents = async () => {
-        const snap = await getDocs(query(collection(db, "events"), orderBy("createdAt", "desc")));
-        const container = document.getElementById('events-list');
-        container.innerHTML = "";
-        snap.forEach(docSnap => {
-            const data = docSnap.data();
-            const isActive = data.active;
-            const div = document.createElement('div');
-            div.className = "bg-white rounded-xl shadow p-4 border-l-4 " + (isActive ? "border-green-500" : "border-gray-300");
-            div.innerHTML = `
-                <div class="flex justify-between items-start mb-2">
-                    <h4 class="font-bold text-lg text-suNavy">${data.name}</h4>
-                    <span class="px-2 py-1 text-xs rounded-full ${isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">
-                        ${isActive ? '🟢 Active' : '⚪ Inactive'}
-                    </span>
-                </div>
-                <p class="text-sm text-gray-500 mb-4">Created: ${data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</p>
-                <div class="flex gap-2">
-                    ${!isActive ? `<button onclick="activateEvent('${docSnap.id}')" class="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 text-sm">Activate</button>` : ''}
-                    ${isActive ? `<button onclick="endEvent('${docSnap.id}')" class="flex-1 bg-red-600 text-white py-2 rounded hover:bg-red-700 text-sm">End Event</button>` : ''}
-                </div>
-            `;
-            container.appendChild(div);
-        });
-    };
-
-    window.activateEvent = async (eventId) => {
-        try {
-            const batch = writeBatch(db);
-            const activeSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
-            activeSnap.forEach(d => batch.update(d.ref, { active: false }));
-            batch.update(doc(db, "events", eventId), { active: true });
-            await batch.commit();
-            showToast("Event activated!", "success");
-            renderEvents();
-        } catch (err) { 
-            showToast("Failed to activate", "error"); 
-        }
-    };
-
-    window.endEvent = async (eventId) => {
-        try {
-            await updateDoc(doc(db, "events", eventId), { active: false });
-            showToast("Event ended.", "success");
-            renderEvents();
-        } catch (err) { 
-            showToast("Failed to end event", "error"); 
-        }
-    };
-
-    window.renderStudents = async () => {
-    const search = document.getElementById('student-search').value.toLowerCase();
-    const yearFilter = document.getElementById('student-year-filter').value;
-    const snap = await getDocs(collection(db, "students"));
-    const tbody = document.getElementById('students-table-body');
-    tbody.innerHTML = "";
-    snap.forEach(docSnap => {
-        const data = docSnap.data();
-        
-        // Apply search filter
-        if (search && !data.name.toLowerCase().includes(search) && !docSnap.id.toLowerCase().includes(search)) return;
-        
-        // Apply year filter
-        if (yearFilter !== 'all' && data.year.toString() !== yearFilter) return;
-        
-        const tr = document.createElement('tr');
-        tr.className = "border-b hover:bg-gray-50";
-        tr.innerHTML = `
-            <td class="p-3 font-mono text-sm">${docSnap.id}</td>
-            <td class="p-3">${data.name}</td>
-            <td class="p-3">${data.year}</td>
-            <td class="p-3"><span class="px-2 py-1 text-xs rounded-full ${data.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${data.active ? 'Active' : 'Inactive'}</span></td>
-            <td class="p-3 flex gap-2">
-                <button onclick="showQR('${docSnap.id}', '${data.name}')" class="text-suNavy hover:text-blue-800"><i class="fas fa-qrcode"></i></button>
-                <button onclick="editStudent('${docSnap.id}')" class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
-                <button onclick="toggleStudentActive('${docSnap.id}', ${!data.active})" class="text-${data.active ? 'red' : 'green'}-600 hover:text-${data.active ? 'red' : 'green'}-800">
-                    <i class="fas fa-${data.active ? 'ban' : 'check'}"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-};
-
-    document.getElementById('student-search').addEventListener('input', renderStudents);
-
-    window.openStudentModal = () => {
-        document.getElementById('student-form').reset();
-        document.getElementById('edit-student-id').value = "";
-        document.getElementById('form-student-id').disabled = false;
-        document.getElementById('modal-title').innerText = "Add Student";
-        document.getElementById('student-modal').classList.remove('hidden');
-        document.getElementById('student-modal').classList.add('flex');
-    };
-
-    window.closeStudentModal = () => {
-        document.getElementById('student-modal').classList.add('hidden');
-        document.getElementById('student-modal').classList.remove('flex');
-    };
-
-    window.editStudent = async (id) => {
-        const snap = await getDoc(doc(db, "students", id));
-        const data = snap.data();
-        document.getElementById('edit-student-id').value = id;
-        document.getElementById('form-student-id').value = id;
-        document.getElementById('form-student-id').disabled = true;
-        document.getElementById('form-student-name').value = data.name;
-        document.getElementById('form-student-year').value = data.year;
-        document.getElementById('form-student-active').checked = data.active;
-        document.getElementById('form-payment-status').value = data.paymentStatus || 'unpaid';
-        document.getElementById('form-payment-type').value = data.paymentType || 'none';
-        document.getElementById('modal-title').innerText = "Edit Student";
-        document.getElementById('student-modal').classList.remove('hidden');
-        document.getElementById('student-modal').classList.add('flex');
-    };
-
-    document.getElementById('student-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        setButtonLoading(btn, true);
-
-        const id = document.getElementById('edit-student-id').value || document.getElementById('form-student-id').value;
-        const name = document.getElementById('form-student-name').value;
-        const year = parseInt(document.getElementById('form-student-year').value);
-        const active = document.getElementById('form-student-active').checked;
-        const paymentStatus = document.getElementById('form-payment-status').value;
-        const paymentType = document.getElementById('form-payment-type').value;
-        
-        try {
-            const studentData = { name, year, active, qrCode: id, paymentStatus, paymentType };
-            if (paymentStatus === 'paid') {
-                studentData.paymentDate = serverTimestamp();
-            }
-            await setDoc(doc(db, "students", id), studentData, { merge: true });
-            showToast("Student saved!", "success");
-            closeStudentModal();
-            renderStudents();
-            renderPayments();
-        } catch (err) { 
-            showToast("Error saving student", "error"); 
-        } finally { 
-            setButtonLoading(btn, false, originalText); 
-        }
-    });
-
-    window.toggleStudentActive = async (id, status) => {
-        await updateDoc(doc(db, "students", id), { active: status });
-        renderStudents();
-    };
-
-    window.showQR = (id, name) => {
-        document.getElementById('qr-student-name').innerText = name;
-        document.getElementById('qr-student-id').innerText = id;
-        document.getElementById('qr-code-display').innerHTML = "";
-        new QRCode(document.getElementById("qr-code-display"), { text: id, width: 150, height: 150 });
-        document.getElementById('qr-modal').classList.remove('hidden');
-        document.getElementById('qr-modal').classList.add('flex');
-    };
-
-    window.showPrintableQRs = async () => {
-        const container = document.getElementById("print-qr-container");
-        container.innerHTML = "";
-        const snap = await getDocs(query(collection(db, "students"), where("active", "==", true)));
-        snap.forEach(docSnap => {
-            const data = docSnap.data();
-            const div = document.createElement("div");
-            div.className = "border p-4 rounded-lg text-center break-inside-avoid mb-4 bg-white";
-            div.innerHTML = `
-                <h3 class="font-bold text-lg">${data.name}</h3>
-                <p class="text-sm text-gray-600">ID: ${docSnap.id} | Year: ${data.year}</p>
-                <div id="qr-print-${docSnap.id}" class="flex justify-center my-2"></div>
-                <p class="text-xs text-gray-500 mt-2">SU Psychology Society</p>
-            `;
-            container.appendChild(div);
-            new QRCode(document.getElementById(`qr-print-${docSnap.id}`), { text: docSnap.id, width: 128, height: 128 });
-        });
-        setTimeout(() => window.print(), 500);
-    };
-
-    window.renderUsers = async () => {
-    const search = document.getElementById('user-search') ? document.getElementById('user-search').value.toLowerCase() : '';
-    const snap = await getDocs(collection(db, "users"));
-    const container = document.getElementById('users-list');
-    container.innerHTML = "";
-    snap.forEach(docSnap => {
-        const data = docSnap.data();
-        
-        // Apply search filter
-        const displayName = data.name ? data.name : "Unnamed User";
-        const email = data.email || '';
-        
-        if (search && !displayName.toLowerCase().includes(search) && !email.toLowerCase().includes(search)) return;
-        
-        const div = document.createElement('div');
-        div.className = "flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100";
-        const roleColor = data.role === 'admin' ? 'bg-suNavy text-white' : data.role === 'treasurer' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800';
-        div.innerHTML = `
-            <div>
-                <p class="font-bold text-suNavy">${displayName}</p>
-                <p class="text-sm text-gray-500">${email}</p>
-            </div>
-            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${roleColor}">
-                ${data.role}
-            </span>
-        `;
-        container.appendChild(div);
-    });
-};
-
-    document.getElementById('add-user-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        setButtonLoading(btn, true);
-
-        const name = document.getElementById('new-user-name').value;
-        const email = document.getElementById('new-user-email').value;
-        const role = document.getElementById('new-user-role').value;
-        try {
-            await setDoc(doc(db, "users", email), { name: name, email: email, role: role });
-            showToast("Role assigned successfully!", "success");
-            document.getElementById('add-user-form').reset();
-            renderUsers();
-        } catch (err) { 
-            showToast("Error assigning role: " + err.message, "error"); 
-        } finally { 
-            setButtonLoading(btn, false, originalText); 
-        }
-    });
-
-    window.toggleScanner = async () => {
-        const btn = document.getElementById('toggle-scanner-btn');
-        if (html5QrcodeScanner) {
-            stopScanner();
-            btn.innerText = "Start Camera";
-            btn.classList.remove('bg-red-600');
-            btn.classList.add('bg-suNavy');
-        } else {
-            btn.innerText = "Stop Camera";
-            btn.classList.remove('bg-suNavy');
-            btn.classList.add('bg-red-600');
-            html5QrcodeScanner = new Html5Qrcode("reader");
+            const name = document.getElementById('event-name').value;
             try {
-                await html5QrcodeScanner.start(
-                    { facingMode: "environment" },
-                    { fps: 10, qrbox: { width: 250, height: 250 } },
-                    onScanSuccess,
-                    () => {}
-                );
-            } catch (err) {
-                showToast("Camera permission denied.", "error");
+                await setDoc(doc(collection(db, "events")), { name, active: false, createdBy: currentUser.uid, createdAt: serverTimestamp() });
+                showToast("Event created!", "success");
+                document.getElementById('event-name').value = "";
+                renderEvents();
+            } catch (err) { 
+                showToast("Error creating event", "error"); 
+            } finally { 
+                setButtonLoading(btn, false, originalText); 
+            }
+        });
+
+        window.renderEvents = async () => {
+            const snap = await getDocs(query(collection(db, "events"), orderBy("createdAt", "desc")));
+            const container = document.getElementById('events-list');
+            container.innerHTML = "";
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                const isActive = data.active;
+                const div = document.createElement('div');
+                div.className = "bg-white rounded-xl shadow p-4 border-l-4 " + (isActive ? "border-green-500" : "border-gray-300");
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-bold text-lg text-suNavy">${data.name}</h4>
+                        <span class="px-2 py-1 text-xs rounded-full ${isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">
+                            ${isActive ? '🟢 Active' : '⚪ Inactive'}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-4">Created: ${data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</p>
+                    <div class="flex gap-2">
+                        ${!isActive ? `<button onclick="activateEvent('${docSnap.id}')" class="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 text-sm">Activate</button>` : ''}
+                        ${isActive ? `<button onclick="endEvent('${docSnap.id}')" class="flex-1 bg-red-600 text-white py-2 rounded hover:bg-red-700 text-sm">End Event</button>` : ''}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        window.activateEvent = async (eventId) => {
+            try {
+                const batch = writeBatch(db);
+                const activeSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
+                activeSnap.forEach(d => batch.update(d.ref, { active: false }));
+                batch.update(doc(db, "events", eventId), { active: true });
+                await batch.commit();
+                showToast("Event activated!", "success");
+                renderEvents();
+            } catch (err) { 
+                showToast("Failed to activate", "error"); 
+            }
+        };
+
+        window.endEvent = async (eventId) => {
+            try {
+                await updateDoc(doc(db, "events", eventId), { active: false });
+                showToast("Event ended.", "success");
+                renderEvents();
+            } catch (err) { 
+                showToast("Failed to end event", "error"); 
+            }
+        };
+
+        window.renderStudents = async () => {
+            const search = document.getElementById('student-search').value.toLowerCase();
+            const yearFilter = document.getElementById('student-year-filter').value;
+            const snap = await getDocs(collection(db, "students"));
+            const tbody = document.getElementById('students-table-body');
+            tbody.innerHTML = "";
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                if (search && !data.name.toLowerCase().includes(search) && !docSnap.id.toLowerCase().includes(search)) return;
+                if (yearFilter !== 'all' && data.year.toString() !== yearFilter) return;
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-gray-50";
+                tr.innerHTML = `
+                    <td class="p-3 font-mono text-sm">${docSnap.id}</td>
+                    <td class="p-3">${data.name}</td>
+                    <td class="p-3">${data.year}</td>
+                    <td class="p-3"><span class="px-2 py-1 text-xs rounded-full ${data.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${data.active ? 'Active' : 'Inactive'}</span></td>
+                    <td class="p-3 flex gap-2">
+                        <button onclick="showQR('${docSnap.id}', '${data.name}')" class="text-suNavy hover:text-blue-800"><i class="fas fa-qrcode"></i></button>
+                        <button onclick="editStudent('${docSnap.id}')" class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                        <button onclick="toggleStudentActive('${docSnap.id}', ${!data.active})" class="text-${data.active ? 'red' : 'green'}-600 hover:text-${data.active ? 'red' : 'green'}-800">
+                            <i class="fas fa-${data.active ? 'ban' : 'check'}"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        document.getElementById('student-search').addEventListener('input', renderStudents);
+
+        window.openStudentModal = () => {
+            document.getElementById('student-form').reset();
+            document.getElementById('edit-student-id').value = "";
+            document.getElementById('form-student-id').disabled = false;
+            document.getElementById('modal-title').innerText = "Add Student";
+            document.getElementById('student-modal').classList.remove('hidden');
+            document.getElementById('student-modal').classList.add('flex');
+        };
+
+        window.closeStudentModal = () => {
+            document.getElementById('student-modal').classList.add('hidden');
+            document.getElementById('student-modal').classList.remove('flex');
+        };
+
+        window.editStudent = async (id) => {
+            const snap = await getDoc(doc(db, "students", id));
+            const data = snap.data();
+            document.getElementById('edit-student-id').value = id;
+            document.getElementById('form-student-id').value = id;
+            document.getElementById('form-student-id').disabled = true;
+            document.getElementById('form-student-name').value = data.name;
+            document.getElementById('form-student-year').value = data.year;
+            document.getElementById('form-student-active').checked = data.active;
+            document.getElementById('form-payment-status').value = data.paymentStatus || 'unpaid';
+            document.getElementById('form-payment-type').value = data.paymentType || 'none';
+            document.getElementById('modal-title').innerText = "Edit Student";
+            document.getElementById('student-modal').classList.remove('hidden');
+            document.getElementById('student-modal').classList.add('flex');
+        };
+
+        document.getElementById('student-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            setButtonLoading(btn, true);
+
+            const id = document.getElementById('edit-student-id').value || document.getElementById('form-student-id').value;
+            const name = document.getElementById('form-student-name').value;
+            const year = parseInt(document.getElementById('form-student-year').value);
+            const active = document.getElementById('form-student-active').checked;
+            const paymentStatus = document.getElementById('form-payment-status').value;
+            const paymentType = document.getElementById('form-payment-type').value;
+            
+            try {
+                const studentData = { name, year, active, qrCode: id, paymentStatus, paymentType };
+                if (paymentStatus === 'paid') {
+                    studentData.paymentDate = serverTimestamp();
+                }
+                await setDoc(doc(db, "students", id), studentData, { merge: true });
+                showToast("Student saved!", "success");
+                closeStudentModal();
+                renderStudents();
+                renderPayments();
+            } catch (err) { 
+                showToast("Error saving student", "error"); 
+            } finally { 
+                setButtonLoading(btn, false, originalText); 
+            }
+        });
+
+        window.toggleStudentActive = async (id, status) => {
+            await updateDoc(doc(db, "students", id), { active: status });
+            renderStudents();
+        };
+
+        window.showQR = (id, name) => {
+            document.getElementById('qr-student-name').innerText = name;
+            document.getElementById('qr-student-id').innerText = id;
+            document.getElementById('qr-code-display').innerHTML = "";
+            new QRCode(document.getElementById("qr-code-display"), { text: id, width: 150, height: 150 });
+            document.getElementById('qr-modal').classList.remove('hidden');
+            document.getElementById('qr-modal').classList.add('flex');
+        };
+
+        window.showPrintableQRs = async () => {
+            const container = document.getElementById("print-qr-container");
+            container.innerHTML = "";
+            const snap = await getDocs(query(collection(db, "students"), where("active", "==", true)));
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                const div = document.createElement("div");
+                div.className = "border p-4 rounded-lg text-center break-inside-avoid mb-4 bg-white";
+                div.innerHTML = `
+                    <h3 class="font-bold text-lg">${data.name}</h3>
+                    <p class="text-sm text-gray-600">ID: ${docSnap.id} | Year: ${data.year}</p>
+                    <div id="qr-print-${docSnap.id}" class="flex justify-center my-2"></div>
+                    <p class="text-xs text-gray-500 mt-2">SU Psychology Society</p>
+                `;
+                container.appendChild(div);
+                new QRCode(document.getElementById(`qr-print-${docSnap.id}`), { text: docSnap.id, width: 128, height: 128 });
+            });
+            setTimeout(() => window.print(), 500);
+        };
+
+        window.renderUsers = async () => {
+            const search = document.getElementById('user-search') ? document.getElementById('user-search').value.toLowerCase() : '';
+            const snap = await getDocs(collection(db, "users"));
+            const container = document.getElementById('users-list');
+            container.innerHTML = "";
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                const displayName = data.name ? data.name : "Unnamed User";
+                const email = data.email || '';
+                if (search && !displayName.toLowerCase().includes(search) && !email.toLowerCase().includes(search)) return;
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100";
+                const roleColor = data.role === 'admin' ? 'bg-suNavy text-white' : data.role === 'treasurer' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800';
+                div.innerHTML = `
+                    <div>
+                        <p class="font-bold text-suNavy">${displayName}</p>
+                        <p class="text-sm text-gray-500">${email}</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${roleColor}">
+                        ${data.role}
+                    </span>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        document.getElementById('add-user-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            setButtonLoading(btn, true);
+
+            const name = document.getElementById('new-user-name').value;
+            const email = document.getElementById('new-user-email').value;
+            const role = document.getElementById('new-user-role').value;
+            try {
+                await setDoc(doc(db, "users", email), { name: name, email: email, role: role });
+                showToast("Role assigned successfully!", "success");
+                document.getElementById('add-user-form').reset();
+                renderUsers();
+            } catch (err) { 
+                showToast("Error assigning role: " + err.message, "error"); 
+            } finally { 
+                setButtonLoading(btn, false, originalText); 
+            }
+        });
+
+        window.toggleScanner = async () => {
+            const btn = document.getElementById('toggle-scanner-btn');
+            if (html5QrcodeScanner) {
+                stopScanner();
                 btn.innerText = "Start Camera";
                 btn.classList.remove('bg-red-600');
                 btn.classList.add('bg-suNavy');
+            } else {
+                btn.innerText = "Stop Camera";
+                btn.classList.remove('bg-suNavy');
+                btn.classList.add('bg-red-600');
+                html5QrcodeScanner = new Html5Qrcode("reader");
+                try {
+                    await html5QrcodeScanner.start(
+                        { facingMode: "environment" },
+                        { fps: 10, qrbox: { width: 250, height: 250 } },
+                        onScanSuccess,
+                        () => {}
+                    );
+                } catch (err) {
+                    showToast("Camera permission denied.", "error");
+                    btn.innerText = "Start Camera";
+                    btn.classList.remove('bg-red-600');
+                    btn.classList.add('bg-suNavy');
+                }
+            }
+        };
+
+        window.stopScanner = () => {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(() => {
+                    html5QrcodeScanner.clear();
+                    html5QrcodeScanner = null;
+                }).catch(() => {});
+            }
+        };
+
+        async function onScanSuccess(decodedText) {
+            const now = Date.now();
+            if (now - lastScanTime < 2000) return;
+            lastScanTime = now;
+            await html5QrcodeScanner.pause();
+
+            try {
+                const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
+                if (eventSnap.empty) {
+                    showToast("❌ No active event found!", "error");
+                    html5QrcodeScanner.resume();
+                    return;
+                }
+                
+                const activeEvent = eventSnap.docs[0];
+                const eventId = activeEvent.id;
+                const eventName = activeEvent.data().name;
+
+                const studentSnap = await getDoc(doc(db, "students", decodedText));
+                if (!studentSnap.exists() || !studentSnap.data().active) {
+                    showToast("❌ Invalid or Inactive Student", "error");
+                    html5QrcodeScanner.resume();
+                    return;
+                }
+                const sData = studentSnap.data();
+
+                const attSnap = await getDocs(query(collection(db, "attendance"), where("eventId", "==", eventId), where("studentId", "==", decodedText)));
+                if (!attSnap.empty) {
+                    showToast("⚠ Already Scanned for this event", "warning");
+                    html5QrcodeScanner.resume();
+                    return;
+                }
+
+                const newAttRef = doc(collection(db, "attendance"));
+                const attData = {
+                    eventId, 
+                    eventName,
+                    studentId: decodedText, 
+                    studentName: sData.name, 
+                    studentYear: sData.year,
+                    timestamp: serverTimestamp(), 
+                    scannedBy: currentUser.uid
+                };
+                await setDoc(newAttRef, attData);
+
+                sendToGoogleSheets({
+                    eventId, 
+                    eventName,
+                    studentId: decodedText, 
+                    name: sData.name, 
+                    year: sData.year,
+                    timestamp: new Date().toISOString(), 
+                    scannedBy: currentUser.email
+                });
+
+                showToast(`✔ ${sData.name} checked in!`, "success");
+            } catch (error) {
+                console.error(error);
+                showToast("❌ Scan failed.", "error");
+            } finally {
+                html5QrcodeScanner.resume();
             }
         }
-    };
 
-    window.stopScanner = () => {
-        if (html5QrcodeScanner) {
-            html5QrcodeScanner.stop().then(() => {
-                html5QrcodeScanner.clear();
-                html5QrcodeScanner = null;
-            }).catch(() => {});
+        function sendToGoogleSheets(data) {
+            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS")) {
+                console.error("❌ Google Sheets URL is not configured in index.html!");
+                return;
+            }
+            console.log("📤 Sending to Google Sheets:", data);
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", 
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(data)
+            })
+            .then(() => console.log("✅ Google Sheets request sent successfully."))
+            .catch(err => console.error("❌ Google Sheets sync failed:", err));
         }
-    };
 
-    async function onScanSuccess(decodedText) {
-        const now = Date.now();
-        if (now - lastScanTime < 2000) return;
-        lastScanTime = now;
-        await html5QrcodeScanner.pause();
-
-        try {
+        window.startLiveAttendanceListener = async () => {
             const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
-            if (eventSnap.empty) {
-                showToast("❌ No active event found!", "error");
-                html5QrcodeScanner.resume();
-                return;
+            if (eventSnap.empty) return;
+            const eventId = eventSnap.docs[0].id;
+            const q = query(collection(db, "attendance"), where("eventId", "==", eventId), orderBy("timestamp", "desc"));
+            unsubscribeLiveAttendance = onSnapshot(q, (snapshot) => {
+                const tbody = document.getElementById("live-attendance-body");
+                tbody.innerHTML = "";
+                document.getElementById("live-attendance-count").innerText = snapshot.size;
+                snapshot.forEach(docSnap => {
+                    const d = docSnap.data();
+                    const time = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleTimeString() : "Just now";
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b fade-in";
+                    tr.innerHTML = `<td class="p-3 text-sm text-gray-500">${time}</td><td class="p-3 font-mono text-sm">${d.studentId}</td><td class="p-3">${d.studentName}</td><td class="p-3">${d.studentYear}</td>`;
+                    tbody.appendChild(tr);
+                });
+            });
+        };
+
+        window.stopLiveAttendanceListener = () => {
+            if (unsubscribeLiveAttendance) {
+                unsubscribeLiveAttendance();
+                unsubscribeLiveAttendance = null;
             }
+        };
+
+        window.loadAnalytics = async () => {
+            const select = document.getElementById('analytics-event-select');
+            const selectedEventId = select.value;
+            if (select.options.length <= 1) {
+                const eventsSnap = await getDocs(query(collection(db, "events"), orderBy("createdAt", "desc")));
+                eventsSnap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const option = document.createElement('option');
+                    option.value = docSnap.id;
+                    option.text = data.name + (data.active ? " 🟢 (Active)" : "");
+                    select.appendChild(option);
+                });
+            }
+            const studentsSnap = await getDocs(collection(db, "students"));
+            const total = studentsSnap.size;
+            const years = {1: 0, 2: 0, 3: 0, 4: 0};
+            studentsSnap.forEach(d => { if (years[d.data().year] !== undefined) years[d.data().year]++; });
+            let present = 0;
+            let attQuery;
+            if (selectedEventId === 'all') {
+                attQuery = collection(db, "attendance");
+            } else {
+                attQuery = query(collection(db, "attendance"), where("eventId", "==", selectedEventId));
+            }
+            const attSnap = await getDocs(attQuery);
+            present = attSnap.size;
+            const absent = selectedEventId === 'all' ? 'N/A' : (total - present);
+            const rate = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
+            document.getElementById("stat-total").innerText = total;
+            document.getElementById("stat-present").innerText = present;
+            document.getElementById("stat-absent").innerText = absent;
+            document.getElementById("stat-rate").innerText = rate + "%";
+            const ctxYear = document.getElementById('yearChart').getContext('2d');
+            const ctxStatus = document.getElementById('statusChart').getContext('2d');
+            if (yearChartInstance) yearChartInstance.destroy();
+            if (statusChartInstance) statusChartInstance.destroy();
+            yearChartInstance = new Chart(ctxYear, {
+                type: 'bar',
+                data: { labels: ['1st Year', '2nd Year', '3rd Year', '4th Year'], datasets: [{ label: 'Students', data: [years[1], years[2], years[3], years[4]], backgroundColor: '#0B1F4D' }] },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+            const statusLabels = selectedEventId === 'all' ? ['Total Scans', 'Unscanned Members'] : ['Present', 'Absent'];
+            const statusData = selectedEventId === 'all' ? [present, total] : [present, total - present];
+            const statusColors = selectedEventId === 'all' ? ['#0B1F4D', '#E5E7EB'] : ['#10B981', '#EF4444'];
+            statusChartInstance = new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: { labels: statusLabels, datasets: [{ data: statusData, backgroundColor: statusColors }] },
+                options: { responsive: true }
+            });
+        };
+
+        window.updateExportUI = async () => {
+            const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
+            document.getElementById("export-current-event-name").innerText = eventSnap.empty ? "No active event" : eventSnap.docs[0].data().name;
+        };
+
+        window.exportData = async (scope, format) => {
+            showToast("Preparing export...", "info");
+            let data = [];
+            if (scope === 'current') {
+                const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
+                if (eventSnap.empty) { showToast("No active event", "error"); return; }
+                const eventId = eventSnap.docs[0].id;
+                const eventName = eventSnap.docs[0].data().name;
+                const attSnap = await getDocs(query(collection(db, "attendance"), where("eventId", "==", eventId)));
+                attSnap.forEach(d => {
+                    const val = d.data();
+                    data.push({ "Event ID": eventId, "Event Name": eventName, "Student ID": val.studentId, "Name": val.studentName, "Year": val.studentYear, "Timestamp": val.timestamp ? new Date(val.timestamp.seconds * 1000).toLocaleString() : "N/A", "Scanned By": val.scannedBy });
+                });
+            } else {
+                const eventsSnap = await getDocs(collection(db, "events"));
+                const eventNames = {};
+                eventsSnap.forEach(d => { eventNames[d.id] = d.data().name; });
+                const attSnap = await getDocs(collection(db, "attendance"));
+                attSnap.forEach(d => {
+                    const val = d.data();
+                    data.push({ "Event ID": val.eventId, "Event Name": eventNames[val.eventId] || "Unknown", "Student ID": val.studentId, "Name": val.studentName, "Year": val.studentYear, "Timestamp": val.timestamp ? new Date(val.timestamp.seconds * 1000).toLocaleString() : "N/A", "Scanned By": val.scannedBy });
+                });
+            }
+            if (data.length === 0) { showToast("No data to export.", "warning"); return; }
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+            const filename = `Attendance_${scope}_${new Date().toISOString().split('T')[0]}.${format === 'excel' ? 'xlsx' : 'csv'}`;
+            XLSX.writeFile(wb, filename, { bookType: format === 'excel' ? 'xlsx' : 'csv' });
+            showToast("Export successful!", "success");
+        };
+
+        window.renderPayments = async () => {
+            const statusFilter = document.getElementById('payment-filter-status').value;
+            const typeFilter = document.getElementById('payment-filter-type').value;
             
-            const activeEvent = eventSnap.docs[0];
-            const eventId = activeEvent.id;
-            const eventName = activeEvent.data().name;
-
-            const studentSnap = await getDoc(doc(db, "students", decodedText));
-            if (!studentSnap.exists() || !studentSnap.data().active) {
-                showToast("❌ Invalid or Inactive Student", "error");
-                html5QrcodeScanner.resume();
-                return;
-            }
-            const sData = studentSnap.data();
-
-            const attSnap = await getDocs(query(collection(db, "attendance"), where("eventId", "==", eventId), where("studentId", "==", decodedText)));
-            if (!attSnap.empty) {
-                showToast("⚠ Already Scanned for this event", "warning");
-                html5QrcodeScanner.resume();
-                return;
-            }
-
-            const newAttRef = doc(collection(db, "attendance"));
-            const attData = {
-                eventId, 
-                eventName,
-                studentId: decodedText, 
-                studentName: sData.name, 
-                studentYear: sData.year,
-                timestamp: serverTimestamp(), 
-                scannedBy: currentUser.uid
-            };
-            await setDoc(newAttRef, attData);
-
-            sendToGoogleSheets({
-    eventId, 
-    eventName,  //
-    studentId: decodedText, 
-    name: sData.name, 
-    year: sData.year,
-    timestamp: new Date().toISOString(), 
-    scannedBy: currentUser.email
-});
-            showToast(`✔ ${sData.name} checked in!`, "success");
-        } catch (error) {
-            console.error(error);
-            showToast("❌ Scan failed.", "error");
-        } finally {
-            html5QrcodeScanner.resume();
-        }
-    }
-
-    function sendToGoogleSheets(data) {
-        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS")) {
-            console.error("❌ Google Sheets URL is not configured in index.html!");
-            return;
-        }
-        console.log("📤 Sending to Google Sheets:", data);
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors", 
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(data)
-        })
-        .then(() => console.log("✅ Google Sheets request sent successfully."))
-        .catch(err => console.error("❌ Google Sheets sync failed:", err));
-    }
-
-    window.startLiveAttendanceListener = async () => {
-        const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
-        if (eventSnap.empty) return;
-        const eventId = eventSnap.docs[0].id;
-        const q = query(collection(db, "attendance"), where("eventId", "==", eventId), orderBy("timestamp", "desc"));
-        unsubscribeLiveAttendance = onSnapshot(q, (snapshot) => {
-            const tbody = document.getElementById("live-attendance-body");
+            const snap = await getDocs(collection(db, "students"));
+            const tbody = document.getElementById('payments-table-body');
             tbody.innerHTML = "";
-            document.getElementById("live-attendance-count").innerText = snapshot.size;
-            snapshot.forEach(docSnap => {
-                const d = docSnap.data();
-                const time = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleTimeString() : "Just now";
+            
+            let total = 0, paid = 0, unpaid = 0, earlybird = 0;
+            
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                total++;
+                
+                const status = data.paymentStatus || 'unpaid';
+                const type = data.paymentType || 'none';
+                
+                if (status === 'paid') paid++;
+                else unpaid++;
+                
+                if (type === 'early-bird') earlybird++;
+                
+                if (statusFilter !== 'all' && status !== statusFilter) return;
+                if (typeFilter !== 'all' && type !== typeFilter) return;
+                
                 const tr = document.createElement('tr');
-                tr.className = "border-b fade-in";
-                tr.innerHTML = `<td class="p-3 text-sm text-gray-500">${time}</td><td class="p-3 font-mono text-sm">${d.studentId}</td><td class="p-3">${d.studentName}</td><td class="p-3">${d.studentYear}</td>`;
+                tr.className = "border-b hover:bg-gray-50";
+                
+                const statusBadge = status === 'paid' 
+                    ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">Paid</span>'
+                    : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Unpaid</span>';
+                
+                const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : '-';
+                const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : '-';
+                
+                tr.innerHTML = `
+                    <td class="p-3 font-mono text-sm">${docSnap.id}</td>
+                    <td class="p-3">${data.name}</td>
+                    <td class="p-3">${data.year}</td>
+                    <td class="p-3">${statusBadge}</td>
+                    <td class="p-3">${typeDisplay}</td>
+                    <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
+                    <td class="p-3">
+                        <button onclick="quickMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
+                            ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Edit'}
+                        </button>
+                    </td>
+                `;
                 tbody.appendChild(tr);
             });
-        });
-    };
+            
+            document.getElementById('payment-total').innerText = total;
+            document.getElementById('payment-paid').innerText = paid;
+            document.getElementById('payment-unpaid').innerText = unpaid;
+            document.getElementById('payment-earlybird').innerText = earlybird;
+        };
 
-    window.stopLiveAttendanceListener = () => {
-        if (unsubscribeLiveAttendance) {
-            unsubscribeLiveAttendance();
-            unsubscribeLiveAttendance = null;
-        }
-    };
-
-    window.loadAnalytics = async () => {
-        const select = document.getElementById('analytics-event-select');
-        const selectedEventId = select.value;
-        if (select.options.length <= 1) {
-            const eventsSnap = await getDocs(query(collection(db, "events"), orderBy("createdAt", "desc")));
-            eventsSnap.forEach(docSnap => {
-                const data = docSnap.data();
-                const option = document.createElement('option');
-                option.value = docSnap.id;
-                option.text = data.name + (data.active ? " 🟢 (Active)" : "");
-                select.appendChild(option);
-            });
-        }
-        const studentsSnap = await getDocs(collection(db, "students"));
-        const total = studentsSnap.size;
-        const years = {1: 0, 2: 0, 3: 0, 4: 0};
-        studentsSnap.forEach(d => { if (years[d.data().year] !== undefined) years[d.data().year]++; });
-        let present = 0;
-        let attQuery;
-        if (selectedEventId === 'all') {
-            attQuery = collection(db, "attendance");
-        } else {
-            attQuery = query(collection(db, "attendance"), where("eventId", "==", selectedEventId));
-        }
-        const attSnap = await getDocs(attQuery);
-        present = attSnap.size;
-        const absent = selectedEventId === 'all' ? 'N/A' : (total - present);
-        const rate = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
-        document.getElementById("stat-total").innerText = total;
-        document.getElementById("stat-present").innerText = present;
-        document.getElementById("stat-absent").innerText = absent;
-        document.getElementById("stat-rate").innerText = rate + "%";
-        const ctxYear = document.getElementById('yearChart').getContext('2d');
-        const ctxStatus = document.getElementById('statusChart').getContext('2d');
-        if (yearChartInstance) yearChartInstance.destroy();
-        if (statusChartInstance) statusChartInstance.destroy();
-        yearChartInstance = new Chart(ctxYear, {
-            type: 'bar',
-            data: { labels: ['1st Year', '2nd Year', '3rd Year', '4th Year'], datasets: [{ label: 'Students', data: [years[1], years[2], years[3], years[4]], backgroundColor: '#0B1F4D' }] },
-            options: { responsive: true, plugins: { legend: { display: false } } }
-        });
-        const statusLabels = selectedEventId === 'all' ? ['Total Scans', 'Unscanned Members'] : ['Present', 'Absent'];
-        const statusData = selectedEventId === 'all' ? [present, total] : [present, total - present];
-        const statusColors = selectedEventId === 'all' ? ['#0B1F4D', '#E5E7EB'] : ['#10B981', '#EF4444'];
-        statusChartInstance = new Chart(ctxStatus, {
-            type: 'doughnut',
-            data: { labels: statusLabels, datasets: [{ data: statusData, backgroundColor: statusColors }] },
-            options: { responsive: true }
-        });
-    };
-
-    window.updateExportUI = async () => {
-        const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
-        document.getElementById("export-current-event-name").innerText = eventSnap.empty ? "No active event" : eventSnap.docs[0].data().name;
-    };
-
-    window.exportData = async (scope, format) => {
-        showToast("Preparing export...", "info");
-        let data = [];
-        if (scope === 'current') {
-            const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
-            if (eventSnap.empty) { showToast("No active event", "error"); return; }
-            const eventId = eventSnap.docs[0].id;
-            const eventName = eventSnap.docs[0].data().name;
-            const attSnap = await getDocs(query(collection(db, "attendance"), where("eventId", "==", eventId)));
-            attSnap.forEach(d => {
-                const val = d.data();
-                data.push({ "Event ID": eventId, "Event Name": eventName, "Student ID": val.studentId, "Name": val.studentName, "Year": val.studentYear, "Timestamp": val.timestamp ? new Date(val.timestamp.seconds * 1000).toLocaleString() : "N/A", "Scanned By": val.scannedBy });
-            });
-        } else {
-            const eventsSnap = await getDocs(collection(db, "events"));
-            const eventNames = {};
-            eventsSnap.forEach(d => { eventNames[d.id] = d.data().name; });
-            const attSnap = await getDocs(collection(db, "attendance"));
-            attSnap.forEach(d => {
-                const val = d.data();
-                data.push({ "Event ID": val.eventId, "Event Name": eventNames[val.eventId] || "Unknown", "Student ID": val.studentId, "Name": val.studentName, "Year": val.studentYear, "Timestamp": val.timestamp ? new Date(val.timestamp.seconds * 1000).toLocaleString() : "N/A", "Scanned By": val.scannedBy });
-            });
-        }
-        if (data.length === 0) { showToast("No data to export.", "warning"); return; }
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Attendance");
-        const filename = `Attendance_${scope}_${new Date().toISOString().split('T')[0]}.${format === 'excel' ? 'xlsx' : 'csv'}`;
-        XLSX.writeFile(wb, filename, { bookType: format === 'excel' ? 'xlsx' : 'csv' });
-        showToast("Export successful!", "success");
-    };
-
-    window.renderPayments = async () => {
-        const statusFilter = document.getElementById('payment-filter-status').value;
-        const typeFilter = document.getElementById('payment-filter-type').value;
-        
-        const snap = await getDocs(collection(db, "students"));
-        const tbody = document.getElementById('payments-table-body');
-        tbody.innerHTML = "";
-        
-        let total = 0, paid = 0, unpaid = 0, earlybird = 0;
-        
-        snap.forEach(docSnap => {
-            const data = docSnap.data();
-            total++;
+        window.quickMarkPaid = async (studentId) => {
+            const snap = await getDoc(doc(db, "students", studentId));
+            const data = snap.data();
             
-            const status = data.paymentStatus || 'unpaid';
-            const type = data.paymentType || 'none';
-            
-            if (status === 'paid') paid++;
-            else unpaid++;
-            
-            if (type === 'early-bird') earlybird++;
-            
-            if (statusFilter !== 'all' && status !== statusFilter) return;
-            if (typeFilter !== 'all' && type !== typeFilter) return;
-            
-            const tr = document.createElement('tr');
-            tr.className = "border-b hover:bg-gray-50";
-            
-            const statusBadge = status === 'paid' 
-                ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">Paid</span>'
-                : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Unpaid</span>';
-            
-            const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : '-';
-            const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : '-';
-            
-            tr.innerHTML = `
-                <td class="p-3 font-mono text-sm">${docSnap.id}</td>
-                <td class="p-3">${data.name}</td>
-                <td class="p-3">${data.year}</td>
-                <td class="p-3">${statusBadge}</td>
-                <td class="p-3">${typeDisplay}</td>
-                <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
-                <td class="p-3">
-                    <button onclick="quickMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
-                        ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Edit'}
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-        
-        document.getElementById('payment-total').innerText = total;
-        document.getElementById('payment-paid').innerText = paid;
-        document.getElementById('payment-unpaid').innerText = unpaid;
-        document.getElementById('payment-earlybird').innerText = earlybird;
-    };
-
-    window.quickMarkPaid = async (studentId) => {
-        const snap = await getDoc(doc(db, "students", studentId));
-        const data = snap.data();
-        
-        if (data.paymentStatus === 'paid') {
-            editStudent(studentId);
-        } else {
-            await updateDoc(doc(db, "students", studentId), {
-                paymentStatus: 'paid',
-                paymentType: 'regular',
-                paymentDate: serverTimestamp()
-            });
-            showToast(`${data.name} marked as paid!`, "success");
-            renderPayments();
-        }
-    };
-
-    window.exportPayments = async () => {
-        showToast("Preparing export...", "info");
-        const snap = await getDocs(collection(db, "students"));
-        const data = [];
-        
-        snap.forEach(docSnap => {
-            const student = docSnap.data();
-            data.push({
-                "Student ID": docSnap.id,
-                "Name": student.name,
-                "Year": student.year,
-                "Payment Status": student.paymentStatus || 'unpaid',
-                "Payment Type": student.paymentType || 'none',
-                "Amount": student.paymentType === 'early-bird' ? 150 : student.paymentType === 'regular' ? 200 : 0,
-                "Date Paid": student.paymentDate ? new Date(student.paymentDate.seconds * 1000).toLocaleDateString() : ''
-            });
-        });
-        
-        if (data.length === 0) {
-            showToast("No payment data to export.", "warning");
-            return;
-        }
-        
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Payments");
-        XLSX.writeFile(wb, `Society_Fee_Payments_${new Date().toISOString().split('T')[0]}.xlsx`);
-        showToast("Payment data exported!", "success");
-    };
-
-    window.renderTreasurerPayments = async () => {
-        const statusFilter = document.getElementById('treasurer-filter-status').value;
-        const typeFilter = document.getElementById('treasurer-filter-type').value;
-        
-        const snap = await getDocs(collection(db, "students"));
-        const tbody = document.getElementById('treasurer-payments-body');
-        tbody.innerHTML = "";
-        
-        let total = 0, paid = 0, unpaid = 0, earlybird = 0;
-        
-        snap.forEach(docSnap => {
-            const data = docSnap.data();
-            total++;
-            
-            const status = data.paymentStatus || 'unpaid';
-            const type = data.paymentType || 'none';
-            
-            if (status === 'paid') paid++;
-            else unpaid++;
-            
-            if (type === 'early-bird') earlybird++;
-            
-            if (statusFilter !== 'all' && status !== statusFilter) return;
-            if (typeFilter !== 'all' && type !== typeFilter) return;
-            
-            const tr = document.createElement('tr');
-            tr.className = "border-b hover:bg-gray-50";
-            
-            const statusBadge = status === 'paid' 
-                ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">Paid</span>'
-                : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Unpaid</span>';
-            
-            const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : '-';
-            const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : '-';
-            
-            tr.innerHTML = `
-                <td class="p-3 font-mono text-sm">${docSnap.id}</td>
-                <td class="p-3">${data.name}</td>
-                <td class="p-3">${data.year}</td>
-                <td class="p-3">${statusBadge}</td>
-                <td class="p-3">${typeDisplay}</td>
-                <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
-                <td class="p-3">
-                    <button onclick="treasurerMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
-                        ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Update'}
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-        
-        document.getElementById('treasurer-total').innerText = total;
-        document.getElementById('treasurer-paid').innerText = paid;
-        document.getElementById('treasurer-unpaid').innerText = unpaid;
-        document.getElementById('treasurer-earlybird').innerText = earlybird;
-    };
-
-    window.treasurerMarkPaid = async (studentId) => {
-        const snap = await getDoc(doc(db, "students", studentId));
-        const data = snap.data();
-        
-        if (data.paymentStatus === 'paid') {
-            const newType = prompt(`Current: ${data.paymentType}\n\nEnter new payment type (early-bird/regular/none):`, data.paymentType);
-            if (newType && ['early-bird', 'regular', 'none'].includes(newType)) {
-                await updateDoc(doc(db, "students", studentId), {
-                    paymentType: newType,
-                    paymentDate: serverTimestamp()
-                });
-                showToast("Payment updated!", "success");
-                renderTreasurerPayments();
-            }
-        } else {
-            const paymentType = prompt("Select payment type:\n1. Early Bird (₱150)\n2. Regular (₱200)\n\nEnter 1 or 2:", "2");
-            
-            if (paymentType === '1') {
-                await updateDoc(doc(db, "students", studentId), {
-                    paymentStatus: 'paid',
-                    paymentType: 'early-bird',
-                    paymentDate: serverTimestamp()
-                });
-                showToast(`${data.name} marked as Early Bird paid!`, "success");
-            } else if (paymentType === '2') {
+            if (data.paymentStatus === 'paid') {
+                editStudent(studentId);
+            } else {
                 await updateDoc(doc(db, "students", studentId), {
                     paymentStatus: 'paid',
                     paymentType: 'regular',
                     paymentDate: serverTimestamp()
                 });
-                showToast(`${data.name} marked as Regular paid!`, "success");
+                showToast(`${data.name} marked as paid!`, "success");
+                renderPayments();
             }
-            renderTreasurerPayments();
-        }
-    };
+        };
 
-    document.getElementById('student-register-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        setButtonLoading(btn, true);
-
-        const studentId = document.getElementById('reg-student-id').value.trim();
-        const name = document.getElementById('reg-student-name').value.trim();
-        const year = parseInt(document.getElementById('reg-student-year').value);
-
-        try {
-            await setDoc(doc(db, "students", studentId), {
-                name: name, year: year, active: true, qrCode: studentId, authUid: currentUser.uid,
-                paymentStatus: 'unpaid', paymentType: 'none'
-            });
-            await setDoc(doc(db, "users", currentUser.uid), {
-    email: currentUser.email, 
-    role: 'student', 
-    studentId: studentId,
-    name: name  // 👈 NEW: Save the student's name
-});
+        window.exportPayments = async () => {
+            showToast("Preparing export...", "info");
+            const snap = await getDocs(collection(db, "students"));
+            const data = [];
             
-            showToast("Profile created! Generating ID...", "success");
-            
-            const attBtn = document.getElementById('student-tab-attendance-btn');
-            const payBtn = document.getElementById('student-tab-payment-btn');
-            if (attBtn) {
-                attBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                attBtn.disabled = false;
-            }
-            if (payBtn) {
-                payBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                payBtn.disabled = false;
-            }
-            
-            switchStudentTab('id');
-            document.getElementById('student-registration-form').classList.add('hidden');
-            document.getElementById('student-id-card-view').classList.remove('hidden');
-            document.getElementById('user-role-badge').innerText = 'student';
-            renderIDCard(studentId, name, year);
-            
-        } catch (err) {
-            console.error(err);
-            showToast("Error: " + err.message, "error");
-        } finally { 
-            setButtonLoading(btn, false, originalText); 
-        }
-    });
-
-    async function loadStudentProfile(uid) {
-        const userDoc = await getDoc(doc(db, "users", uid));
-        
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            const studentId = userData.studentId;
-            
-            if (studentId) {
-                const studentDoc = await getDoc(doc(db, "students", studentId));
-                
-                if (studentDoc.exists()) {
-                    const data = studentDoc.data();
-                    
-                    document.getElementById('student-registration-form').classList.add('hidden');
-                    document.getElementById('student-id-card-view').classList.remove('hidden');
-                    
-                    renderIDCard(studentId, data.name, data.year);
-                    
-                    switchStudentTab('id');
-                }
-            }
-        }
-    }
-
-    function renderIDCard(id, name, year) {
-        document.getElementById('card-name').innerText = name;
-        document.getElementById('card-id').innerText = id;
-        document.getElementById('card-year').innerText = year + getYearSuffix(year);
-        const qrContainer = document.getElementById('card-qr');
-        qrContainer.innerHTML = "";
-        new QRCode(qrContainer, {
-            text: id, width: 110, height: 110, colorDark : "#0B1F4D", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
-        });
-    }
-
-    function getYearSuffix(year) {
-        if (year === 1) return "st Year";
-        if (year === 2) return "nd Year";
-        if (year === 3) return "rd Year";
-        return "th Year";
-    }
-
-    window.downloadIDCard = () => {
-        const card = document.getElementById('student-id-card');
-        showToast("Generating ID Card...", "info");
-        html2canvas(card, { scale: 3, backgroundColor: "#ffffff", useCORS: true }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `SU_Psych_ID_${document.getElementById('card-id').innerText}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            showToast("ID Card Downloaded!", "success");
-        });
-    };
-
-    async function loadStudentAttendance() {
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-        if (!userDoc.exists() || !userDoc.data().studentId) return;
-        
-        const studentId = userDoc.data().studentId;
-        const loadingEl = document.getElementById('student-attendance-loading');
-        const emptyEl = document.getElementById('student-attendance-empty');
-        const tableEl = document.getElementById('student-attendance-table');
-        const tbody = document.getElementById('student-attendance-body');
-
-        loadingEl.classList.remove('hidden');
-        emptyEl.classList.add('hidden');
-        tableEl.classList.add('hidden');
-        tbody.innerHTML = '';
-
-        try {
-            const q = query(collection(db, "attendance"), where("studentId", "==", studentId), orderBy("timestamp", "desc"));
-            const snap = await getDocs(q);
-            
-            loadingEl.classList.add('hidden');
-
-            if (snap.empty) {
-                emptyEl.classList.remove('hidden');
-            } else {
-                tableEl.classList.remove('hidden');
-                snap.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const date = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : 'Just now';
-                    const eventName = data.eventName || "Unknown Event";
-                    
-                    const tr = document.createElement('tr');
-                    tr.className = "border-b hover:bg-gray-50";
-                    tr.innerHTML = `
-                        <td class="p-3 text-sm text-gray-600">${date}</td>
-                        <td class="p-3 font-medium text-suNavy">${eventName}</td>
-                        <td class="p-3"><span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">✔ Present</span></td>
-                    `;
-                    tbody.appendChild(tr);
+            snap.forEach(docSnap => {
+                const student = docSnap.data();
+                data.push({
+                    "Student ID": docSnap.id,
+                    "Name": student.name,
+                    "Year": student.year,
+                    "Payment Status": student.paymentStatus || 'unpaid',
+                    "Payment Type": student.paymentType || 'none',
+                    "Amount": student.paymentType === 'early-bird' ? 150 : student.paymentType === 'regular' ? 200 : 0,
+                    "Date Paid": student.paymentDate ? new Date(student.paymentDate.seconds * 1000).toLocaleDateString() : ''
                 });
+            });
+            
+            if (data.length === 0) {
+                showToast("No payment data to export.", "warning");
+                return;
             }
-        } catch (err) {
-            console.error("Error loading attendance:", err);
-            loadingEl.classList.add('hidden');
-            emptyEl.classList.remove('hidden');
-            showToast("Failed to load attendance history.", "error");
-        }
-    }
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Payments");
+            XLSX.writeFile(wb, `Society_Fee_Payments_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showToast("Payment data exported!", "success");
+        };
 
-    async function loadStudentPayment() {
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-        if (!userDoc.exists() || !userDoc.data().studentId) return;
-        
-        const studentId = userDoc.data().studentId;
-        const loadingEl = document.getElementById('student-payment-loading');
-        const infoEl = document.getElementById('student-payment-info');
-        
-        loadingEl.classList.remove('hidden');
-        infoEl.classList.add('hidden');
-        
-        try {
-            const studentDoc = await getDoc(doc(db, "students", studentId));
-            if (studentDoc.exists()) {
-                const data = studentDoc.data();
+        window.renderTreasurerPayments = async () => {
+            const statusFilter = document.getElementById('treasurer-filter-status').value;
+            const typeFilter = document.getElementById('treasurer-filter-type').value;
+            
+            const snap = await getDocs(collection(db, "students"));
+            const tbody = document.getElementById('treasurer-payments-body');
+            tbody.innerHTML = "";
+            
+            let total = 0, paid = 0, unpaid = 0, earlybird = 0;
+            
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                total++;
+                
                 const status = data.paymentStatus || 'unpaid';
                 const type = data.paymentType || 'none';
                 
-                const statusCard = document.getElementById('payment-status-card');
-                const statusBadge = document.getElementById('payment-status-badge');
+                if (status === 'paid') paid++;
+                else unpaid++;
                 
-                if (status === 'paid') {
-                    statusCard.className = 'rounded-xl p-6 mb-4 border-2 bg-green-50 border-green-300';
-                    statusBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-green-600 text-white';
-                    statusBadge.innerText = '✓ PAID';
-                } else {
-                    statusCard.className = 'rounded-xl p-6 mb-4 border-2 bg-red-50 border-red-300';
-                    statusBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-red-600 text-white';
-                    statusBadge.innerText = '✗ UNPAID';
+                if (type === 'early-bird') earlybird++;
+                
+                if (statusFilter !== 'all' && status !== statusFilter) return;
+                if (typeFilter !== 'all' && type !== typeFilter) return;
+                
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-gray-50";
+                
+                const statusBadge = status === 'paid' 
+                    ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">Paid</span>'
+                    : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Unpaid</span>';
+                
+                const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : '-';
+                const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : '-';
+                
+                tr.innerHTML = `
+                    <td class="p-3 font-mono text-sm">${docSnap.id}</td>
+                    <td class="p-3">${data.name}</td>
+                    <td class="p-3">${data.year}</td>
+                    <td class="p-3">${statusBadge}</td>
+                    <td class="p-3">${typeDisplay}</td>
+                    <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
+                    <td class="p-3">
+                        <button onclick="treasurerMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
+                            ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Update'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('treasurer-total').innerText = total;
+            document.getElementById('treasurer-paid').innerText = paid;
+            document.getElementById('treasurer-unpaid').innerText = unpaid;
+            document.getElementById('treasurer-earlybird').innerText = earlybird;
+        };
+
+        window.treasurerMarkPaid = async (studentId) => {
+            const snap = await getDoc(doc(db, "students", studentId));
+            const data = snap.data();
+            
+            if (data.paymentStatus === 'paid') {
+                const newType = prompt(`Current: ${data.paymentType}\n\nEnter new payment type (early-bird/regular/none):`, data.paymentType);
+                if (newType && ['early-bird', 'regular', 'none'].includes(newType)) {
+                    await updateDoc(doc(db, "students", studentId), {
+                        paymentType: newType,
+                        paymentDate: serverTimestamp()
+                    });
+                    showToast("Payment updated!", "success");
+                    renderTreasurerPayments();
+                }
+            } else {
+                const paymentType = prompt("Select payment type:\n1. Early Bird (₱150)\n2. Regular (₱200)\n\nEnter 1 or 2:", "2");
+                
+                if (paymentType === '1') {
+                    await updateDoc(doc(db, "students", studentId), {
+                        paymentStatus: 'paid',
+                        paymentType: 'early-bird',
+                        paymentDate: serverTimestamp()
+                    });
+                    showToast(`${data.name} marked as Early Bird paid!`, "success");
+                } else if (paymentType === '2') {
+                    await updateDoc(doc(db, "students", studentId), {
+                        paymentStatus: 'paid',
+                        paymentType: 'regular',
+                        paymentDate: serverTimestamp()
+                    });
+                    showToast(`${data.name} marked as Regular paid!`, "success");
+                }
+                renderTreasurerPayments();
+            }
+        };
+
+        document.getElementById('student-register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            setButtonLoading(btn, true);
+
+            const studentId = document.getElementById('reg-student-id').value.trim();
+            const name = document.getElementById('reg-student-name').value.trim();
+            const year = parseInt(document.getElementById('reg-student-year').value);
+
+            try {
+                await setDoc(doc(db, "students", studentId), {
+                    name: name, year: year, active: true, qrCode: studentId, authUid: currentUser.uid,
+                    paymentStatus: 'unpaid', paymentType: 'none'
+                });
+                await setDoc(doc(db, "users", currentUser.uid), {
+                    email: currentUser.email, role: 'student', studentId: studentId, name: name
+                });
+                
+                showToast("Profile created! Generating ID...", "success");
+                
+                const attBtn = document.getElementById('student-tab-attendance-btn');
+                const payBtn = document.getElementById('student-tab-payment-btn');
+                if (attBtn) {
+                    attBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    attBtn.disabled = false;
+                }
+                if (payBtn) {
+                    payBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    payBtn.disabled = false;
                 }
                 
-                const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : 'Not Applicable';
-                const amount = type === 'early-bird' ? '₱150' : type === 'regular' ? '₱200' : '₱0';
-                const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : 'Not yet paid';
+                switchStudentTab('id');
+                document.getElementById('student-registration-form').classList.add('hidden');
+                document.getElementById('student-id-card-view').classList.remove('hidden');
+                document.getElementById('user-role-badge').innerText = 'student';
+                renderIDCard(studentId, name, year);
                 
-                document.getElementById('payment-type-display').innerText = typeDisplay;
-                document.getElementById('payment-amount-display').innerText = amount;
-                document.getElementById('payment-date-display').innerText = dateDisplay;
+            } catch (err) {
+                console.error(err);
+                showToast("Error: " + err.message, "error");
+            } finally { 
+                setButtonLoading(btn, false, originalText); 
+            }
+        });
+
+        async function loadStudentProfile(uid) {
+            const userDoc = await getDoc(doc(db, "users", uid));
+            
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const studentId = userData.studentId;
+                
+                if (studentId) {
+                    const studentDoc = await getDoc(doc(db, "students", studentId));
+                    
+                    if (studentDoc.exists()) {
+                        const data = studentDoc.data();
+                        
+                        document.getElementById('student-registration-form').classList.add('hidden');
+                        document.getElementById('student-id-card-view').classList.remove('hidden');
+                        
+                        renderIDCard(studentId, data.name, data.year);
+                        
+                        switchStudentTab('id');
+                    }
+                }
+            }
+        }
+
+        function renderIDCard(id, name, year) {
+            document.getElementById('card-name').innerText = name;
+            document.getElementById('card-id').innerText = id;
+            document.getElementById('card-year').innerText = year + getYearSuffix(year);
+            const qrContainer = document.getElementById('card-qr');
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, {
+                text: id, width: 110, height: 110, colorDark : "#0B1F4D", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+
+        function getYearSuffix(year) {
+            if (year === 1) return "st Year";
+            if (year === 2) return "nd Year";
+            if (year === 3) return "rd Year";
+            return "th Year";
+        }
+
+        window.downloadIDCard = () => {
+            const card = document.getElementById('student-id-card');
+            showToast("Generating ID Card...", "info");
+            html2canvas(card, { scale: 3, backgroundColor: "#ffffff", useCORS: true }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `SU_Psych_ID_${document.getElementById('card-id').innerText}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast("ID Card Downloaded!", "success");
+            });
+        };
+
+        async function loadStudentAttendance() {
+            const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+            if (!userDoc.exists() || !userDoc.data().studentId) return;
+            
+            const studentId = userDoc.data().studentId;
+            const loadingEl = document.getElementById('student-attendance-loading');
+            const emptyEl = document.getElementById('student-attendance-empty');
+            const tableEl = document.getElementById('student-attendance-table');
+            const tbody = document.getElementById('student-attendance-body');
+
+            loadingEl.classList.remove('hidden');
+            emptyEl.classList.add('hidden');
+            tableEl.classList.add('hidden');
+            tbody.innerHTML = '';
+
+            try {
+                const q = query(collection(db, "attendance"), where("studentId", "==", studentId), orderBy("timestamp", "desc"));
+                const snap = await getDocs(q);
                 
                 loadingEl.classList.add('hidden');
-                infoEl.classList.remove('hidden');
-            }
-        } catch (err) {
-            console.error("Error loading payment status:", err);
-            loadingEl.classList.add('hidden');
-            showToast("Failed to load payment status.", "error");
-        }
-    }
 
-       // ONE-TIME FIX: Run this in the browser console to fix existing users
-window.fixUnnamedUsers = async () => {
-    const usersSnap = await getDocs(collection(db, "users"));
-    let fixed = 0;
-    
-    for (const userDoc of usersSnap.docs) {
-        const userData = userDoc.data();
-        
-        // If user has no name but has a studentId, fetch it from students collection
-        if (!userData.name && userData.studentId) {
-            try {
-                const studentDoc = await getDoc(doc(db, "students", userData.studentId));
-                if (studentDoc.exists()) {
-                    await updateDoc(userDoc.ref, { name: studentDoc.data().name });
-                    fixed++;
+                if (snap.empty) {
+                    emptyEl.classList.remove('hidden');
+                } else {
+                    tableEl.classList.remove('hidden');
+                    snap.forEach(docSnap => {
+                        const data = docSnap.data();
+                        const date = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : 'Just now';
+                        const eventName = data.eventName || "Unknown Event";
+                        
+                        const tr = document.createElement('tr');
+                        tr.className = "border-b hover:bg-gray-50";
+                        tr.innerHTML = `
+                            <td class="p-3 text-sm text-gray-600">${date}</td>
+                            <td class="p-3 font-medium text-suNavy">${eventName}</td>
+                            <td class="p-3"><span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">✔ Present</span></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
                 }
             } catch (err) {
-                console.error("Error fixing user:", userDoc.id, err);
+                console.error("Error loading attendance:", err);
+                loadingEl.classList.add('hidden');
+                emptyEl.classList.remove('hidden');
+                showToast("Failed to load attendance history.", "error");
             }
         }
-    }
-    
-    console.log(`✅ Fixed ${fixed} unnamed users!`);
-    showToast(`Fixed ${fixed} unnamed users!`, "success");
-};
 
-    window.showToast = (message, type = 'info') => {
-        const toast = document.createElement('div');
-        const colors = { success: 'bg-green-600', error: 'bg-red-600', warning: 'bg-yellow-600', info: 'bg-blue-600' };
-        toast.className = `fixed bottom-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg fade-in z-50`;
-        toast.innerText = message;
-        document.body.appendChild(toast);
-        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
-    };
-</script>
+        async function loadStudentPayment() {
+            const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+            if (!userDoc.exists() || !userDoc.data().studentId) return;
+            
+            const studentId = userDoc.data().studentId;
+            const loadingEl = document.getElementById('student-payment-loading');
+            const infoEl = document.getElementById('student-payment-info');
+            
+            loadingEl.classList.remove('hidden');
+            infoEl.classList.add('hidden');
+            
+            try {
+                const studentDoc = await getDoc(doc(db, "students", studentId));
+                if (studentDoc.exists()) {
+                    const data = studentDoc.data();
+                    const status = data.paymentStatus || 'unpaid';
+                    const type = data.paymentType || 'none';
+                    
+                    const statusCard = document.getElementById('payment-status-card');
+                    const statusBadge = document.getElementById('payment-status-badge');
+                    
+                    if (status === 'paid') {
+                        statusCard.className = 'rounded-xl p-6 mb-4 border-2 bg-green-50 border-green-300';
+                        statusBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-green-600 text-white';
+                        statusBadge.innerText = '✓ PAID';
+                    } else {
+                        statusCard.className = 'rounded-xl p-6 mb-4 border-2 bg-red-50 border-red-300';
+                        statusBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-red-600 text-white';
+                        statusBadge.innerText = '✗ UNPAID';
+                    }
+                    
+                    const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : 'Not Applicable';
+                    const amount = type === 'early-bird' ? '₱150' : type === 'regular' ? '₱200' : '₱0';
+                    const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : 'Not yet paid';
+                    
+                    document.getElementById('payment-type-display').innerText = typeDisplay;
+                    document.getElementById('payment-amount-display').innerText = amount;
+                    document.getElementById('payment-date-display').innerText = dateDisplay;
+                    
+                    loadingEl.classList.add('hidden');
+                    infoEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Error loading payment status:", err);
+                loadingEl.classList.add('hidden');
+                showToast("Failed to load payment status.", "error");
+            }
+        }
+
+        window.showToast = (message, type = 'info') => {
+            const toast = document.createElement('div');
+            const colors = { success: 'bg-green-600', error: 'bg-red-600', warning: 'bg-yellow-600', info: 'bg-blue-600' };
+            toast.className = `fixed bottom-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg fade-in z-50`;
+            toast.innerText = message;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+        };
+    </script>
 </body>
 </html>
