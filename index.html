@@ -1099,20 +1099,19 @@
         }
         await setDoc(doc(db, "students", id), studentData, { merge: true });
         
-        if (paymentStatus === 'paid') {
-            try {
-                sendPaymentToGoogleSheets({
-                    studentId: id,
-                    name: name,
-                    year: year,
-                    semester: paymentSemester,
-                    paymentStatus: paymentStatus,
-                    paymentType: paymentType,
-                    recordedBy: currentUser.email
-                });
-            } catch (sheetError) {
-                console.error("Payment sheet sync failed:", sheetError);
-            }
+        // NEW: Always send to Google Sheets when payment info changes (not just when paid)
+        try {
+            sendPaymentToGoogleSheets({
+                studentId: id,
+                name: name,
+                year: year,
+                semester: paymentSemester,
+                paymentStatus: paymentStatus,
+                paymentType: paymentType,
+                recordedBy: currentUser.email
+            });
+        } catch (sheetError) {
+            console.error("Payment sheet sync failed:", sheetError);
         }
         
         showToast("Student saved!", "success");
@@ -1526,10 +1525,11 @@
                     <td class="p-3">${typeDisplay}</td>
                     <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
                     <td class="p-3">
-                        <button onclick="quickMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
-                            ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Edit'}
-                        </button>
-                    </td>
+    ${status === 'unpaid' 
+        ? `<button onclick="quickMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold"><i class="fas fa-check-circle mr-1"></i>Mark Paid</button>`
+        : `<button onclick="markAsUnpaid('${docSnap.id}')" class="text-red-600 hover:text-red-800 text-sm font-semibold"><i class="fas fa-times-circle mr-1"></i>Mark Unpaid</button>`
+    }
+</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1555,8 +1555,11 @@
             paymentStatus: 'paid',
             paymentType: 'regular',
             paymentDate: serverTimestamp()
+
+
         });
         
+        // Always sync to Google Sheets
         sendPaymentToGoogleSheets({
             studentId: studentId,
             name: data.name,
@@ -1570,6 +1573,32 @@
         showToast(`${data.name} marked as paid for ${semesterValue} semester!`, "success");
         renderPayments();
     }
+};
+
+        window.markAsUnpaid = async (studentId) => {
+    if (!confirm("Are you sure you want to mark this student as unpaid?")) return;
+    
+    const snap = await getDoc(doc(db, "students", studentId));
+    const data = snap.data();
+    
+    await updateDoc(doc(db, "students", studentId), {
+        paymentStatus: 'unpaid',
+        paymentType: 'none',
+        paymentDate: null
+    });
+    
+    sendPaymentToGoogleSheets({
+        studentId: studentId,
+        name: data.name,
+        year: data.year,
+        semester: data.semester || '1st',
+        paymentStatus: 'unpaid',
+        paymentType: 'none',
+        recordedBy: currentUser.email
+    });
+    
+    showToast(`${data.name} marked as unpaid.`, "success");
+    renderPayments();
 };
 
         window.exportPayments = async () => {
@@ -1671,6 +1700,7 @@
                 paymentDate: serverTimestamp()
             });
             
+            // Always sync to Google Sheets
             sendPaymentToGoogleSheets({
                 studentId: studentId,
                 name: data.name,
@@ -1732,7 +1762,6 @@
         renderTreasurerPayments();
     }
 };
-
         document.getElementById('student-register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
