@@ -204,49 +204,48 @@
 
             <!-- Analytics Tab -->
             <div id="tab-analytics" class="tab-content hidden">
-                <div class="bg-white p-4 rounded-xl shadow mb-6 flex flex-col md:flex-row items-center gap-4">
-                    <label class="font-bold text-suNavy whitespace-nowrap">View Analytics For:</label>
-                    <select id="analytics-event-select" onchange="loadAnalytics()" class="w-full md:w-auto flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none bg-gray-50">
-                        <option value="all">All Time (All Events Combined)</option>
-                    </select>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Total Members</p><p id="stat-total" class="text-3xl font-bold text-suNavy">0</p></div>
-                    <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Present</p><p id="stat-present" class="text-3xl font-bold text-green-600">0</p></div>
-                    <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Absent</p><p id="stat-absent" class="text-3xl font-bold text-red-600">0</p></div>
-                    <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Attendance Rate</p><p id="stat-rate" class="text-3xl font-bold text-blue-600">0%</p></div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow"><h4 class="font-bold text-suNavy mb-4">Year Level Breakdown</h4><canvas id="yearChart"></canvas></div>
-                    <div class="bg-white p-6 rounded-xl shadow"><h4 class="font-bold text-suNavy mb-4">Attendance Status</h4><canvas id="statusChart"></canvas></div>
-                </div>
-            </div>
+    <div class="bg-white p-4 rounded-xl shadow mb-6 flex flex-col md:flex-row items-center gap-4">
+        <label class="font-bold text-suNavy whitespace-nowrap">View Analytics For:</label>
+        <select id="analytics-event-select" onchange="loadAnalytics()" class="w-full md:w-auto flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none bg-gray-50">
+            <option value="all">All Time (All Events Combined)</option>
+        </select>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Total Members</p><p id="stat-total" class="text-3xl font-bold text-suNavy">0</p></div>
+        <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Present</p><p id="stat-present" class="text-3xl font-bold text-green-600">0</p></div>
+        <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Absent</p><p id="stat-absent" class="text-3xl font-bold text-red-600">0</p></div>
+        <div class="bg-white p-6 rounded-xl shadow"><p class="text-gray-500 text-sm">Attendance Rate</p><p id="stat-rate" class="text-3xl font-bold text-blue-600">0%</p></div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow"><h4 class="font-bold text-suNavy mb-4">Year Level Breakdown</h4><canvas id="yearChart"></canvas></div>
+        <div class="bg-white p-6 rounded-xl shadow"><h4 class="font-bold text-suNavy mb-4">Attendance Status</h4><canvas id="statusChart"></canvas></div>
+    </div>
+</div>
 
             <!-- Export Tab -->
-            <div id="tab-export" class="tab-content hidden">
-                <div class="bg-white rounded-xl shadow p-6">
-                    <h3 class="text-lg font-bold text-suNavy mb-4">Export Attendance Data</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <h4 class="font-semibold mb-2">Current Active Event</h4>
-                            <p id="export-current-event-name" class="text-sm text-gray-500 mb-4">No active event</p>
-                            <div class="flex gap-2">
-                                <button onclick="exportData('current', 'csv')" class="flex-1 bg-gray-800 text-white py-2 rounded hover:bg-gray-900">Export CSV</button>
-                                <button onclick="exportData('current', 'excel')" class="flex-1 bg-green-700 text-white py-2 rounded hover:bg-green-800">Export Excel</button>
-                            </div>
-                        </div>
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <h4 class="font-semibold mb-2">All Events</h4>
-                            <p class="text-sm text-gray-500 mb-4">Includes historical data from all events.</p>
-                            <div class="flex gap-2">
-                                <button onclick="exportData('all', 'csv')" class="flex-1 bg-gray-800 text-white py-2 rounded hover:bg-gray-900">Export CSV</button>
-                                <button onclick="exportData('all', 'excel')" class="flex-1 bg-green-700 text-white py-2 rounded hover:bg-green-800">Export Excel</button>
-                            </div>
-                        </div>
-                    </div>
+           <div id="tab-export" class="tab-content hidden">
+    <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-lg font-bold text-suNavy mb-4">Export Attendance Data</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="border border-gray-200 rounded-lg p-4">
+                <h4 class="font-semibold mb-2">Current Active Event</h4>
+                <p id="export-current-event-name" class="text-sm text-gray-500 mb-4">No active event</p>
+                <div class="flex gap-2">
+                    <button onclick="exportData('current', 'csv')" class="flex-1 bg-gray-800 text-white py-2 rounded hover:bg-gray-900">Export CSV</button>
+                    <button onclick="exportData('current', 'excel')" class="flex-1 bg-green-700 text-white py-2 rounded hover:bg-green-800">Export Excel</button>
+                </div>
+            </div>
+            <div class="border border-gray-200 rounded-lg p-4">
+                <h4 class="font-semibold mb-2">All Events</h4>
+                <p class="text-sm text-gray-500 mb-4">Includes historical data from all events.</p>
+                <div class="flex gap-2">
+                    <button onclick="exportData('all', 'csv')" class="flex-1 bg-gray-800 text-white py-2 rounded hover:bg-gray-900">Export CSV</button>
+                    <button onclick="exportData('all', 'excel')" class="flex-1 bg-green-700 text-white py-2 rounded hover:bg-green-800">Export Excel</button>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
         <!-- Payments Tab -->
 <div id="tab-payments" class="tab-content hidden">
