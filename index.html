@@ -688,7 +688,8 @@
         };
 
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5Q1-9j4P_XhsjaXQSYm3Gata8rhoj55fbjx7b_Yi6wzXzB0OpnL79HEa6e48frpfi/exec";
-
+const PAYMENT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcMinP3SJehBCnmWqYTS4VTQQzqsuAU7grZIELIUTW-ajkVzrE9f-mO4NDdjUO4mLpFg/exec";
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -1083,26 +1084,45 @@
             const paymentType = document.getElementById('form-payment-type').value;
             
             try {
-                const studentData = { name, year, active, qrCode: id, paymentStatus, paymentType };
-                if (paymentStatus === 'paid') {
-                    studentData.paymentDate = serverTimestamp();
-                }
-                await setDoc(doc(db, "students", id), studentData, { merge: true });
-                showToast("Student saved!", "success");
-                closeStudentModal();
-                renderStudents();
-                renderPayments();
-            } catch (err) { 
-                showToast("Error saving student", "error"); 
-            } finally { 
-                setButtonLoading(btn, false, originalText); 
-            }
+    const studentData = { name, year, active, qrCode: id, paymentStatus, paymentType };
+    if (paymentStatus === 'paid') {
+        studentData.paymentDate = serverTimestamp();
+    }
+    await setDoc(doc(db, "students", id), studentData, { merge: true });
+    
+    // NEW: Send to payment tracking sheet
+    if (paymentStatus === 'paid') {
+        try {
+            sendPaymentToGoogleSheets({
+                studentId: id,
+                name: name,
+                year: year,
+                paymentStatus: paymentStatus,
+                paymentType: paymentType,
+                recordedBy: currentUser.email
+            });
+        } catch (sheetError) {
+            console.error("Payment sheet sync failed:", sheetError);
+            // Don't show error to user - the database save succeeded
+        }
+    }
+    
+    showToast("Student saved!", "success");
+    closeStudentModal();
+    renderStudents();
+    renderPayments();
+} catch (err) { 
+    showToast("Error saving student", "error"); 
+} finally { 
+    setButtonLoading(btn, false, originalText); 
+}
         });
 
         window.toggleStudentActive = async (id, status) => {
             await updateDoc(doc(db, "students", id), { active: status });
             renderStudents();
         };
+
 
         window.showQR = (id, name) => {
             document.getElementById('qr-student-name').innerText = name;
@@ -1308,6 +1328,24 @@
         showToast("Failed to sync to Google Sheets", "error");
     });
 }
+
+        function sendPaymentToGoogleSheets(data) {
+    if (!PAYMENT_SCRIPT_URL || PAYMENT_SCRIPT_URL.includes("YOUR_")) {
+        console.error("❌ Payment Sheets URL is not configured!");
+        return;
+    }
+    
+    console.log("💰 Sending payment data to Google Sheets:", data);
+    
+    fetch(PAYMENT_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(data)
+    })
+    .then(() => console.log("✅ Payment data sent successfully."))
+    .catch(err => console.error("❌ Payment sync failed:", err));
+}
         window.startLiveAttendanceListener = async () => {
     const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
     if (eventSnap.empty) {
@@ -1495,21 +1533,32 @@
         };
 
         window.quickMarkPaid = async (studentId) => {
-            const snap = await getDoc(doc(db, "students", studentId));
-            const data = snap.data();
-            
-            if (data.paymentStatus === 'paid') {
-                editStudent(studentId);
-            } else {
-                await updateDoc(doc(db, "students", studentId), {
-                    paymentStatus: 'paid',
-                    paymentType: 'regular',
-                    paymentDate: serverTimestamp()
-                });
-                showToast(`${data.name} marked as paid!`, "success");
-                renderPayments();
-            }
-        };
+    const snap = await getDoc(doc(db, "students", studentId));
+    const data = snap.data();
+    
+    if (data.paymentStatus === 'paid') {
+        editStudent(studentId);
+    } else {
+        await updateDoc(doc(db, "students", studentId), {
+            paymentStatus: 'paid',
+            paymentType: 'regular',
+            paymentDate: serverTimestamp()
+        });
+        
+        // NEW: Send to payment tracking sheet
+        sendPaymentToGoogleSheets({
+            studentId: studentId,
+            name: data.name,
+            year: data.year,
+            paymentStatus: 'paid',
+            paymentType: 'regular',
+            recordedBy: currentUser.email
+        });
+        
+        showToast(`${data.name} marked as paid!`, "success");
+        renderPayments();
+    }
+};
 
         window.exportPayments = async () => {
             showToast("Preparing export...", "info");
@@ -1599,40 +1648,73 @@
         };
 
         window.treasurerMarkPaid = async (studentId) => {
-            const snap = await getDoc(doc(db, "students", studentId));
-            const data = snap.data();
+    const snap = await getDoc(doc(db, "students", studentId));
+    const data = snap.data();
+    
+    if (data.paymentStatus === 'paid') {
+        const newType = prompt(`Current: ${data.paymentType}\n\nEnter new payment type (early-bird/regular/none):`, data.paymentType);
+        if (newType && ['early-bird', 'regular', 'none'].includes(newType)) {
+            await updateDoc(doc(db, "students", studentId), {
+                paymentType: newType,
+                paymentDate: serverTimestamp()
+            });
             
-            if (data.paymentStatus === 'paid') {
-                const newType = prompt(`Current: ${data.paymentType}\n\nEnter new payment type (early-bird/regular/none):`, data.paymentType);
-                if (newType && ['early-bird', 'regular', 'none'].includes(newType)) {
-                    await updateDoc(doc(db, "students", studentId), {
-                        paymentType: newType,
-                        paymentDate: serverTimestamp()
-                    });
-                    showToast("Payment updated!", "success");
-                    renderTreasurerPayments();
-                }
-            } else {
-                const paymentType = prompt("Select payment type:\n1. Early Bird (₱150)\n2. Regular (₱200)\n\nEnter 1 or 2:", "2");
-                
-                if (paymentType === '1') {
-                    await updateDoc(doc(db, "students", studentId), {
-                        paymentStatus: 'paid',
-                        paymentType: 'early-bird',
-                        paymentDate: serverTimestamp()
-                    });
-                    showToast(`${data.name} marked as Early Bird paid!`, "success");
-                } else if (paymentType === '2') {
-                    await updateDoc(doc(db, "students", studentId), {
-                        paymentStatus: 'paid',
-                        paymentType: 'regular',
-                        paymentDate: serverTimestamp()
-                    });
-                    showToast(`${data.name} marked as Regular paid!`, "success");
-                }
-                renderTreasurerPayments();
-            }
-        };
+            // NEW: Send update to payment sheet
+            sendPaymentToGoogleSheets({
+                studentId: studentId,
+                name: data.name,
+                year: data.year,
+                paymentStatus: 'paid',
+                paymentType: newType,
+                recordedBy: currentUser.email
+            });
+            
+            showToast("Payment updated!", "success");
+            renderTreasurerPayments();
+        }
+    } else {
+        const paymentType = prompt("Select payment type:\n1. Early Bird (₱150)\n2. Regular (₱200)\n\nEnter 1 or 2:", "2");
+        
+        if (paymentType === '1') {
+            await updateDoc(doc(db, "students", studentId), {
+                paymentStatus: 'paid',
+                paymentType: 'early-bird',
+                paymentDate: serverTimestamp()
+            });
+            
+            // NEW: Send to payment sheet
+            sendPaymentToGoogleSheets({
+                studentId: studentId,
+                name: data.name,
+                year: data.year,
+                paymentStatus: 'paid',
+                paymentType: 'early-bird',
+                recordedBy: currentUser.email
+            });
+            
+            showToast(`${data.name} marked as Early Bird paid!`, "success");
+        } else if (paymentType === '2') {
+            await updateDoc(doc(db, "students", studentId), {
+                paymentStatus: 'paid',
+                paymentType: 'regular',
+                paymentDate: serverTimestamp()
+            });
+            
+            // NEW: Send to payment sheet
+            sendPaymentToGoogleSheets({
+                studentId: studentId,
+                name: data.name,
+                year: data.year,
+                paymentStatus: 'paid',
+                paymentType: 'regular',
+                recordedBy: currentUser.email
+            });
+            
+            showToast(`${data.name} marked as Regular paid!`, "success");
+        }
+        renderTreasurerPayments();
+    }
+};
 
         document.getElementById('student-register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
