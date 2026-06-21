@@ -687,7 +687,7 @@
             measurementId: "G-C5SH1EEQP2"
         };
 
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWnhp4kVnc_StNi_J6D71Llc5ui63LNyB37AyPXn2vWGL2aNdavqMH17JFX_MsvaY/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHDMMEqOIl9vuT_ryf3N79r_BefZUrJV4v_EpStwjVDcSRAE32gZGi8yIQJa8rP0zx/exec";
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -1298,24 +1298,38 @@
         }
 
         window.startLiveAttendanceListener = async () => {
-            const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
-            if (eventSnap.empty) return;
-            const eventId = eventSnap.docs[0].id;
-            const q = query(collection(db, "attendance"), where("eventId", "==", eventId), orderBy("timestamp", "desc"));
-            unsubscribeLiveAttendance = onSnapshot(q, (snapshot) => {
-                const tbody = document.getElementById("live-attendance-body");
-                tbody.innerHTML = "";
-                document.getElementById("live-attendance-count").innerText = snapshot.size;
-                snapshot.forEach(docSnap => {
-                    const d = docSnap.data();
-                    const time = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleTimeString() : "Just now";
-                    const tr = document.createElement('tr');
-                    tr.className = "border-b fade-in";
-                    tr.innerHTML = `<td class="p-3 text-sm text-gray-500">${time}</td><td class="p-3 font-mono text-sm">${d.studentId}</td><td class="p-3">${d.studentName}</td><td class="p-3">${d.studentYear}</td>`;
-                    tbody.appendChild(tr);
-                });
-            });
-        };
+    const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
+    if (eventSnap.empty) {
+        console.log("⚠ No active event found for live feed");
+        return;
+    }
+    const eventId = eventSnap.docs[0].id;
+    
+    // Query WITHOUT orderBy (no index needed)
+    const q = query(collection(db, "attendance"), where("eventId", "==", eventId));
+    
+    unsubscribeLiveAttendance = onSnapshot(q, (snapshot) => {
+        const tbody = document.getElementById("live-attendance-body");
+        tbody.innerHTML = "";
+        document.getElementById("live-attendance-count").innerText = snapshot.size;
+        
+        // Sort in JavaScript instead of Firestore
+        const sortedDocs = snapshot.docs.sort((a, b) => {
+            const timeA = a.data().timestamp?.seconds || 0;
+            const timeB = b.data().timestamp?.seconds || 0;
+            return timeB - timeA; // Newest first
+        });
+        
+        sortedDocs.forEach(docSnap => {
+            const d = docSnap.data();
+            const time = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleTimeString() : "Just now";
+            const tr = document.createElement('tr');
+            tr.className = "border-b fade-in";
+            tr.innerHTML = `<td class="p-3 text-sm text-gray-500">${time}</td><td class="p-3 font-mono text-sm">${d.studentId}</td><td class="p-3">${d.studentName}</td><td class="p-3">${d.studentYear}</td>`;
+            tbody.appendChild(tr);
+        });
+    });
+};
 
         window.stopLiveAttendanceListener = () => {
             if (unsubscribeLiveAttendance) {
