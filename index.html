@@ -33,12 +33,10 @@
     </style>
 </head>
 <body class="bg-suGray text-gray-800 font-sans min-h-screen flex flex-col">
-    <!-- Offline Banner -->
     <div id="offline-banner" class="hidden bg-red-600 text-white text-center py-2 text-sm font-semibold no-print">
         <i class="fas fa-wifi-slash mr-2"></i> You are offline. Some features may be limited.
     </div>
 
-    <!-- Header -->
     <header class="bg-suNavy text-white shadow-lg no-print">
         <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
             <div class="flex items-center space-x-4 mb-4 md:mb-0">
@@ -58,11 +56,8 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-8">
-        <!-- Login View -->
         <div id="login-view" class="max-w-md mx-auto bg-white rounded-xl shadow-md p-8 fade-in">
-            <!-- Login Form -->
             <div id="login-form-container">
                 <h2 class="text-2xl font-bold text-suNavy mb-6 text-center">System Login</h2>
                 <form id="login-form" class="space-y-4">
@@ -90,7 +85,6 @@
                 </div>
             </div>
 
-            <!-- Sign Up Form -->
             <div id="signup-form-container" class="hidden">
                 <h2 class="text-2xl font-bold text-suNavy mb-2 text-center">Create Account</h2>
                 <p class="text-sm text-gray-500 text-center mb-6">For SU Psychology Society Members</p>
@@ -120,6 +114,21 @@
             </div>
         </div>
 
+        <!-- View Switcher for Officer/Treasurer who are also Students -->
+        <div id="view-switcher" class="hidden mb-6 no-print">
+            <div class="bg-white rounded-xl shadow p-4 flex gap-2">
+                <button onclick="switchMainView('student')" id="view-student-btn" class="flex-1 px-4 py-2 bg-suNavy text-white rounded-lg font-medium transition">
+                    <i class="fas fa-user mr-2"></i>Student View
+                </button>
+                <button onclick="switchMainView('officer')" id="view-officer-btn" class="flex-1 px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition hidden">
+                    <i class="fas fa-qrcode mr-2"></i>Officer View
+                </button>
+                <button onclick="switchMainView('treasurer')" id="view-treasurer-btn" class="flex-1 px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition hidden">
+                    <i class="fas fa-money-bill-wave mr-2"></i>Treasurer View
+                </button>
+            </div>
+        </div>
+
         <!-- Admin Dashboard -->
         <div id="admin-dashboard" class="hidden fade-in">
             <div class="flex space-x-2 mb-6 overflow-x-auto pb-2 no-print">
@@ -131,7 +140,6 @@
                 <button onclick="switchTab('export')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Export</button>
             </div>
 
-            <!-- Events Tab -->
             <div id="tab-events" class="tab-content">
                 <div class="bg-white rounded-xl shadow p-6 mb-6">
                     <h3 class="text-lg font-bold text-suNavy mb-4">Create New Event</h3>
@@ -143,7 +151,6 @@
                 <div id="events-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
 
-            <!-- Students Tab -->
             <div id="tab-students" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow p-6 mb-6">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
@@ -178,7 +185,6 @@
                 </div>
             </div>
 
-            <!-- Manage Users Tab -->
             <div id="tab-users" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow p-6">
                     <h3 class="text-lg font-bold text-suNavy mb-2">Manage Officers & Admins</h3>
@@ -200,7 +206,6 @@
                 </div>
             </div>
 
-            <!-- Payments Tab -->
             <div id="tab-payments" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow p-6 mb-6">
                     <h3 class="text-lg font-bold text-suNavy mb-4">Society Fee Payment Summary</h3>
@@ -256,7 +261,6 @@
                 </div>
             </div>
 
-            <!-- Analytics Tab -->
             <div id="tab-analytics" class="tab-content hidden">
                 <div class="bg-white p-4 rounded-xl shadow mb-6 flex flex-col md:flex-row items-center gap-4">
                     <label class="font-bold text-suNavy whitespace-nowrap">View Analytics For:</label>
@@ -276,7 +280,6 @@
                 </div>
             </div>
 
-            <!-- Export Tab -->
             <div id="tab-export" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow p-6">
                     <h3 class="text-lg font-bold text-suNavy mb-4">Export Attendance Data</h3>
@@ -309,7 +312,6 @@
                 <button onclick="switchOfficerTab('live')" class="officer-tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Live Attendance</button>
             </div>
 
-            <!-- Scanner Tab -->
             <div id="officer-tab-scanner" class="officer-tab-content">
                 <div class="bg-white rounded-xl shadow p-6 text-center">
                     <h3 class="text-lg font-bold text-suNavy mb-4">Scan Student QR Code</h3>
@@ -319,7 +321,6 @@
                 </div>
             </div>
 
-            <!-- Live Attendance Tab -->
             <div id="officer-tab-live" class="officer-tab-content hidden">
                 <div class="bg-white rounded-xl shadow p-6">
                     <div class="flex justify-between items-center mb-4">
@@ -403,7 +404,6 @@
 
         <!-- Student Dashboard -->
         <div id="student-dashboard" class="hidden fade-in max-w-3xl mx-auto">
-            <!-- Tab Navigation -->
             <div class="flex space-x-2 mb-6 border-b border-gray-200 pb-2">
                 <button onclick="switchStudentTab('id')" id="student-tab-id-btn" class="px-4 py-2 bg-suNavy text-white rounded-t-lg font-medium transition flex items-center">
                     <i class="fas fa-id-card mr-2"></i> My ID Card
@@ -416,9 +416,7 @@
                 </button>
             </div>
 
-            <!-- My ID Card View -->
             <div id="student-tab-id" class="student-tab-content">
-                <!-- Registration Form -->
                 <div id="student-registration-form" class="bg-white rounded-xl shadow-lg p-8 mb-8">
                     <div class="text-center mb-6">
                         <div class="mx-auto bg-suNavy text-white w-16 h-16 rounded-full flex items-center justify-center mb-3">
@@ -451,7 +449,6 @@
                     </form>
                 </div>
 
-                <!-- Digital ID Card -->
                 <div id="student-id-card-view" class="hidden">
                     <div class="text-center mb-6">
                         <h2 class="text-2xl font-bold text-suNavy">Your Digital ID</h2>
@@ -501,7 +498,6 @@
                 </div>
             </div>
 
-            <!-- My Attendance View -->
             <div id="student-tab-attendance" class="student-tab-content hidden">
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-xl font-bold text-suNavy mb-4 flex items-center">
@@ -536,7 +532,6 @@
                 </div>
             </div>
 
-            <!-- Payment Status View -->
             <div id="student-tab-payment" class="student-tab-content hidden">
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-xl font-bold text-suNavy mb-4 flex items-center">
@@ -582,7 +577,6 @@
         </div>
     </main>
 
-    <!-- Student Modal -->
     <div id="student-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
         <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md fade-in">
             <h3 class="text-xl font-bold text-suNavy mb-4" id="modal-title">Add Student</h3>
@@ -606,33 +600,30 @@
                     </select>
                 </div>
                 <div class="border-t pt-4 mt-4">
-    <h4 class="font-semibold text-suNavy mb-3">Payment Information</h4>
-    
-    <div class="mb-3">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Semester</label>
-        <select id="form-payment-semester" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-            <option value="1st">1st Semester</option>
-            <option value="2nd">2nd Semester</option>
-        </select>
-    </div>
-    
-    <div class="mb-3">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
-        <select id="form-payment-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-            <option value="unpaid">Unpaid</option>
-            <option value="paid">Paid</option>
-        </select>
-    </div>
-    
-    <div class="mb-3">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Type</label>
-        <select id="form-payment-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-            <option value="none">Not Applicable</option>
-            <option value="early-bird">Early Bird (₱150)</option>
-            <option value="regular">Regular (₱200)</option>
-        </select>
-    </div>
-</div>
+                    <h4 class="font-semibold text-suNavy mb-3">Payment Information</h4>
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Semester</label>
+                        <select id="form-payment-semester" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <option value="1st">1st Semester</option>
+                            <option value="2nd">2nd Semester</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
+                        <select id="form-payment-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <option value="unpaid">Unpaid</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Type</label>
+                        <select id="form-payment-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <option value="none">Not Applicable</option>
+                            <option value="early-bird">Early Bird (₱150)</option>
+                            <option value="regular">Regular (₱200)</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="flex items-center">
                     <input type="checkbox" id="form-student-active" checked class="h-4 w-4 text-suNavy focus:ring-suNavy border-gray-300 rounded">
                     <label class="ml-2 block text-sm text-gray-700">Active</label>
@@ -645,7 +636,6 @@
         </div>
     </div>
 
-    <!-- QR Modal -->
     <div id="qr-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
         <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center fade-in">
             <h3 class="text-xl font-bold text-suNavy mb-2">Student QR Code</h3>
@@ -656,10 +646,8 @@
         </div>
     </div>
 
-    <!-- Printable QR Container -->
     <div id="print-qr-container" class="print-only grid grid-cols-2 md:grid-cols-4 gap-4 p-4"></div>
 
-    <!-- Footer -->
     <footer class="bg-suNavy text-white py-8 mt-auto no-print border-t border-blue-900">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-center items-center gap-8 mb-6">
@@ -698,7 +686,7 @@
         };
 
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5Q1-9j4P_XhsjaXQSYm3Gata8rhoj55fbjx7b_Yi6wzXzB0OpnL79HEa6e48frpfi/exec";
-        const PAYMENT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmK3cDUIXaYLXwBIjEwqGE9oLEPHafVnt9tExPeAl__vfJjem_nyj3G3rW8XVeBS4liw/exec";
+        const PAYMENT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcMinP3SJehBCnmWqYTS4VTQQzqsuAU7grZIELIUTW-ajkVzrE9f-mO4NDdjUO4mLpFg/exec";
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -706,6 +694,7 @@
 
         let currentUser = null;
         let currentRole = null;
+        let currentMainView = 'student';
         let html5QrcodeScanner = null;
         let lastScanTime = 0;
         let unsubscribeLiveAttendance = null;
@@ -754,6 +743,7 @@
                 document.getElementById('officer-dashboard').classList.add('hidden');
                 document.getElementById('student-dashboard').classList.add('hidden');
                 document.getElementById('treasurer-dashboard').classList.add('hidden');
+                document.getElementById('view-switcher').classList.add('hidden');
 
                 try {
                     const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -767,13 +757,18 @@
                             document.getElementById('admin-dashboard').classList.remove('hidden');
                             renderEvents(); renderStudents(); renderUsers();
                         } else if (currentRole === 'officer') {
-                            document.getElementById('officer-dashboard').classList.remove('hidden');
+                            document.getElementById('view-switcher').classList.remove('hidden');
+                            document.getElementById('view-officer-btn').classList.remove('hidden');
+                            switchMainView('student');
+                            loadStudentProfile(user.uid);
+                        } else if (currentRole === 'treasurer') {
+                            document.getElementById('view-switcher').classList.remove('hidden');
+                            document.getElementById('view-treasurer-btn').classList.remove('hidden');
+                            switchMainView('student');
+                            loadStudentProfile(user.uid);
                         } else if (currentRole === 'student') {
                             document.getElementById('student-dashboard').classList.remove('hidden');
                             loadStudentProfile(user.uid);
-                        } else if (currentRole === 'treasurer') {
-                            document.getElementById('treasurer-dashboard').classList.remove('hidden');
-                            renderTreasurerPayments();
                         }
                     } else {
                         console.log("🆕 New user detected. Showing registration form.");
@@ -822,10 +817,41 @@
                 document.getElementById('officer-dashboard').classList.add('hidden');
                 document.getElementById('student-dashboard').classList.add('hidden');
                 document.getElementById('treasurer-dashboard').classList.add('hidden');
+                document.getElementById('view-switcher').classList.add('hidden');
                 document.getElementById('user-info').classList.add('hidden');
                 stopScanner();
             }
         });
+
+        window.switchMainView = (view) => {
+            currentMainView = view;
+            
+            document.getElementById('student-dashboard').classList.add('hidden');
+            document.getElementById('officer-dashboard').classList.add('hidden');
+            document.getElementById('treasurer-dashboard').classList.add('hidden');
+            
+            document.getElementById('view-student-btn').classList.remove('bg-suNavy', 'text-white');
+            document.getElementById('view-student-btn').classList.add('bg-white', 'text-gray-700');
+            document.getElementById('view-officer-btn').classList.remove('bg-suNavy', 'text-white');
+            document.getElementById('view-officer-btn').classList.add('bg-white', 'text-gray-700');
+            document.getElementById('view-treasurer-btn').classList.remove('bg-suNavy', 'text-white');
+            document.getElementById('view-treasurer-btn').classList.add('bg-white', 'text-gray-700');
+            
+            if (view === 'student') {
+                document.getElementById('student-dashboard').classList.remove('hidden');
+                document.getElementById('view-student-btn').classList.add('bg-suNavy', 'text-white');
+                document.getElementById('view-student-btn').classList.remove('bg-white', 'text-gray-700');
+            } else if (view === 'officer') {
+                document.getElementById('officer-dashboard').classList.remove('hidden');
+                document.getElementById('view-officer-btn').classList.add('bg-suNavy', 'text-white');
+                document.getElementById('view-officer-btn').classList.remove('bg-white', 'text-gray-700');
+            } else if (view === 'treasurer') {
+                document.getElementById('treasurer-dashboard').classList.remove('hidden');
+                document.getElementById('view-treasurer-btn').classList.add('bg-suNavy', 'text-white');
+                document.getElementById('view-treasurer-btn').classList.remove('bg-white', 'text-gray-700');
+                renderTreasurerPayments();
+            }
+        };
 
         document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1065,77 +1091,72 @@
         };
 
         window.editStudent = async (id) => {
-    const snap = await getDoc(doc(db, "students", id));
-    const data = snap.data();
-    document.getElementById('edit-student-id').value = id;
-    document.getElementById('form-student-id').value = id;
-    document.getElementById('form-student-id').disabled = true;
-    document.getElementById('form-student-name').value = data.name;
-    document.getElementById('form-student-year').value = data.year;
-    document.getElementById('form-student-active').checked = data.active;
-    
-    // Payment fields
-    document.getElementById('form-payment-semester').value = data.semester || '1st';
-    document.getElementById('form-payment-status').value = data.paymentStatus || 'unpaid';
-    document.getElementById('form-payment-type').value = data.paymentType || 'none';
-    
-    document.getElementById('modal-title').innerText = "Edit Student";
-    document.getElementById('student-modal').classList.remove('hidden');
-    document.getElementById('student-modal').classList.add('flex');
-};
+            const snap = await getDoc(doc(db, "students", id));
+            const data = snap.data();
+            document.getElementById('edit-student-id').value = id;
+            document.getElementById('form-student-id').value = id;
+            document.getElementById('form-student-id').disabled = true;
+            document.getElementById('form-student-name').value = data.name;
+            document.getElementById('form-student-year').value = data.year;
+            document.getElementById('form-student-active').checked = data.active;
+            document.getElementById('form-payment-semester').value = data.semester || '1st';
+            document.getElementById('form-payment-status').value = data.paymentStatus || 'unpaid';
+            document.getElementById('form-payment-type').value = data.paymentType || 'none';
+            document.getElementById('modal-title').innerText = "Edit Student";
+            document.getElementById('student-modal').classList.remove('hidden');
+            document.getElementById('student-modal').classList.add('flex');
+        };
 
         document.getElementById('student-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    const originalText = btn.innerHTML;
-    setButtonLoading(btn, true);
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            setButtonLoading(btn, true);
 
-    const id = document.getElementById('edit-student-id').value || document.getElementById('form-student-id').value;
-    const name = document.getElementById('form-student-name').value;
-    const year = parseInt(document.getElementById('form-student-year').value);
-    const active = document.getElementById('form-student-active').checked;
-    const paymentSemester = document.getElementById('form-payment-semester').value;
-    const paymentStatus = document.getElementById('form-payment-status').value;
-    const paymentType = document.getElementById('form-payment-type').value;
-    
-    try {
-        const studentData = { name, year, active, qrCode: id, semester: paymentSemester, paymentStatus, paymentType };
-        if (paymentStatus === 'paid') {
-            studentData.paymentDate = serverTimestamp();
-        }
-        await setDoc(doc(db, "students", id), studentData, { merge: true });
-        
-        // NEW: Always send to Google Sheets when payment info changes (not just when paid)
-        try {
-            sendPaymentToGoogleSheets({
-                studentId: id,
-                name: name,
-                year: year,
-                semester: paymentSemester,
-                paymentStatus: paymentStatus,
-                paymentType: paymentType,
-                recordedBy: currentUser.email
-            });
-        } catch (sheetError) {
-            console.error("Payment sheet sync failed:", sheetError);
-        }
-        
-        showToast("Student saved!", "success");
-        closeStudentModal();
-        renderStudents();
-        renderPayments();
-    } catch (err) { 
-        showToast("Error saving student", "error"); 
-    } finally { 
-        setButtonLoading(btn, false, originalText); 
-    }
-});
+            const id = document.getElementById('edit-student-id').value || document.getElementById('form-student-id').value;
+            const name = document.getElementById('form-student-name').value;
+            const year = parseInt(document.getElementById('form-student-year').value);
+            const active = document.getElementById('form-student-active').checked;
+            const paymentSemester = document.getElementById('form-payment-semester').value;
+            const paymentStatus = document.getElementById('form-payment-status').value;
+            const paymentType = document.getElementById('form-payment-type').value;
+            
+            try {
+                const studentData = { name, year, active, qrCode: id, semester: paymentSemester, paymentStatus, paymentType };
+                if (paymentStatus === 'paid') {
+                    studentData.paymentDate = serverTimestamp();
+                }
+                await setDoc(doc(db, "students", id), studentData, { merge: true });
+                
+                try {
+                    sendPaymentToGoogleSheets({
+                        studentId: id,
+                        name: name,
+                        year: year,
+                        semester: paymentSemester,
+                        paymentStatus: paymentStatus,
+                        paymentType: paymentType,
+                        recordedBy: currentUser.email
+                    });
+                } catch (sheetError) {
+                    console.error("Payment sheet sync failed:", sheetError);
+                }
+                
+                showToast("Student saved!", "success");
+                closeStudentModal();
+                renderStudents();
+                renderPayments();
+            } catch (err) { 
+                showToast("Error saving student", "error"); 
+            } finally { 
+                setButtonLoading(btn, false, originalText); 
+            }
+        });
 
         window.toggleStudentActive = async (id, status) => {
             await updateDoc(doc(db, "students", id), { active: status });
             renderStudents();
         };
-
 
         window.showQR = (id, name) => {
             document.getElementById('qr-student-name').innerText = name;
@@ -1201,9 +1222,27 @@
             const name = document.getElementById('new-user-name').value;
             const email = document.getElementById('new-user-email').value;
             const role = document.getElementById('new-user-role').value;
+            
             try {
-                await setDoc(doc(db, "users", email), { name: name, email: email, role: role });
-                showToast("Role assigned successfully!", "success");
+                const usersSnap = await getDocs(query(collection(db, "users"), where("email", "==", email)));
+                
+                if (!usersSnap.empty) {
+                    const existingDoc = usersSnap.docs[0];
+                    await updateDoc(existingDoc.ref, { 
+                        name: name, 
+                        email: email, 
+                        role: role 
+                    });
+                    showToast(`✅ Role updated for ${email}! They need to log out and log back in.`, "success");
+                } else {
+                    await setDoc(doc(db, "users", email), { 
+                        name: name, 
+                        email: email, 
+                        role: role 
+                    });
+                    showToast(`⚠️ Role assigned, but user must be created in Firebase Auth first.`, "warning");
+                }
+                
                 document.getElementById('add-user-form').reset();
                 renderUsers();
             } catch (err) { 
@@ -1315,83 +1354,73 @@
         }
 
         function sendToGoogleSheets(data) {
-    if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS")) {
-        console.error("❌ Google Sheets URL is not configured in index.html!");
-        showToast("Google Sheets not configured!", "error");
-        return;
-    }
-    
-    console.log("📤 Sending to Google Sheets:", data);
-    console.log("🔗 URL:", GOOGLE_SCRIPT_URL);
-    
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors", 
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        console.log("✅ Google Sheets request sent. Response:", response);
-        // Note: With mode: "no-cors", we can't see the actual response
-        // But if we get here, the request was sent
-        showToast("Attendance logged to Google Sheets", "success");
-    })
-    .catch(err => {
-        console.error("❌ Google Sheets sync failed:", err);
-        showToast("Failed to sync to Google Sheets", "error");
-    });
-}
+            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS")) {
+                console.error("❌ Google Sheets URL is not configured in index.html!");
+                showToast("Google Sheets not configured!", "error");
+                return;
+            }
+            
+            console.log("📤 Sending to Google Sheets:", data);
+            
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", 
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(data)
+            })
+            .then(() => console.log("✅ Google Sheets request sent successfully."))
+            .catch(err => console.error("❌ Google Sheets sync failed:", err));
+        }
 
         function sendPaymentToGoogleSheets(data) {
-    if (!PAYMENT_SCRIPT_URL || PAYMENT_SCRIPT_URL.includes("YOUR_")) {
-        console.error("❌ Payment Sheets URL is not configured!");
-        return;
-    }
-    
-    console.log("💰 Sending payment data to Google Sheets:", data);
-    
-    fetch(PAYMENT_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(data)
-    })
-    .then(() => console.log("✅ Payment data sent successfully."))
-    .catch(err => console.error("❌ Payment sync failed:", err));
-}
+            if (!PAYMENT_SCRIPT_URL || PAYMENT_SCRIPT_URL.includes("YOUR_")) {
+                console.error("❌ Payment Sheets URL is not configured!");
+                return;
+            }
+            
+            console.log("💰 Sending payment data to Google Sheets:", data);
+            
+            fetch(PAYMENT_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(data)
+            })
+            .then(() => console.log("✅ Payment data sent successfully."))
+            .catch(err => console.error("❌ Payment sync failed:", err));
+        }
+
         window.startLiveAttendanceListener = async () => {
-    const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
-    if (eventSnap.empty) {
-        console.log("⚠ No active event found for live feed");
-        return;
-    }
-    const eventId = eventSnap.docs[0].id;
-    
-    // Query WITHOUT orderBy (no index needed)
-    const q = query(collection(db, "attendance"), where("eventId", "==", eventId));
-    
-    unsubscribeLiveAttendance = onSnapshot(q, (snapshot) => {
-        const tbody = document.getElementById("live-attendance-body");
-        tbody.innerHTML = "";
-        document.getElementById("live-attendance-count").innerText = snapshot.size;
-        
-        // Sort in JavaScript instead of Firestore
-        const sortedDocs = snapshot.docs.sort((a, b) => {
-            const timeA = a.data().timestamp?.seconds || 0;
-            const timeB = b.data().timestamp?.seconds || 0;
-            return timeB - timeA; // Newest first
-        });
-        
-        sortedDocs.forEach(docSnap => {
-            const d = docSnap.data();
-            const time = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleTimeString() : "Just now";
-            const tr = document.createElement('tr');
-            tr.className = "border-b fade-in";
-            tr.innerHTML = `<td class="p-3 text-sm text-gray-500">${time}</td><td class="p-3 font-mono text-sm">${d.studentId}</td><td class="p-3">${d.studentName}</td><td class="p-3">${d.studentYear}</td>`;
-            tbody.appendChild(tr);
-        });
-    });
-};
+            const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
+            if (eventSnap.empty) {
+                console.log("⚠ No active event found for live feed");
+                return;
+            }
+            const eventId = eventSnap.docs[0].id;
+            
+            const q = query(collection(db, "attendance"), where("eventId", "==", eventId));
+            
+            unsubscribeLiveAttendance = onSnapshot(q, (snapshot) => {
+                const tbody = document.getElementById("live-attendance-body");
+                tbody.innerHTML = "";
+                document.getElementById("live-attendance-count").innerText = snapshot.size;
+                
+                const sortedDocs = snapshot.docs.sort((a, b) => {
+                    const timeA = a.data().timestamp?.seconds || 0;
+                    const timeB = b.data().timestamp?.seconds || 0;
+                    return timeB - timeA;
+                });
+                
+                sortedDocs.forEach(docSnap => {
+                    const d = docSnap.data();
+                    const time = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleTimeString() : "Just now";
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b fade-in";
+                    tr.innerHTML = `<td class="p-3 text-sm text-gray-500">${time}</td><td class="p-3 font-mono text-sm">${d.studentId}</td><td class="p-3">${d.studentName}</td><td class="p-3">${d.studentYear}</td>`;
+                    tbody.appendChild(tr);
+                });
+            });
+        };
 
         window.stopLiveAttendanceListener = () => {
             if (unsubscribeLiveAttendance) {
@@ -1531,11 +1560,12 @@
                     <td class="p-3">${typeDisplay}</td>
                     <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
                     <td class="p-3">
-    ${status === 'unpaid' 
-        ? `<button onclick="quickMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold"><i class="fas fa-check-circle mr-1"></i>Mark Paid</button>`
-        : `<button onclick="markAsUnpaid('${docSnap.id}')" class="text-red-600 hover:text-red-800 text-sm font-semibold"><i class="fas fa-times-circle mr-1"></i>Mark Unpaid</button>`
-    }
-</td>
+                        ${status === 'unpaid' 
+                            ? `<button onclick="quickMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold"><i class="fas fa-check-circle mr-1"></i>Mark Paid</button>`
+                            : `<button onclick="markAsUnpaid('${docSnap.id}')" class="text-red-600 hover:text-red-800 text-sm font-semibold mr-2"><i class="fas fa-times-circle mr-1"></i>Mark Unpaid</button>
+                               <button onclick="editStudent('${docSnap.id}')" class="text-blue-600 hover:text-blue-800 text-sm font-semibold"><i class="fas fa-edit mr-1"></i>Edit</button>`
+                        }
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1547,65 +1577,62 @@
         };
 
         window.quickMarkPaid = async (studentId) => {
-    const snap = await getDoc(doc(db, "students", studentId));
-    const data = snap.data();
-    
-    if (data.paymentStatus === 'paid') {
-        editStudent(studentId);
-    } else {
-        const semester = prompt("Select semester:\n1. 1st Semester\n2. 2nd Semester\n\nEnter 1 or 2:", "1");
-        const semesterValue = semester === '2' ? '2nd' : '1st';
-        
-        await updateDoc(doc(db, "students", studentId), {
-            semester: semesterValue,
-            paymentStatus: 'paid',
-            paymentType: 'regular',
-            paymentDate: serverTimestamp()
-
-
-        });
-        
-        // Always sync to Google Sheets
-        sendPaymentToGoogleSheets({
-            studentId: studentId,
-            name: data.name,
-            year: data.year,
-            semester: semesterValue,
-            paymentStatus: 'paid',
-            paymentType: 'regular',
-            recordedBy: currentUser.email
-        });
-        
-        showToast(`${data.name} marked as paid for ${semesterValue} semester!`, "success");
-        renderPayments();
-    }
-};
+            const snap = await getDoc(doc(db, "students", studentId));
+            const data = snap.data();
+            
+            if (data.paymentStatus === 'paid') {
+                editStudent(studentId);
+            } else {
+                const semester = prompt("Select semester:\n1. 1st Semester\n2. 2nd Semester\n\nEnter 1 or 2:", "1");
+                const semesterValue = semester === '2' ? '2nd' : '1st';
+                
+                await updateDoc(doc(db, "students", studentId), {
+                    semester: semesterValue,
+                    paymentStatus: 'paid',
+                    paymentType: 'regular',
+                    paymentDate: serverTimestamp()
+                });
+                
+                sendPaymentToGoogleSheets({
+                    studentId: studentId,
+                    name: data.name,
+                    year: data.year,
+                    semester: semesterValue,
+                    paymentStatus: 'paid',
+                    paymentType: 'regular',
+                    recordedBy: currentUser.email
+                });
+                
+                showToast(`${data.name} marked as paid for ${semesterValue} semester!`, "success");
+                renderPayments();
+            }
+        };
 
         window.markAsUnpaid = async (studentId) => {
-    if (!confirm("Are you sure you want to mark this student as unpaid?")) return;
-    
-    const snap = await getDoc(doc(db, "students", studentId));
-    const data = snap.data();
-    
-    await updateDoc(doc(db, "students", studentId), {
-        paymentStatus: 'unpaid',
-        paymentType: 'none',
-        paymentDate: null
-    });
-    
-    sendPaymentToGoogleSheets({
-        studentId: studentId,
-        name: data.name,
-        year: data.year,
-        semester: data.semester || '1st',
-        paymentStatus: 'unpaid',
-        paymentType: 'none',
-        recordedBy: currentUser.email
-    });
-    
-    showToast(`${data.name} marked as unpaid.`, "success");
-    renderPayments();
-};
+            if (!confirm("Are you sure you want to mark this student as unpaid?")) return;
+            
+            const snap = await getDoc(doc(db, "students", studentId));
+            const data = snap.data();
+            
+            await updateDoc(doc(db, "students", studentId), {
+                paymentStatus: 'unpaid',
+                paymentType: 'none',
+                paymentDate: null
+            });
+            
+            sendPaymentToGoogleSheets({
+                studentId: studentId,
+                name: data.name,
+                year: data.year,
+                semester: data.semester || '1st',
+                paymentStatus: 'unpaid',
+                paymentType: 'none',
+                recordedBy: currentUser.email
+            });
+            
+            showToast(`${data.name} marked as unpaid.`, "success");
+            renderPayments();
+        };
 
         window.exportPayments = async () => {
             showToast("Preparing export...", "info");
@@ -1695,79 +1722,79 @@
         };
 
         window.treasurerMarkPaid = async (studentId) => {
-    const snap = await getDoc(doc(db, "students", studentId));
-    const data = snap.data();
-    
-    if (data.paymentStatus === 'paid') {
-        const newType = prompt(`Current: ${data.paymentType}\n\nEnter new payment type (early-bird/regular/none):`, data.paymentType);
-        if (newType && ['early-bird', 'regular', 'none'].includes(newType)) {
-            await updateDoc(doc(db, "students", studentId), {
-                paymentType: newType,
-                paymentDate: serverTimestamp()
-            });
+            const snap = await getDoc(doc(db, "students", studentId));
+            const data = snap.data();
             
-            // Always sync to Google Sheets
-            sendPaymentToGoogleSheets({
-                studentId: studentId,
-                name: data.name,
-                year: data.year,
-                semester: data.semester || '1st',
-                paymentStatus: 'paid',
-                paymentType: newType,
-                recordedBy: currentUser.email
-            });
-            
-            showToast("Payment updated!", "success");
-            renderTreasurerPayments();
-        }
-    } else {
-        const semester = prompt("Select semester:\n1. 1st Semester\n2. 2nd Semester\n\nEnter 1 or 2:", "1");
-        const semesterValue = semester === '2' ? '2nd' : '1st';
-        
-        const paymentType = prompt("Select payment type:\n1. Early Bird (₱150)\n2. Regular (₱200)\n\nEnter 1 or 2:", "2");
-        
-        if (paymentType === '1') {
-            await updateDoc(doc(db, "students", studentId), {
-                semester: semesterValue,
-                paymentStatus: 'paid',
-                paymentType: 'early-bird',
-                paymentDate: serverTimestamp()
-            });
-            
-            sendPaymentToGoogleSheets({
-                studentId: studentId,
-                name: data.name,
-                year: data.year,
-                semester: semesterValue,
-                paymentStatus: 'paid',
-                paymentType: 'early-bird',
-                recordedBy: currentUser.email
-            });
-            
-            showToast(`${data.name} marked as Early Bird paid for ${semesterValue} semester!`, "success");
-        } else if (paymentType === '2') {
-            await updateDoc(doc(db, "students", studentId), {
-                semester: semesterValue,
-                paymentStatus: 'paid',
-                paymentType: 'regular',
-                paymentDate: serverTimestamp()
-            });
-            
-            sendPaymentToGoogleSheets({
-                studentId: studentId,
-                name: data.name,
-                year: data.year,
-                semester: semesterValue,
-                paymentStatus: 'paid',
-                paymentType: 'regular',
-                recordedBy: currentUser.email
-            });
-            
-            showToast(`${data.name} marked as Regular paid for ${semesterValue} semester!`, "success");
-        }
-        renderTreasurerPayments();
-    }
-};
+            if (data.paymentStatus === 'paid') {
+                const newType = prompt(`Current: ${data.paymentType}\n\nEnter new payment type (early-bird/regular/none):`, data.paymentType);
+                if (newType && ['early-bird', 'regular', 'none'].includes(newType)) {
+                    await updateDoc(doc(db, "students", studentId), {
+                        paymentType: newType,
+                        paymentDate: serverTimestamp()
+                    });
+                    
+                    sendPaymentToGoogleSheets({
+                        studentId: studentId,
+                        name: data.name,
+                        year: data.year,
+                        semester: data.semester || '1st',
+                        paymentStatus: 'paid',
+                        paymentType: newType,
+                        recordedBy: currentUser.email
+                    });
+                    
+                    showToast("Payment updated!", "success");
+                    renderTreasurerPayments();
+                }
+            } else {
+                const semester = prompt("Select semester:\n1. 1st Semester\n2. 2nd Semester\n\nEnter 1 or 2:", "1");
+                const semesterValue = semester === '2' ? '2nd' : '1st';
+                
+                const paymentType = prompt("Select payment type:\n1. Early Bird (₱150)\n2. Regular (₱200)\n\nEnter 1 or 2:", "2");
+                
+                if (paymentType === '1') {
+                    await updateDoc(doc(db, "students", studentId), {
+                        semester: semesterValue,
+                        paymentStatus: 'paid',
+                        paymentType: 'early-bird',
+                        paymentDate: serverTimestamp()
+                    });
+                    
+                    sendPaymentToGoogleSheets({
+                        studentId: studentId,
+                        name: data.name,
+                        year: data.year,
+                        semester: semesterValue,
+                        paymentStatus: 'paid',
+                        paymentType: 'early-bird',
+                        recordedBy: currentUser.email
+                    });
+                    
+                    showToast(`${data.name} marked as Early Bird paid for ${semesterValue} semester!`, "success");
+                } else if (paymentType === '2') {
+                    await updateDoc(doc(db, "students", studentId), {
+                        semester: semesterValue,
+                        paymentStatus: 'paid',
+                        paymentType: 'regular',
+                        paymentDate: serverTimestamp()
+                    });
+                    
+                    sendPaymentToGoogleSheets({
+                        studentId: studentId,
+                        name: data.name,
+                        year: data.year,
+                        semester: semesterValue,
+                        paymentStatus: 'paid',
+                        paymentType: 'regular',
+                        recordedBy: currentUser.email
+                    });
+                    
+                    showToast(`${data.name} marked as Regular paid for ${semesterValue} semester!`, "success");
+                }
+                renderTreasurerPayments();
+            }
+        };
+
         document.getElementById('student-register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
@@ -1964,45 +1991,6 @@
                 showToast("Failed to load payment status.", "error");
             }
         }
-
-        // TEMPORARY FIX FUNCTION - Run fixDuplicateUsers() in console, then delete this
-window.fixDuplicateUsers = async () => {
-    const usersSnap = await getDocs(collection(db, "users"));
-    let fixed = 0;
-    
-    // Build a map of email → role (from admin-assigned documents)
-    const emailRoles = {};
-    const emailNames = {};
-    usersSnap.forEach(docSnap => {
-        const data = docSnap.data();
-        if (docSnap.id.includes('@')) {
-            emailRoles[data.email] = data.role;
-            if (data.name) emailNames[data.email] = data.name;
-        }
-    });
-    
-    // Find student documents and update their role if they have an admin-assigned role
-    for (const docSnap of usersSnap.docs) {
-        const data = docSnap.data();
-        if (docSnap.id.includes('@')) continue;
-        
-        const email = data.email;
-        if (email && emailRoles[email] && emailRoles[email] !== 'student') {
-            await updateDoc(doc(db, "users", docSnap.id), { 
-                role: emailRoles[email],
-                name: emailNames[email] || data.name
-            });
-            
-            await deleteDoc(doc(db, "users", email));
-            
-            fixed++;
-            console.log(`✅ Updated ${email} to role: ${emailRoles[email]}`);
-        }
-    }
-    
-    console.log(`🎉 Fixed ${fixed} user(s)!`);
-    alert(`Fixed ${fixed} user(s)! They need to log out and log back in to see their new dashboard.`);
-};
 
         window.showToast = (message, type = 'info') => {
             const toast = document.createElement('div');
