@@ -1965,6 +1965,45 @@
             }
         }
 
+        // TEMPORARY FIX FUNCTION - Run fixDuplicateUsers() in console, then delete this
+window.fixDuplicateUsers = async () => {
+    const usersSnap = await getDocs(collection(db, "users"));
+    let fixed = 0;
+    
+    // Build a map of email → role (from admin-assigned documents)
+    const emailRoles = {};
+    const emailNames = {};
+    usersSnap.forEach(docSnap => {
+        const data = docSnap.data();
+        if (docSnap.id.includes('@')) {
+            emailRoles[data.email] = data.role;
+            if (data.name) emailNames[data.email] = data.name;
+        }
+    });
+    
+    // Find student documents and update their role if they have an admin-assigned role
+    for (const docSnap of usersSnap.docs) {
+        const data = docSnap.data();
+        if (docSnap.id.includes('@')) continue;
+        
+        const email = data.email;
+        if (email && emailRoles[email] && emailRoles[email] !== 'student') {
+            await updateDoc(doc(db, "users", docSnap.id), { 
+                role: emailRoles[email],
+                name: emailNames[email] || data.name
+            });
+            
+            await deleteDoc(doc(db, "users", email));
+            
+            fixed++;
+            console.log(`✅ Updated ${email} to role: ${emailRoles[email]}`);
+        }
+    }
+    
+    console.log(`🎉 Fixed ${fixed} user(s)!`);
+    alert(`Fixed ${fixed} user(s)! They need to log out and log back in to see their new dashboard.`);
+};
+
         window.showToast = (message, type = 'info') => {
             const toast = document.createElement('div');
             const colors = { success: 'bg-green-600', error: 'bg-red-600', warning: 'bg-yellow-600', info: 'bg-blue-600' };
