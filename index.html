@@ -114,9 +114,9 @@
             </div>
         </div>
 
-        <!-- View Switcher for Officer/Treasurer who are also Students -->
+        <!-- View Switcher -->
         <div id="view-switcher" class="hidden mb-6 no-print">
-            <div class="bg-white rounded-xl shadow p-4 flex gap-2">
+            <div class="bg-white rounded-xl shadow p-4 flex gap-2 flex-wrap">
                 <button onclick="switchMainView('student')" id="view-student-btn" class="flex-1 px-4 py-2 bg-suNavy text-white rounded-lg font-medium transition">
                     <i class="fas fa-user mr-2"></i>Student View
                 </button>
@@ -188,32 +188,30 @@
             <div id="tab-users" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow p-6">
                     <h3 class="text-lg font-bold text-suNavy mb-2">Manage Officers & Admins</h3>
-                    <p class="text-sm text-gray-600 mb-4">Note: Firebase Auth accounts must be created in the Firebase Console. This tool assigns their database role.</p>
-                    <form id="add-user-form" class="flex flex-col md:flex-row gap-4 mb-6">
-                        <input type="text" id="new-user-name" placeholder="Full Name (e.g., Juan Dela Cruz)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                        <input type="email" id="new-user-email" placeholder="User Email (Must match Firebase Auth)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                        <select id="new-user-role" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none hidden">
-    <option value="officer">Officer</option>
-    <option value="admin">Admin</option>
-    <option value="treasurer">Treasurer</option>
-</select>
-
-<!-- NEW: Multi-role checkboxes -->
-<div class="flex flex-col md:flex-row gap-4">
-    <label class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-        <input type="checkbox" id="role-officer" class="h-4 w-4 text-suNavy rounded">
-        <span class="text-sm font-medium">Officer (Scanner)</span>
-    </label>
-    <label class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-        <input type="checkbox" id="role-treasurer" class="h-4 w-4 text-suNavy rounded">
-        <span class="text-sm font-medium">Treasurer (Payments)</span>
-    </label>
-    <label class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-        <input type="checkbox" id="role-admin" class="h-4 w-4 text-suNavy rounded">
-        <span class="text-sm font-medium">Admin (Full Access)</span>
-    </label>
-</div>
-                        <button type="submit" class="bg-suNavy text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-900 transition whitespace-nowrap">Assign Role</button>
+                    <p class="text-sm text-gray-600 mb-4">Select multiple roles for a single user. The user must log out and log back in to see changes.</p>
+                    <form id="add-user-form" class="space-y-4 mb-6">
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <input type="text" id="new-user-name" placeholder="Full Name (e.g., Juan Dela Cruz)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <input type="email" id="new-user-email" placeholder="User Email (Must match Firebase Auth)" required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Roles (can choose multiple):</label>
+                            <div class="flex flex-col md:flex-row gap-3">
+                                <label class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <input type="checkbox" id="role-officer" class="h-4 w-4 text-suNavy rounded">
+                                    <span class="text-sm font-medium">Officer (Scanner)</span>
+                                </label>
+                                <label class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <input type="checkbox" id="role-treasurer" class="h-4 w-4 text-suNavy rounded">
+                                    <span class="text-sm font-medium">Treasurer (Payments)</span>
+                                </label>
+                                <label class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <input type="checkbox" id="role-admin" class="h-4 w-4 text-suNavy rounded">
+                                    <span class="text-sm font-medium">Admin (Full Access)</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="bg-suNavy text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-900 transition">Assign Roles</button>
                     </form>
                     <div class="mb-4">
                         <input type="text" id="user-search" placeholder="Search by name or email..." oninput="renderUsers()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
@@ -710,6 +708,7 @@
 
         let currentUser = null;
         let currentRole = null;
+        let currentUserRoles = [];
         let currentMainView = 'student';
         let html5QrcodeScanner = null;
         let lastScanTime = 0;
@@ -760,81 +759,58 @@
                 document.getElementById('student-dashboard').classList.add('hidden');
                 document.getElementById('treasurer-dashboard').classList.add('hidden');
                 document.getElementById('view-switcher').classList.add('hidden');
+                document.getElementById('view-officer-btn').classList.add('hidden');
+                document.getElementById('view-treasurer-btn').classList.add('hidden');
 
                 try {
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     
                     if (userDoc.exists()) {
-    const userData = userDoc.data();
-    
-    // Support both old (single role) and new (roles array) format
-    let roles = [];
-    if (userData.roles && Array.isArray(userData.roles)) {
-        roles = userData.roles;
-    } else if (userData.role) {
-        roles = [userData.role];
-    }
-    
-    currentRole = roles[0]; // Keep for backward compatibility
-    console.log("📂 User roles:", roles);
-    
-    // Display all roles in badge
-    document.getElementById('user-role-badge').innerText = roles.join(' / ');
-    
-    // Hide everything first
-    document.getElementById('admin-dashboard').classList.add('hidden');
-    document.getElementById('officer-dashboard').classList.add('hidden');
-    document.getElementById('student-dashboard').classList.add('hidden');
-    document.getElementById('treasurer-dashboard').classList.add('hidden');
-    document.getElementById('view-switcher').classList.add('hidden');
-    document.getElementById('view-officer-btn').classList.add('hidden');
-    document.getElementById('view-treasurer-btn').classList.add('hidden');
-    
-    // Admin gets full access
-    if (roles.includes('admin')) {
-        document.getElementById('admin-dashboard').classList.remove('hidden');
-        renderEvents(); renderStudents(); renderUsers();
-    } 
-    // Officers and Treasurers get view switcher
-    else if (roles.includes('officer') || roles.includes('treasurer')) {
-        document.getElementById('view-switcher').classList.remove('hidden');
-        document.getElementById('student-dashboard').classList.remove('hidden');
-        loadStudentProfile(user.uid);
-        
-        if (roles.includes('officer')) {
-            document.getElementById('view-officer-btn').classList.remove('hidden');
-        }
-        if (roles.includes('treasurer')) {
-            document.getElementById('view-treasurer-btn').classList.remove('hidden');
-        }
-    } 
-    // Regular student
-    else {
-        document.getElementById('student-dashboard').classList.remove('hidden');
-        loadStudentProfile(user.uid);
-    }
-}
+                        const userData = userDoc.data();
                         
-                        if (currentRole === 'admin') {
+                        // Support both old (single role) and new (roles array) format
+                        let roles = [];
+                        if (userData.roles && Array.isArray(userData.roles)) {
+                            roles = userData.roles;
+                        } else if (userData.role) {
+                            roles = [userData.role];
+                        }
+                        
+                        currentUserRoles = roles;
+                        currentRole = roles[0] || 'student';
+                        console.log("📂 User roles:", roles);
+                        
+                        // Display all roles in badge
+                        document.getElementById('user-role-badge').innerText = roles.join(' / ');
+                        
+                        // Admin gets full access
+                        if (roles.includes('admin')) {
                             document.getElementById('admin-dashboard').classList.remove('hidden');
                             renderEvents(); renderStudents(); renderUsers();
-                        } else if (currentRole === 'officer') {
+                        } 
+                        // Officers and Treasurers get view switcher + student view
+                        else if (roles.includes('officer') || roles.includes('treasurer')) {
                             document.getElementById('view-switcher').classList.remove('hidden');
-                            document.getElementById('view-officer-btn').classList.remove('hidden');
-                            switchMainView('student');
+                            document.getElementById('student-dashboard').classList.remove('hidden');
+                            
+                            if (roles.includes('officer')) {
+                                document.getElementById('view-officer-btn').classList.remove('hidden');
+                            }
+                            if (roles.includes('treasurer')) {
+                                document.getElementById('view-treasurer-btn').classList.remove('hidden');
+                            }
+                            
                             loadStudentProfile(user.uid);
-                        } else if (currentRole === 'treasurer') {
-                            document.getElementById('view-switcher').classList.remove('hidden');
-                            document.getElementById('view-treasurer-btn').classList.remove('hidden');
-                            switchMainView('student');
-                            loadStudentProfile(user.uid);
-                        } else if (currentRole === 'student') {
+                        } 
+                        // Regular student
+                        else {
                             document.getElementById('student-dashboard').classList.remove('hidden');
                             loadStudentProfile(user.uid);
                         }
                     } else {
                         console.log("🆕 New user detected. Showing registration form.");
                         currentRole = 'pending';
+                        currentUserRoles = [];
                         document.getElementById('user-role-badge').innerText = 'New Student';
                         document.getElementById('student-dashboard').classList.remove('hidden');
                         
@@ -874,6 +850,7 @@
                 console.log("🚪 User logged out");
                 currentUser = null;
                 currentRole = null;
+                currentUserRoles = [];
                 document.getElementById('login-view').classList.remove('hidden');
                 document.getElementById('admin-dashboard').classList.add('hidden');
                 document.getElementById('officer-dashboard').classList.add('hidden');
@@ -1259,71 +1236,79 @@
                 const displayName = data.name ? data.name : "Unnamed User";
                 const email = data.email || '';
                 if (search && !displayName.toLowerCase().includes(search) && !email.toLowerCase().includes(search)) return;
+                
+                // Support both old and new role format
+                const roles = data.roles || (data.role ? [data.role] : []);
+                const roleBadges = roles.map(r => {
+                    const color = r === 'admin' ? 'bg-suNavy text-white' : 
+                                  r === 'treasurer' ? 'bg-yellow-100 text-yellow-800' : 
+                                  'bg-blue-100 text-blue-800';
+                    return `<span class="px-2 py-1 rounded-full text-xs font-bold uppercase ${color} mr-1">${r}</span>`;
+                }).join('');
+                
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100";
-                const roleColor = data.role === 'admin' ? 'bg-suNavy text-white' : data.role === 'treasurer' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800';
                 div.innerHTML = `
                     <div>
                         <p class="font-bold text-suNavy">${displayName}</p>
                         <p class="text-sm text-gray-500">${email}</p>
                     </div>
-                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${roleColor}">
-                        ${data.role}
-                    </span>
+                    <div>${roleBadges}</div>
                 `;
                 container.appendChild(div);
             });
         };
 
         document.getElementById('add-user-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    const originalText = btn.innerHTML;
-    setButtonLoading(btn, true);
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            setButtonLoading(btn, true);
 
-    const name = document.getElementById('new-user-name').value;
-    const email = document.getElementById('new-user-email').value;
-    
-    // Collect selected roles
-    const roles = [];
-    if (document.getElementById('role-officer').checked) roles.push('officer');
-    if (document.getElementById('role-treasurer').checked) roles.push('treasurer');
-    if (document.getElementById('role-admin').checked) roles.push('admin');
-    
-    if (roles.length === 0) {
-        showToast("Please select at least one role!", "warning");
-        setButtonLoading(btn, false, originalText);
-        return;
-    }
-    
-    try {
-        const usersSnap = await getDocs(query(collection(db, "users"), where("email", "==", email)));
-        
-        if (!usersSnap.empty) {
-            const existingDoc = usersSnap.docs[0];
-            await updateDoc(existingDoc.ref, { 
-                name: name, 
-                email: email, 
-                roles: roles  // Now an array!
-            });
-            showToast(`✅ Roles updated for ${email}: ${roles.join(', ')}. They need to log out and log back in.`, "success");
-        } else {
-            await setDoc(doc(db, "users", email), { 
-                name: name, 
-                email: email, 
-                roles: roles
-            });
-            showToast(`⚠️ Roles assigned, but user must be created in Firebase Auth first.`, "warning");
-        }
-        
-        document.getElementById('add-user-form').reset();
-        renderUsers();
-    } catch (err) { 
-        showToast("Error assigning role: " + err.message, "error"); 
-    } finally { 
-        setButtonLoading(btn, false, originalText); 
-    }
-});
+            const name = document.getElementById('new-user-name').value;
+            const email = document.getElementById('new-user-email').value;
+            
+            // Collect selected roles
+            const roles = [];
+            if (document.getElementById('role-officer').checked) roles.push('officer');
+            if (document.getElementById('role-treasurer').checked) roles.push('treasurer');
+            if (document.getElementById('role-admin').checked) roles.push('admin');
+            
+            if (roles.length === 0) {
+                showToast("Please select at least one role!", "warning");
+                setButtonLoading(btn, false, originalText);
+                return;
+            }
+            
+            try {
+                const usersSnap = await getDocs(query(collection(db, "users"), where("email", "==", email)));
+                
+                if (!usersSnap.empty) {
+                    const existingDoc = usersSnap.docs[0];
+                    await updateDoc(existingDoc.ref, { 
+                        name: name, 
+                        email: email, 
+                        roles: roles
+                    });
+                    showToast(`✅ Roles updated for ${email}: ${roles.join(', ')}. They need to log out and log back in.`, "success");
+                } else {
+                    await setDoc(doc(db, "users", email), { 
+                        name: name, 
+                        email: email, 
+                        roles: roles
+                    });
+                    showToast(`⚠️ Roles assigned, but user must be created in Firebase Auth first.`, "warning");
+                }
+                
+                document.getElementById('add-user-form').reset();
+                renderUsers();
+            } catch (err) { 
+                showToast("Error assigning role: " + err.message, "error"); 
+            } finally { 
+                setButtonLoading(btn, false, originalText); 
+            }
+        });
+
         window.toggleScanner = async () => {
             const btn = document.getElementById('toggle-scanner-btn');
             if (html5QrcodeScanner) {
