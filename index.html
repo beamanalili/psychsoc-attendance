@@ -411,20 +411,28 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-3 mb-4">
-                    <select id="treasurer-filter-status" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                        <option value="all">All Status</option>
-                        <option value="paid">Paid Only</option>
-                        <option value="unpaid">Unpaid Only</option>
-                    </select>
-                    <select id="treasurer-filter-type" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-                        <option value="all">All Types</option>
-                        <option value="early-bird">Early Bird</option>
-                        <option value="regular">Regular</option>
-                    </select>
-                    <button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
-                        <i class="fas fa-download mr-2"></i>Export Payments
-                    </button>
-                </div>
+    <input type="text" id="treasurer-search" placeholder="Search by name or ID..." oninput="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none flex-grow min-w-[200px]">
+    <select id="treasurer-sort" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+        <option value="default">Sort: Default</option>
+        <option value="name-asc">Name (A-Z)</option>
+        <option value="name-desc">Name (Z-A)</option>
+        <option value="year-asc">Year (1st → 4th)</option>
+        <option value="year-desc">Year (4th → 1st)</option>
+    </select>
+    <select id="treasurer-filter-status" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+        <option value="all">All Status</option>
+        <option value="paid">Paid Only</option>
+        <option value="unpaid">Unpaid Only</option>
+    </select>
+    <select id="treasurer-filter-type" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+        <option value="all">All Types</option>
+        <option value="early-bird">Early Bird</option>
+        <option value="regular">Regular</option>
+    </select>
+    <button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+        <i class="fas fa-download mr-2"></i>Export Payments
+    </button>
+</div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -1876,61 +1884,6 @@
         };
 
         window.renderTreasurerPayments = async () => {
-            const statusFilter = document.getElementById('treasurer-filter-status').value;
-            const typeFilter = document.getElementById('treasurer-filter-type').value;
-            
-            const snap = await getDocs(collection(db, "students"));
-            const tbody = document.getElementById('treasurer-payments-body');
-            tbody.innerHTML = "";
-            
-            let total = 0, paid = 0, unpaid = 0, earlybird = 0;
-            
-            snap.forEach(docSnap => {
-                const data = docSnap.data();
-                total++;
-                
-                const status = data.paymentStatus || 'unpaid';
-                const type = data.paymentType || 'none';
-                
-                if (status === 'paid') paid++;
-                else unpaid++;
-                
-                if (type === 'early-bird') earlybird++;
-                
-                if (statusFilter !== 'all' && status !== statusFilter) return;
-                if (typeFilter !== 'all' && type !== typeFilter) return;
-                
-                const tr = document.createElement('tr');
-                tr.className = "border-b hover:bg-gray-50";
-                
-                const statusBadge = status === 'paid' 
-                    ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">Paid</span>'
-                    : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Unpaid</span>';
-                
-                const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : '-';
-                const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : '-';
-                
-                tr.innerHTML = `
-                    <td class="p-3 font-mono text-sm">${docSnap.id}</td>
-                    <td class="p-3">${data.name}</td>
-                    <td class="p-3">${data.year}</td>
-                    <td class="p-3">${statusBadge}</td>
-                    <td class="p-3">${typeDisplay}</td>
-                    <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
-                    <td class="p-3">
-                        <button onclick="treasurerMarkPaid('${docSnap.id}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
-                            ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Update'}
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            
-            document.getElementById('treasurer-total').innerText = total;
-            document.getElementById('treasurer-paid').innerText = paid;
-            document.getElementById('treasurer-unpaid').innerText = unpaid;
-            document.getElementById('treasurer-earlybird').innerText = earlybird;
-        };
 
         window.treasurerMarkPaid = async (studentId) => {
             const snap = await getDoc(doc(db, "students", studentId));
