@@ -117,7 +117,7 @@
         <!-- View Switcher -->
         <div id="view-switcher" class="hidden mb-6 no-print">
             <div class="bg-white rounded-xl shadow p-4 flex gap-2 flex-wrap">
-                <button onclick="switchMainView('student')" id="view-student-btn" class="flex-1 px-4 py-2 bg-suNavy text-white rounded-lg font-medium transition">
+                <button onclick="switchMainView('student')" id="view-student-btn" class="flex-1 px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition hidden">
                     <i class="fas fa-user mr-2"></i>Student View
                 </button>
                 <button onclick="switchMainView('officer')" id="view-officer-btn" class="flex-1 px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition hidden">
@@ -125,6 +125,9 @@
                 </button>
                 <button onclick="switchMainView('treasurer')" id="view-treasurer-btn" class="flex-1 px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition hidden">
                     <i class="fas fa-money-bill-wave mr-2"></i>Treasurer View
+                </button>
+                <button onclick="switchMainView('admin')" id="view-admin-btn" class="flex-1 px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition hidden">
+                    <i class="fas fa-cog mr-2"></i>Admin View
                 </button>
             </div>
         </div>
@@ -134,6 +137,7 @@
             <div class="flex space-x-2 mb-6 overflow-x-auto pb-2 no-print">
                 <button onclick="switchTab('events')" class="tab-btn px-4 py-2 bg-suNavy text-white rounded-lg font-medium">Events</button>
                 <button onclick="switchTab('students')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Students</button>
+                <button onclick="switchTab('manual-attendance')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Manual Attendance</button>
                 <button onclick="switchTab('users')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Manage Users</button>
                 <button onclick="switchTab('payments')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Payments</button>
                 <button onclick="switchTab('analytics')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Analytics</button>
@@ -182,6 +186,30 @@
                             <tbody id="students-table-body"></tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- NEW: Manual Attendance Tab -->
+            <div id="tab-manual-attendance" class="tab-content hidden">
+                <div class="bg-white rounded-xl shadow p-6 mb-6 max-w-2xl mx-auto">
+                    <h3 class="text-lg font-bold text-suNavy mb-2">Manually Add Attendance Record</h3>
+                    <p class="text-sm text-gray-600 mb-6">Use this to add attendance for students who were recorded manually instead of scanned.</p>
+                    <form id="manual-attendance-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
+                            <input type="text" id="manual-student-id" placeholder="e.g., 20261234" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                            <p class="text-xs text-gray-500 mt-1">The system will auto-check if the ID is valid.</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Event</label>
+                            <select id="manual-event-select" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                                <option value="">Loading events...</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-suNavy text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition">
+                            <i class="fas fa-plus mr-2"></i>Add Attendance Record
+                        </button>
+                    </form>
                 </div>
             </div>
 
@@ -582,7 +610,7 @@
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                             <p class="text-sm text-blue-800">
                                 <i class="fas fa-info-circle mr-2"></i>
-                                If you believe there's an error with your payment status, please contact the treasurer.
+                                If you believe there's an error with your payment status, please contact your year-level treasurer.
                             </p>
                         </div>
                     </div>
@@ -633,8 +661,8 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Payment Type</label>
                         <select id="form-payment-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
                             <option value="none">Not Applicable</option>
-                            <option value="early-bird">Early Bird (₱150)</option>
-                            <option value="regular">Regular (₱200)</option>
+                            <option value="early-bird">Early Bird (₱130)</option>
+                            <option value="regular">Regular (₱145)</option>
                         </select>
                     </div>
                 </div>
@@ -700,7 +728,7 @@
         };
 
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5Q1-9j4P_XhsjaXQSYm3Gata8rhoj55fbjx7b_Yi6wzXzB0OpnL79HEa6e48frpfi/exec";
-        const PAYMENT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcMinP3SJehBCnmWqYTS4VTQQzqsuAU7grZIELIUTW-ajkVzrE9f-mO4NDdjUO4mLpFg/exec";
+        const PAYMENT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjCtEEjlIWaX0hqjgFt_RQBgek6b0fFTUIho57W5Dh30PCC79GheI1URKkUCpqkuBAow/exec";
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -761,6 +789,7 @@
                 document.getElementById('view-switcher').classList.add('hidden');
                 document.getElementById('view-officer-btn').classList.add('hidden');
                 document.getElementById('view-treasurer-btn').classList.add('hidden');
+                document.getElementById('view-admin-btn').classList.add('hidden');
 
                 try {
                     const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -768,7 +797,6 @@
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
                         
-                        // Support both old (single role) and new (roles array) format
                         let roles = [];
                         if (userData.roles && Array.isArray(userData.roles)) {
                             roles = userData.roles;
@@ -780,15 +808,26 @@
                         currentRole = roles[0] || 'student';
                         console.log("📂 User roles:", roles);
                         
-                        // Display all roles in badge
                         document.getElementById('user-role-badge').innerText = roles.join(' / ');
                         
-                        // Admin gets full access
                         if (roles.includes('admin')) {
+                            document.getElementById('view-switcher').classList.remove('hidden');
+                            document.getElementById('view-admin-btn').classList.remove('hidden');
                             document.getElementById('admin-dashboard').classList.remove('hidden');
+                            
+                            if (userData.studentId) {
+                                document.getElementById('view-student-btn').classList.remove('hidden');
+                                document.getElementById('student-dashboard').classList.remove('hidden');
+                                loadStudentProfile(user.uid);
+                                switchMainView('admin');
+                            } else {
+                                document.getElementById('view-admin-btn').classList.add('bg-suNavy', 'text-white');
+                                document.getElementById('view-admin-btn').classList.remove('bg-white', 'text-gray-700');
+                            }
+                            
                             renderEvents(); renderStudents(); renderUsers();
+                            loadManualAttendanceEvents(); // Load events for manual attendance tab
                         } 
-                        // Officers and Treasurers get view switcher + student view
                         else if (roles.includes('officer') || roles.includes('treasurer')) {
                             document.getElementById('view-switcher').classList.remove('hidden');
                             document.getElementById('student-dashboard').classList.remove('hidden');
@@ -802,7 +841,6 @@
                             
                             loadStudentProfile(user.uid);
                         } 
-                        // Regular student
                         else {
                             document.getElementById('student-dashboard').classList.remove('hidden');
                             loadStudentProfile(user.uid);
@@ -868,6 +906,7 @@
             document.getElementById('student-dashboard').classList.add('hidden');
             document.getElementById('officer-dashboard').classList.add('hidden');
             document.getElementById('treasurer-dashboard').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
             
             document.getElementById('view-student-btn').classList.remove('bg-suNavy', 'text-white');
             document.getElementById('view-student-btn').classList.add('bg-white', 'text-gray-700');
@@ -875,6 +914,8 @@
             document.getElementById('view-officer-btn').classList.add('bg-white', 'text-gray-700');
             document.getElementById('view-treasurer-btn').classList.remove('bg-suNavy', 'text-white');
             document.getElementById('view-treasurer-btn').classList.add('bg-white', 'text-gray-700');
+            document.getElementById('view-admin-btn').classList.remove('bg-suNavy', 'text-white');
+            document.getElementById('view-admin-btn').classList.add('bg-white', 'text-gray-700');
             
             if (view === 'student') {
                 document.getElementById('student-dashboard').classList.remove('hidden');
@@ -889,6 +930,10 @@
                 document.getElementById('view-treasurer-btn').classList.add('bg-suNavy', 'text-white');
                 document.getElementById('view-treasurer-btn').classList.remove('bg-white', 'text-gray-700');
                 renderTreasurerPayments();
+            } else if (view === 'admin') {
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                document.getElementById('view-admin-btn').classList.add('bg-suNavy', 'text-white');
+                document.getElementById('view-admin-btn').classList.remove('bg-white', 'text-gray-700');
             }
         };
 
@@ -965,6 +1010,7 @@
             if (tab === 'analytics') loadAnalytics();
             if (tab === 'export') updateExportUI();
             if (tab === 'payments') renderPayments();
+            if (tab === 'manual-attendance') loadManualAttendanceEvents();
         };
 
         window.switchOfficerTab = (tab) => {
@@ -1102,15 +1148,42 @@
                     <td class="p-3">${data.year}</td>
                     <td class="p-3"><span class="px-2 py-1 text-xs rounded-full ${data.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${data.active ? 'Active' : 'Inactive'}</span></td>
                     <td class="p-3 flex gap-2">
-                        <button onclick="showQR('${docSnap.id}', '${data.name}')" class="text-suNavy hover:text-blue-800"><i class="fas fa-qrcode"></i></button>
-                        <button onclick="editStudent('${docSnap.id}')" class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
-                        <button onclick="toggleStudentActive('${docSnap.id}', ${!data.active})" class="text-${data.active ? 'red' : 'green'}-600 hover:text-${data.active ? 'red' : 'green'}-800">
-                            <i class="fas fa-${data.active ? 'ban' : 'check'}"></i>
-                        </button>
+                        <button onclick="showQR('${docSnap.id}', '${data.name}')" class="text-suNavy hover:text-blue-800" title="Show QR"><i class="fas fa-qrcode"></i></button>
+                        <button onclick="editStudent('${docSnap.id}')" class="text-blue-600 hover:text-blue-800" title="Edit Info"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteStudentAccount('${docSnap.id}')" class="text-red-600 hover:text-red-800" title="Delete Account (allows re-registration)"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+        };
+
+        // NEW: Delete Student Account Function
+        window.deleteStudentAccount = async (studentId) => {
+            if (!confirm(`Are you sure you want to delete the account for student ID ${studentId}?\n\nThis will remove their profile from the database. The next time they log in, they will be prompted to create a new profile.`)) return;
+            
+            try {
+                const studentDoc = await getDoc(doc(db, "students", studentId));
+                const authUid = studentDoc.exists() ? studentDoc.data().authUid : null;
+                
+                // Delete student document
+                await deleteDoc(doc(db, "students", studentId));
+                
+                // Delete user document
+                if (authUid) {
+                    await deleteDoc(doc(db, "users", authUid));
+                } else {
+                    const userSnap = await getDocs(query(collection(db, "users"), where("studentId", "==", studentId)));
+                    userSnap.forEach(async (d) => {
+                        await deleteDoc(d.ref);
+                    });
+                }
+                
+                showToast("Student account deleted. They can now register again.", "success");
+                renderStudents();
+            } catch (err) {
+                console.error(err);
+                showToast("Error deleting account: " + err.message, "error");
+            }
         };
 
         document.getElementById('student-search').addEventListener('input', renderStudents);
@@ -1237,7 +1310,6 @@
                 const email = data.email || '';
                 if (search && !displayName.toLowerCase().includes(search) && !email.toLowerCase().includes(search)) return;
                 
-                // Support both old and new role format
                 const roles = data.roles || (data.role ? [data.role] : []);
                 const roleBadges = roles.map(r => {
                     const color = r === 'admin' ? 'bg-suNavy text-white' : 
@@ -1268,7 +1340,6 @@
             const name = document.getElementById('new-user-name').value;
             const email = document.getElementById('new-user-email').value;
             
-            // Collect selected roles
             const roles = [];
             if (document.getElementById('role-officer').checked) roles.push('officer');
             if (document.getElementById('role-treasurer').checked) roles.push('treasurer');
@@ -1306,6 +1377,89 @@
                 showToast("Error assigning role: " + err.message, "error"); 
             } finally { 
                 setButtonLoading(btn, false, originalText); 
+            }
+        });
+
+        // NEW: Manual Attendance Functions
+        async function loadManualAttendanceEvents() {
+            const select = document.getElementById('manual-event-select');
+            if (!select) return;
+            select.innerHTML = '<option value="">Loading events...</option>';
+            try {
+                const snap = await getDocs(query(collection(db, "events"), orderBy("createdAt", "desc")));
+                select.innerHTML = '<option value="">Select an event...</option>';
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const option = document.createElement('option');
+                    option.value = docSnap.id;
+                    option.text = data.name + (data.active ? " 🟢 (Active)" : "");
+                    option.dataset.name = data.name;
+                    select.appendChild(option);
+                });
+            } catch (err) {
+                console.error("Error loading events:", err);
+            }
+        }
+
+        document.getElementById('manual-student-id').addEventListener('blur', async (e) => {
+            const studentId = e.target.value.trim();
+            if (!studentId) return;
+            const snap = await getDoc(doc(db, "students", studentId));
+            if (snap.exists()) {
+                e.target.classList.add('border-green-500');
+                e.target.classList.remove('border-red-500');
+            } else {
+                e.target.classList.add('border-red-500');
+                e.target.classList.remove('border-green-500');
+            }
+        });
+
+        document.getElementById('manual-attendance-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            setButtonLoading(btn, true);
+
+            const studentId = document.getElementById('manual-student-id').value.trim();
+            const eventId = document.getElementById('manual-event-select').value;
+            const eventName = document.getElementById('manual-event-select').options[document.getElementById('manual-event-select').selectedIndex].dataset.name;
+
+            try {
+                const studentSnap = await getDoc(doc(db, "students", studentId));
+                if (!studentSnap.exists()) {
+                    showToast("Student ID not found!", "error");
+                    setButtonLoading(btn, false, originalText);
+                    return;
+                }
+                
+                const sData = studentSnap.data();
+                
+                const attSnap = await getDocs(query(collection(db, "attendance"), where("eventId", "==", eventId), where("studentId", "==", studentId)));
+                if (!attSnap.empty) {
+                    showToast("⚠ Student is already marked as present for this event!", "warning");
+                    setButtonLoading(btn, false, originalText);
+                    return;
+                }
+
+                const newAttRef = doc(collection(db, "attendance"));
+                await setDoc(newAttRef, {
+                    eventId,
+                    eventName,
+                    studentId,
+                    studentName: sData.name,
+                    studentYear: sData.year,
+                    timestamp: serverTimestamp(),
+                    scannedBy: currentUser.uid + " (Manual)"
+                });
+
+                showToast(`✔ ${sData.name} manually checked in!`, "success");
+                document.getElementById('manual-attendance-form').reset();
+                document.getElementById('manual-student-id').classList.remove('border-green-500', 'border-red-500');
+            } catch (err) {
+                console.error(err);
+                showToast("Error adding attendance: " + err.message, "error");
+            } finally {
+                setButtonLoading(btn, false, originalText);
             }
         });
 
@@ -1704,7 +1858,7 @@
                     "Year": student.year,
                     "Payment Status": student.paymentStatus || 'unpaid',
                     "Payment Type": student.paymentType || 'none',
-                    "Amount": student.paymentType === 'early-bird' ? 150 : student.paymentType === 'regular' ? 200 : 0,
+                    "Amount": student.paymentType === 'early-bird' ? 130 : student.paymentType === 'regular' ? 145 : 0,
                     "Date Paid": student.paymentDate ? new Date(student.paymentDate.seconds * 1000).toLocaleDateString() : ''
                 });
             });
@@ -1807,7 +1961,7 @@
                 const semester = prompt("Select semester:\n1. 1st Semester\n2. 2nd Semester\n\nEnter 1 or 2:", "1");
                 const semesterValue = semester === '2' ? '2nd' : '1st';
                 
-                const paymentType = prompt("Select payment type:\n1. Early Bird (₱150)\n2. Regular (₱200)\n\nEnter 1 or 2:", "2");
+                const paymentType = prompt("Select payment type:\n1. Early Bird (₱130)\n2. Regular (₱145)\n\nEnter 1 or 2:", "2");
                 
                 if (paymentType === '1') {
                     await updateDoc(doc(db, "students", studentId), {
@@ -1968,7 +2122,7 @@
             tbody.innerHTML = '';
 
             try {
-                const q = query(collection(db, "attendance"), where("studentId", "==", studentId), orderBy("timestamp", "desc"));
+                const q = query(collection(db, "attendance"), where("studentId", "==", studentId));
                 const snap = await getDocs(q);
                 
                 loadingEl.classList.add('hidden');
@@ -1977,7 +2131,14 @@
                     emptyEl.classList.remove('hidden');
                 } else {
                     tableEl.classList.remove('hidden');
-                    snap.forEach(docSnap => {
+                    
+                    const sortedDocs = snap.docs.sort((a, b) => {
+                        const timeA = a.data().timestamp?.seconds || 0;
+                        const timeB = b.data().timestamp?.seconds || 0;
+                        return timeB - timeA;
+                    });
+                    
+                    sortedDocs.forEach(docSnap => {
                         const data = docSnap.data();
                         const date = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : 'Just now';
                         const eventName = data.eventName || "Unknown Event";
@@ -2032,7 +2193,7 @@
                     }
                     
                     const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : 'Not Applicable';
-                    const amount = type === 'early-bird' ? '₱150' : type === 'regular' ? '₱200' : '₱0';
+                    const amount = type === 'early-bird' ? '₱130' : type === 'regular' ? '₱145' : '₱0';
                     const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : 'Not yet paid';
                     
                     document.getElementById('payment-type-display').innerText = typeDisplay;
