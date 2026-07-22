@@ -189,7 +189,6 @@
                 </div>
             </div>
 
-            <!-- NEW: Manual Attendance Tab -->
             <div id="tab-manual-attendance" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow p-6 mb-6 max-w-2xl mx-auto">
                     <h3 class="text-lg font-bold text-suNavy mb-2">Manually Add Attendance Record</h3>
@@ -411,28 +410,28 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-3 mb-4">
-    <input type="text" id="treasurer-search" placeholder="Search by name or ID..." oninput="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none flex-grow min-w-[200px]">
-    <select id="treasurer-sort" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-        <option value="default">Sort: Default</option>
-        <option value="name-asc">Name (A-Z)</option>
-        <option value="name-desc">Name (Z-A)</option>
-        <option value="year-asc">Year (1st → 4th)</option>
-        <option value="year-desc">Year (4th → 1st)</option>
-    </select>
-    <select id="treasurer-filter-status" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-        <option value="all">All Status</option>
-        <option value="paid">Paid Only</option>
-        <option value="unpaid">Unpaid Only</option>
-    </select>
-    <select id="treasurer-filter-type" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-        <option value="all">All Types</option>
-        <option value="early-bird">Early Bird</option>
-        <option value="regular">Regular</option>
-    </select>
-    <button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
-        <i class="fas fa-download mr-2"></i>Export Payments
-    </button>
-</div>
+                    <input type="text" id="treasurer-search" placeholder="Search by name or ID..." oninput="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none flex-grow min-w-[200px]">
+                    <select id="treasurer-sort" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <option value="default">Sort: Default</option>
+                        <option value="name-asc">Name (A-Z)</option>
+                        <option value="name-desc">Name (Z-A)</option>
+                        <option value="year-asc">Year (1st → 4th)</option>
+                        <option value="year-desc">Year (4th → 1st)</option>
+                    </select>
+                    <select id="treasurer-filter-status" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <option value="all">All Status</option>
+                        <option value="paid">Paid Only</option>
+                        <option value="unpaid">Unpaid Only</option>
+                    </select>
+                    <select id="treasurer-filter-type" onchange="renderTreasurerPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+                        <option value="all">All Types</option>
+                        <option value="early-bird">Early Bird</option>
+                        <option value="regular">Regular</option>
+                    </select>
+                    <button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+                        <i class="fas fa-download mr-2"></i>Export Payments
+                    </button>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -818,6 +817,8 @@
                         
                         document.getElementById('user-role-badge').innerText = roles.join(' / ');
                         
+                        const isSpecialRole = roles.includes('admin') || roles.includes('officer') || roles.includes('treasurer');
+
                         if (roles.includes('admin')) {
                             document.getElementById('view-switcher').classList.remove('hidden');
                             document.getElementById('view-admin-btn').classList.remove('hidden');
@@ -826,7 +827,7 @@
                             if (userData.studentId) {
                                 document.getElementById('view-student-btn').classList.remove('hidden');
                                 document.getElementById('student-dashboard').classList.remove('hidden');
-                                loadStudentProfile(user.uid);
+                                loadStudentProfile(user.uid, isSpecialRole);
                                 switchMainView('admin');
                             } else {
                                 document.getElementById('view-admin-btn').classList.add('bg-suNavy', 'text-white');
@@ -834,7 +835,7 @@
                             }
                             
                             renderEvents(); renderStudents(); renderUsers();
-                            loadManualAttendanceEvents(); // Load events for manual attendance tab
+                            loadManualAttendanceEvents();
                         } 
                         else if (roles.includes('officer') || roles.includes('treasurer')) {
                             document.getElementById('view-switcher').classList.remove('hidden');
@@ -847,11 +848,11 @@
                                 document.getElementById('view-treasurer-btn').classList.remove('hidden');
                             }
                             
-                            loadStudentProfile(user.uid);
+                            loadStudentProfile(user.uid, isSpecialRole);
                         } 
                         else {
                             document.getElementById('student-dashboard').classList.remove('hidden');
-                            loadStudentProfile(user.uid);
+                            loadStudentProfile(user.uid, false);
                         }
                     } else {
                         console.log("🆕 New user detected. Showing registration form.");
@@ -1165,7 +1166,6 @@
             });
         };
 
-        // NEW: Delete Student Account Function
         window.deleteStudentAccount = async (studentId) => {
             if (!confirm(`Are you sure you want to delete the account for student ID ${studentId}?\n\nThis will remove their profile from the database. The next time they log in, they will be prompted to create a new profile.`)) return;
             
@@ -1173,10 +1173,8 @@
                 const studentDoc = await getDoc(doc(db, "students", studentId));
                 const authUid = studentDoc.exists() ? studentDoc.data().authUid : null;
                 
-                // Delete student document
                 await deleteDoc(doc(db, "students", studentId));
                 
-                // Delete user document
                 if (authUid) {
                     await deleteDoc(doc(db, "users", authUid));
                 } else {
@@ -1388,7 +1386,6 @@
             }
         });
 
-        // NEW: Manual Attendance Functions
         async function loadManualAttendanceEvents() {
             const select = document.getElementById('manual-event-select');
             if (!select) return;
@@ -1883,7 +1880,86 @@
             showToast("Payment data exported!", "success");
         };
 
+        // FIXED: Complete renderTreasurerPayments function
         window.renderTreasurerPayments = async () => {
+            const search = document.getElementById('treasurer-search') ? document.getElementById('treasurer-search').value.toLowerCase() : '';
+            const sortBy = document.getElementById('treasurer-sort') ? document.getElementById('treasurer-sort').value : 'default';
+            const statusFilter = document.getElementById('treasurer-filter-status').value;
+            const typeFilter = document.getElementById('treasurer-filter-type').value;
+            
+            const snap = await getDocs(collection(db, "students"));
+            const tbody = document.getElementById('treasurer-payments-body');
+            tbody.innerHTML = "";
+            
+            let studentsList = [];
+            let total = 0, paid = 0, unpaid = 0, earlybird = 0;
+            
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                total++;
+                
+                const status = data.paymentStatus || 'unpaid';
+                const type = data.paymentType || 'none';
+                
+                if (status === 'paid') paid++;
+                else unpaid++;
+                
+                if (type === 'early-bird') earlybird++;
+                
+                if (search && !data.name.toLowerCase().includes(search) && !docSnap.id.toLowerCase().includes(search)) return;
+                if (statusFilter !== 'all' && status !== statusFilter) return;
+                if (typeFilter !== 'all' && type !== typeFilter) return;
+                
+                studentsList.push({ id: docSnap.id, data: data });
+            });
+            
+            if (sortBy === 'name-asc') {
+                studentsList.sort((a, b) => a.data.name.localeCompare(b.data.name));
+            } else if (sortBy === 'name-desc') {
+                studentsList.sort((a, b) => b.data.name.localeCompare(a.data.name));
+            } else if (sortBy === 'year-asc') {
+                studentsList.sort((a, b) => a.data.year - b.data.year || a.data.name.localeCompare(b.data.name));
+            } else if (sortBy === 'year-desc') {
+                studentsList.sort((a, b) => b.data.year - a.data.year || a.data.name.localeCompare(b.data.name));
+            }
+            
+            studentsList.forEach(item => {
+                const docSnapId = item.id;
+                const data = item.data;
+                const status = data.paymentStatus || 'unpaid';
+                const type = data.paymentType || 'none';
+                
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-gray-50";
+                
+                const statusBadge = status === 'paid' 
+                    ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">Paid</span>'
+                    : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 font-semibold">Unpaid</span>';
+                
+                const typeDisplay = type === 'early-bird' ? 'Early Bird' : type === 'regular' ? 'Regular' : '-';
+                const dateDisplay = data.paymentDate ? new Date(data.paymentDate.seconds * 1000).toLocaleDateString() : '-';
+                
+                tr.innerHTML = `
+                    <td class="p-3 font-mono text-sm">${docSnapId}</td>
+                    <td class="p-3">${data.name}</td>
+                    <td class="p-3">${data.year}</td>
+                    <td class="p-3">${statusBadge}</td>
+                    <td class="p-3">${typeDisplay}</td>
+                    <td class="p-3 text-sm text-gray-600">${dateDisplay}</td>
+                    <td class="p-3">
+                        <button onclick="treasurerMarkPaid('${docSnapId}')" class="text-green-600 hover:text-green-800 text-sm font-semibold">
+                            ${status === 'unpaid' ? '<i class="fas fa-check-circle mr-1"></i>Mark Paid' : '<i class="fas fa-edit mr-1"></i>Update'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('treasurer-total').innerText = total;
+            document.getElementById('treasurer-paid').innerText = paid;
+            document.getElementById('treasurer-unpaid').innerText = unpaid;
+            document.getElementById('treasurer-earlybird').innerText = earlybird;
+        };
 
         window.treasurerMarkPaid = async (studentId) => {
             const snap = await getDoc(doc(db, "students", studentId));
@@ -2005,7 +2081,8 @@
             }
         });
 
-        async function loadStudentProfile(uid) {
+        // FIXED: loadStudentProfile now correctly hides registration form for special roles
+        async function loadStudentProfile(uid, isSpecialRole = false) {
             const userDoc = await getDoc(doc(db, "users", uid));
             
             if (userDoc.exists()) {
@@ -2017,15 +2094,22 @@
                     
                     if (studentDoc.exists()) {
                         const data = studentDoc.data();
-                        
                         document.getElementById('student-registration-form').classList.add('hidden');
                         document.getElementById('student-id-card-view').classList.remove('hidden');
-                        
                         renderIDCard(studentId, data.name, data.year);
-                        
                         switchStudentTab('id');
+                        return;
                     }
                 }
+            }
+            
+            // If no student profile found:
+            if (isSpecialRole) {
+                document.getElementById('student-registration-form').classList.add('hidden');
+                document.getElementById('student-id-card-view').classList.add('hidden');
+            } else {
+                document.getElementById('student-registration-form').classList.remove('hidden');
+                document.getElementById('student-id-card-view').classList.add('hidden');
             }
         }
 
