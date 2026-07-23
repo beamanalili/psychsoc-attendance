@@ -1793,36 +1793,43 @@
         };
 
         window.quickMarkPaid = async (studentId) => {
-            const snap = await getDoc(doc(db, "students", studentId));
-            const data = snap.data();
+    try {
+        const snap = await getDoc(doc(db, "students", studentId));
+        const data = snap.data();
+        
+        if (data.paymentStatus === 'paid') {
+            editStudent(studentId);
+        } else {
+            const semester = prompt("Select semester:\n1. 1st Semester\n2. 2nd Semester\n\nEnter 1 or 2:", "1");
+            if (semester === null) return; // User cancelled
             
-            if (data.paymentStatus === 'paid') {
-                editStudent(studentId);
-            } else {
-                const semester = prompt("Select semester:\n1. 1st Semester\n2. 2nd Semester\n\nEnter 1 or 2:", "1");
-                const semesterValue = semester === '2' ? '2nd' : '1st';
-                
-                await updateDoc(doc(db, "students", studentId), {
-                    semester: semesterValue,
-                    paymentStatus: 'paid',
-                    paymentType: 'regular',
-                    paymentDate: serverTimestamp()
-                });
-                
-                sendPaymentToGoogleSheets({
-                    studentId: studentId,
-                    name: data.name,
-                    year: data.year,
-                    semester: semesterValue,
-                    paymentStatus: 'paid',
-                    paymentType: 'regular',
-                    recordedBy: currentUser.email
-                });
-                
-                showToast(`${data.name} marked as paid for ${semesterValue} semester!`, "success");
-                renderPayments();
-            }
-        };
+            const semesterValue = semester.trim() === '2' ? '2nd' : '1st';
+            
+            await updateDoc(doc(db, "students", studentId), {
+                semester: semesterValue,
+                paymentStatus: 'paid',
+                paymentType: 'regular',
+                paymentDate: serverTimestamp()
+            });
+            
+            sendPaymentToGoogleSheets({
+                studentId: studentId,
+                name: data.name,
+                year: data.year,
+                semester: semesterValue,
+                paymentStatus: 'paid',
+                paymentType: 'regular',
+                recordedBy: currentUser.email
+            });
+            
+            showToast(`${data.name} marked as paid for ${semesterValue} semester!`, "success");
+            renderPayments();
+        }
+    } catch (err) {
+        console.error("Error marking paid:", err);
+        showToast("Failed to update payment: " + err.message, "error");
+    }
+};
 
         window.markAsUnpaid = async (studentId) => {
             if (!confirm("Are you sure you want to mark this student as unpaid?")) return;
@@ -1962,78 +1969,79 @@
         };
 
         window.treasurerMarkPaid = async (studentId) => {
-            const snap = await getDoc(doc(db, "students", studentId));
-            const data = snap.data();
+    try {
+        const snap = await getDoc(doc(db, "students", studentId));
+        if (!snap.exists()) {
+            showToast("Student not found!", "error");
+            return;
+        }
+        const data = snap.data();
+        
+        if (data.paymentStatus === 'paid') {
+            const newType = prompt(`Current Type: ${data.paymentType}\n\nEnter new payment type:\n- early-bird\n- regular\n- none`, data.paymentType || 'regular');
             
-            if (data.paymentStatus === 'paid') {
-                const newType = prompt(`Current: ${data.paymentType}\n\nEnter new payment type (early-bird/regular/none):`, data.paymentType);
-                if (newType && ['early-bird', 'regular', 'none'].includes(newType)) {
-                    await updateDoc(doc(db, "students", studentId), {
-                        paymentType: newType,
-                        paymentDate: serverTimestamp()
-                    });
-                    
-                    sendPaymentToGoogleSheets({
-                        studentId: studentId,
-                        name: data.name,
-                        year: data.year,
-                        semester: data.semester || '1st',
-                        paymentStatus: 'paid',
-                        paymentType: newType,
-                        recordedBy: currentUser.email
-                    });
-                    
-                    showToast("Payment updated!", "success");
-                    renderTreasurerPayments();
-                }
-            } else {
-                const semester = prompt("Select semester:\n1. 1st Semester\n2. 2nd Semester\n\nEnter 1 or 2:", "1");
-                const semesterValue = semester === '2' ? '2nd' : '1st';
+            if (newType === null) return; // User cancelled
+            
+            const cleanType = newType.toLowerCase().trim();
+            if (['early-bird', 'regular', 'none'].includes(cleanType)) {
+                await updateDoc(doc(db, "students", studentId), {
+                    paymentType: cleanType,
+                    paymentDate: serverTimestamp()
+                });
                 
-                const paymentType = prompt("Select payment type:\n1. Early Bird (₱130)\n2. Regular (₱145)\n\nEnter 1 or 2:", "2");
+                sendPaymentToGoogleSheets({
+                    studentId: studentId,
+                    name: data.name,
+                    year: data.year,
+                    semester: data.semester || '1st',
+                    paymentStatus: 'paid',
+                    paymentType: cleanType,
+                    recordedBy: currentUser.email
+                });
                 
-                if (paymentType === '1') {
-                    await updateDoc(doc(db, "students", studentId), {
-                        semester: semesterValue,
-                        paymentStatus: 'paid',
-                        paymentType: 'early-bird',
-                        paymentDate: serverTimestamp()
-                    });
-                    
-                    sendPaymentToGoogleSheets({
-                        studentId: studentId,
-                        name: data.name,
-                        year: data.year,
-                        semester: semesterValue,
-                        paymentStatus: 'paid',
-                        paymentType: 'early-bird',
-                        recordedBy: currentUser.email
-                    });
-                    
-                    showToast(`${data.name} marked as Early Bird paid for ${semesterValue} semester!`, "success");
-                } else if (paymentType === '2') {
-                    await updateDoc(doc(db, "students", studentId), {
-                        semester: semesterValue,
-                        paymentStatus: 'paid',
-                        paymentType: 'regular',
-                        paymentDate: serverTimestamp()
-                    });
-                    
-                    sendPaymentToGoogleSheets({
-                        studentId: studentId,
-                        name: data.name,
-                        year: data.year,
-                        semester: semesterValue,
-                        paymentStatus: 'paid',
-                        paymentType: 'regular',
-                        recordedBy: currentUser.email
-                    });
-                    
-                    showToast(`${data.name} marked as Regular paid for ${semesterValue} semester!`, "success");
-                }
+                showToast("Payment type updated!", "success");
                 renderTreasurerPayments();
+            } else {
+                showToast("Invalid type. Use 'early-bird', 'regular', or 'none'.", "error");
             }
-        };
+        } else {
+            // Unpaid -> Paid
+            const semesterInput = prompt("Select semester:\n1 for 1st Semester\n2 for 2nd Semester", "1");
+            if (semesterInput === null) return; // User cancelled
+            
+            const semesterValue = semesterInput.trim() === '2' ? '2nd' : '1st';
+            
+            const typeInput = prompt("Select payment type:\n1 for Early Bird (₱130)\n2 for Regular (₱145)", "2");
+            if (typeInput === null) return; // User cancelled
+            
+            const paymentType = typeInput.trim() === '1' ? 'early-bird' : 'regular';
+            
+            await updateDoc(doc(db, "students", studentId), {
+                semester: semesterValue,
+                paymentStatus: 'paid',
+                paymentType: paymentType,
+                paymentDate: serverTimestamp()
+            });
+            
+            sendPaymentToGoogleSheets({
+                studentId: studentId,
+                name: data.name,
+                year: data.year,
+                semester: semesterValue,
+                paymentStatus: 'paid',
+                paymentType: paymentType,
+                recordedBy: currentUser.email
+            });
+            
+            const typeDisplay = paymentType === 'early-bird' ? 'Early Bird' : 'Regular';
+            showToast(`${data.name} marked as ${typeDisplay} paid for ${semesterValue} semester!`, "success");
+            renderTreasurerPayments();
+        }
+    } catch (err) {
+        console.error("Error updating payment:", err);
+        showToast("Failed to update payment: " + err.message, "error");
+    }
+};
 
         document.getElementById('student-register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
