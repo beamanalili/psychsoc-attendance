@@ -1978,34 +1978,78 @@
         const data = snap.data();
         
         if (data.paymentStatus === 'paid') {
-            const newType = prompt(`Current Type: ${data.paymentType}\n\nEnter new payment type:\n- early-bird\n- regular\n- none`, data.paymentType || 'regular');
+            // Give the treasurer a choice: update type OR revert to unpaid
+            const action = prompt(
+                `Student is currently PAID (${data.paymentType}).\n\n` +
+                `Choose an action:\n` +
+                `1. Change Payment Type (early-bird / regular / none)\n` +
+                `2. Mark as UNPAID (Revert mistake)\n\n` +
+                `Enter 1 or 2:`, "1"
+            );
             
-            if (newType === null) return; // User cancelled
+            if (action === null) return; // User cancelled
             
-            const cleanType = newType.toLowerCase().trim();
-            if (['early-bird', 'regular', 'none'].includes(cleanType)) {
+            const cleanAction = action.trim();
+            
+            if (cleanAction === '2') {
+                // REVERT TO UNPAID
                 await updateDoc(doc(db, "students", studentId), {
-                    paymentType: cleanType,
-                    paymentDate: serverTimestamp()
+                    paymentStatus: 'unpaid',
+                    paymentType: 'none',
+                    paymentDate: null
                 });
                 
+                // Sync the reversal to Google Sheets
                 sendPaymentToGoogleSheets({
                     studentId: studentId,
                     name: data.name,
                     year: data.year,
                     semester: data.semester || '1st',
-                    paymentStatus: 'paid',
-                    paymentType: cleanType,
+                    paymentStatus: 'unpaid',
+                    paymentType: 'none',
                     recordedBy: currentUser.email
                 });
                 
-                showToast("Payment type updated!", "success");
+                showToast(`${data.name} marked as UNPAID.`, "success");
                 renderTreasurerPayments();
+                
+            } else if (cleanAction === '1') {
+                // CHANGE PAYMENT TYPE
+                const newType = prompt(
+                    `Enter new payment type:\n- early-bird\n- regular\n- none`, 
+                    data.paymentType || 'regular'
+                );
+                
+                if (newType === null) return; // User cancelled
+                
+                const cleanType = newType.toLowerCase().trim();
+                if (['early-bird', 'regular', 'none'].includes(cleanType)) {
+                    await updateDoc(doc(db, "students", studentId), {
+                        paymentType: cleanType,
+                        paymentDate: serverTimestamp()
+                    });
+                    
+                    sendPaymentToGoogleSheets({
+                        studentId: studentId,
+                        name: data.name,
+                        year: data.year,
+                        semester: data.semester || '1st',
+                        paymentStatus: 'paid',
+                        paymentType: cleanType,
+                        recordedBy: currentUser.email
+                    });
+                    
+                    showToast("Payment type updated!", "success");
+                    renderTreasurerPayments();
+                } else {
+                    showToast("Invalid type. Use 'early-bird', 'regular', or 'none'.", "error");
+                }
             } else {
-                showToast("Invalid type. Use 'early-bird', 'regular', or 'none'.", "error");
+                showToast("Invalid choice. Please enter 1 or 2.", "error");
             }
+            
         } else {
-            // Unpaid -> Paid
+            // UNPAID -> PAID (Original logic)
             const semesterInput = prompt("Select semester:\n1 for 1st Semester\n2 for 2nd Semester", "1");
             if (semesterInput === null) return; // User cancelled
             
