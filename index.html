@@ -431,19 +431,20 @@ Already have an account?
 </div>
 </div>
 <div class="flex flex-wrap gap-3 mb-4">
-<select id="payment-filter-status" onchange="renderPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-<option value="all">All Status</option>
-<option value="paid">Paid Only</option>
-<option value="unpaid">Unpaid Only</option>
-</select>
-<select id="payment-filter-type" onchange="renderPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
-<option value="all">All Types</option>
-<option value="early-bird">Early Bird</option>
-<option value="regular">Regular</option>
-</select>
-<button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
-<i class="fas fa-download mr-2"></i>Export Payments
-</button>
+    <input type="text" id="payment-search" placeholder="Search by name or ID..." oninput="renderPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none flex-grow min-w-[200px]">
+    <select id="payment-filter-status" onchange="renderPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+        <option value="all">All Status</option>
+        <option value="paid">Paid Only</option>
+        <option value="unpaid">Unpaid Only</option>
+    </select>
+    <select id="payment-filter-type" onchange="renderPayments()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
+        <option value="all">All Types</option>
+        <option value="early-bird">Early Bird</option>
+        <option value="regular">Regular</option>
+    </select>
+    <button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+        <i class="fas fa-download mr-2"></i>Export Payments
+    </button>
 </div>
 <div class="overflow-x-auto">
 <table class="w-full text-left border-collapse">
@@ -2428,6 +2429,7 @@ window.exportData = async (scope, format) => {
 };
 
 window.renderPayments = async () => {
+    const search = document.getElementById('payment-search') ? document.getElementById('payment-search').value.toLowerCase() : '';
     const statusFilter = document.getElementById('payment-filter-status').value;
     const typeFilter = document.getElementById('payment-filter-type').value;
     
@@ -2449,7 +2451,16 @@ window.renderPayments = async () => {
         
         if (type === 'early-bird') earlybird++;
         
+        // Apply search filter
+        if (search) {
+            const searchStr = `${data.name} ${docSnap.id}`.toLowerCase();
+            if (!searchStr.includes(search)) return;
+        }
+        
+        // Apply status filter
         if (statusFilter !== 'all' && status !== statusFilter) return;
+        
+        // Apply type filter
         if (typeFilter !== 'all' && type !== typeFilter) return;
         
         const tr = document.createElement('tr');
