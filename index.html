@@ -1689,55 +1689,104 @@
         };
 
         window.loadAnalytics = async () => {
-            const select = document.getElementById('analytics-event-select');
-            const selectedEventId = select.value;
-            if (select.options.length <= 1) {
-                const eventsSnap = await getDocs(query(collection(db, "events"), orderBy("createdAt", "desc")));
-                eventsSnap.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const option = document.createElement('option');
-                    option.value = docSnap.id;
-                    option.text = data.name + (data.active ? " 🟢 (Active)" : "");
-                    select.appendChild(option);
-                });
-            }
-            const studentsSnap = await getDocs(collection(db, "students"));
-            const total = studentsSnap.size;
-            const years = {1: 0, 2: 0, 3: 0, 4: 0};
-            studentsSnap.forEach(d => { if (years[d.data().year] !== undefined) years[d.data().year]++; });
-            let present = 0;
-            let attQuery;
-            if (selectedEventId === 'all') {
-                attQuery = collection(db, "attendance");
+    const select = document.getElementById('analytics-event-select');
+    const selectedEventId = select.value;
+    if (select.options.length <= 1) {
+        const eventsSnap = await getDocs(query(collection(db, "events"), orderBy("createdAt", "desc")));
+        eventsSnap.forEach(docSnap => {
+            const data = docSnap.data();
+            const option = document.createElement('option');
+            option.value = docSnap.id;
+            option.text = data.name + (data.active ? " 🟢 (Active)" : "");
+            select.appendChild(option);
+        });
+    }
+    
+    // Get all students
+    const studentsSnap = await getDocs(collection(db, "students"));
+    const total = studentsSnap.size;
+    
+    // Group students by year level
+    const studentsByYear = {1: [], 2: [], 3: [], 4: []};
+    studentsSnap.forEach(d => {
+        const year = d.data().year;
+        if (studentsByYear[year] !== undefined) {
+            studentsByYear[year].push(d.id);
+        }
+    });
+    
+    // Get attendance records
+    let attQuery;
+    if (selectedEventId === 'all') {
+        attQuery = collection(db, "attendance");
+    } else {
+        attQuery = query(collection(db, "attendance"), where("eventId", "==", selectedEventId));
+    }
+    const attSnap = await getDocs(attQuery);
+    
+    // Get unique students who attended
+    const attendedStudentIds = new Set();
+    attSnap.forEach(d => {
+        attendedStudentIds.add(d.data().studentId);
+    });
+    
+    // Calculate present and absent per year level
+    const presentByYear = {1: 0, 2: 0, 3: 0, 4: 0};
+    const absentByYear = {1: 0, 2: 0, 3: 0, 4: 0};
+    
+    for (let year = 1; year <= 4; year++) {
+        const studentsInYear = studentsByYear[year];
+        studentsInYear.forEach(studentId => {
+            if (attendedStudentIds.has(studentId)) {
+                presentByYear[year]++;
             } else {
-                attQuery = query(collection(db, "attendance"), where("eventId", "==", selectedEventId));
+                absentByYear[year]++;
             }
-            const attSnap = await getDocs(attQuery);
-            present = attSnap.size;
-            const absent = selectedEventId === 'all' ? 'N/A' : (total - present);
-            const rate = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
-            document.getElementById("stat-total").innerText = total;
-            document.getElementById("stat-present").innerText = present;
-            document.getElementById("stat-absent").innerText = absent;
-            document.getElementById("stat-rate").innerText = rate + "%";
-            const ctxYear = document.getElementById('yearChart').getContext('2d');
-            const ctxStatus = document.getElementById('statusChart').getContext('2d');
-            if (yearChartInstance) yearChartInstance.destroy();
-            if (statusChartInstance) statusChartInstance.destroy();
-            yearChartInstance = new Chart(ctxYear, {
-                type: 'bar',
-                data: { labels: ['1st Year', '2nd Year', '3rd Year', '4th Year'], datasets: [{ label: 'Students', data: [years[1], years[2], years[3], years[4]], backgroundColor: '#0B1F4D' }] },
-                options: { responsive: true, plugins: { legend: { display: false } } }
-            });
-            const statusLabels = selectedEventId === 'all' ? ['Total Scans', 'Unscanned Members'] : ['Present', 'Absent'];
-            const statusData = selectedEventId === 'all' ? [present, total] : [present, total - present];
-            const statusColors = selectedEventId === 'all' ? ['#0B1F4D', '#E5E7EB'] : ['#10B981', '#EF4444'];
-            statusChartInstance = new Chart(ctxStatus, {
-                type: 'doughnut',
-                data: { labels: statusLabels, datasets: [{ data: statusData, backgroundColor: statusColors }] },
-                options: { responsive: true }
-            });
-        };
+        });
+    }
+    
+    // Calculate totals
+    const present = attendedStudentIds.size;
+    const absent = selectedEventId === 'all' ? 'N/A' : (total - present);
+    const rate = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
+    
+    // Update stat cards
+    document.getElementById("stat-total").innerText = total;
+    document.getElementById("stat-present").innerText = present;
+    document.getElementById("stat-absent").innerText = absent;
+    document.getElementById("stat-rate").innerText = rate + "%";
+    
+    // Update Year Level Breakdown Chart
+    const ctxYear = document.getElementById('yearChart').getContext('2d');
+    if (yearChartInstance) yearChartInstance.destroy();
+    
+    yearChartInstance = new Chart(ctxYear, {
+        type: 'bar',
+        data: {
+            labels: ['1st Year', '2nd Year', '3rd Year', '4th Year'],
+            datasets: [
+                {
+                    label: 'Present',
+                    data: [presentByYear[1], presentByYear[2], presentByYear[3], presentByYear[4]],
+                    backgroundColor: '#10B981',
+                    borderColor: '#059669',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Absent',
+                    data: [absentByYear[1], absentByYear[2], absentByYear[3], absentByYear[4]],
+                    backgroundColor: '#EF4444',
+                    borderColor: '#DC2626',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position
 
         window.updateExportUI = async () => {
             const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
