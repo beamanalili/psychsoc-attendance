@@ -34,7 +34,6 @@ body { background: white; }
 .priority-important { border-left: 4px solid #F59E0B; }
 .priority-normal { border-left: 4px solid #3B82F6; }
 .status-active { background-color: #D1FAE5; color: #065F46; }
-.status-pending { background-color: #FEF3C7; color: #92400E; }
 .status-inactive { background-color: #F3F4F6; color: #4B5563; }
 .status-alumni { background-color: #DBEAFE; color: #1E40AF; }
 </style>
@@ -155,7 +154,7 @@ Already have an account?
 <button onclick="switchTab('export')" class="tab-btn px-4 py-2 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-100">Export</button>
 </div>
 
-<!-- NEW: Admin Overview Dashboard Tab -->
+<!-- Admin Overview Dashboard Tab -->
 <div id="tab-dashboard" class="tab-content">
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
 <div class="bg-white p-5 rounded-xl shadow border-l-4 border-blue-500">
@@ -174,15 +173,6 @@ Already have an account?
 <p id="dash-active-members" class="text-3xl font-bold text-green-700 mt-1">0</p>
 </div>
 <i class="fas fa-user-check text-3xl text-green-500 opacity-50"></i>
-</div>
-</div>
-<div class="bg-white p-5 rounded-xl shadow border-l-4 border-yellow-500">
-<div class="flex items-center justify-between">
-<div>
-<p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Pending</p>
-<p id="dash-pending-members" class="text-3xl font-bold text-yellow-700 mt-1">0</p>
-</div>
-<i class="fas fa-user-clock text-3xl text-yellow-500 opacity-50"></i>
 </div>
 </div>
 <div class="bg-white p-5 rounded-xl shadow border-l-4 border-gray-400">
@@ -232,55 +222,32 @@ Already have an account?
 </div>
 </div>
 
-<!-- Quick Actions -->
+<!-- Quick Actions - ALL NAVY -->
 <div class="bg-white rounded-xl shadow p-6 mb-6">
 <h3 class="text-lg font-bold text-suNavy mb-4"><i class="fas fa-bolt text-yellow-500 mr-2"></i>Quick Actions</h3>
 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
 <button onclick="switchTab('events'); setTimeout(() => document.getElementById('event-name').focus(), 100)" class="bg-suNavy text-white px-4 py-3 rounded-lg hover:bg-blue-900 transition text-sm font-semibold">
 <i class="fas fa-plus-circle mr-2"></i>Create Event
 </button>
-<button onclick="switchTab('students'); setTimeout(() => openStudentModal(), 100)" class="bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition text-sm font-semibold">
+<button onclick="switchTab('students'); setTimeout(() => openStudentModal(), 100)" class="bg-suNavy text-white px-4 py-3 rounded-lg hover:bg-blue-900 transition text-sm font-semibold">
 <i class="fas fa-user-plus mr-2"></i>Add Student
 </button>
-<button onclick="switchTab('manual-attendance')" class="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition text-sm font-semibold">
+<button onclick="switchTab('manual-attendance')" class="bg-suNavy text-white px-4 py-3 rounded-lg hover:bg-blue-900 transition text-sm font-semibold">
 <i class="fas fa-clipboard-check mr-2"></i>Record Attendance
 </button>
-<button onclick="switchTab('payments')" class="bg-emerald-600 text-white px-4 py-3 rounded-lg hover:bg-emerald-700 transition text-sm font-semibold">
+<button onclick="switchTab('payments')" class="bg-suNavy text-white px-4 py-3 rounded-lg hover:bg-blue-900 transition text-sm font-semibold">
 <i class="fas fa-money-bill mr-2"></i>Record Payment
 </button>
-<button onclick="switchTab('announcements'); setTimeout(() => openAnnouncementModal(), 100)" class="bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition text-sm font-semibold">
+<button onclick="switchTab('announcements'); setTimeout(() => openAnnouncementModal(), 100)" class="bg-suNavy text-white px-4 py-3 rounded-lg hover:bg-blue-900 transition text-sm font-semibold">
 <i class="fas fa-bullhorn mr-2"></i>Post Announcement
 </button>
-<button onclick="switchTab('students')" class="bg-gray-700 text-white px-4 py-3 rounded-lg hover:bg-gray-800 transition text-sm font-semibold">
+<button onclick="switchTab('students')" class="bg-suNavy text-white px-4 py-3 rounded-lg hover:bg-blue-900 transition text-sm font-semibold">
 <i class="fas fa-users-cog mr-2"></i>Manage Members
 </button>
 </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-<!-- Attendance Overview -->
-<div class="bg-white rounded-xl shadow p-6">
-<h3 class="text-lg font-bold text-suNavy mb-4"><i class="fas fa-clipboard-list mr-2"></i>Attendance Overview</h3>
-<div class="space-y-3">
-<div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-<span class="font-medium text-green-800"><i class="fas fa-check text-green-600 mr-2"></i>Present</span>
-<span id="dash-att-present" class="text-2xl font-bold text-green-700">0</span>
-</div>
-<div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-<span class="font-medium text-yellow-800"><i class="fas fa-clock text-yellow-600 mr-2"></i>Late</span>
-<span id="dash-att-late" class="text-2xl font-bold text-yellow-700">0</span>
-</div>
-<div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
-<span class="font-medium text-red-800"><i class="fas fa-times text-red-600 mr-2"></i>Absent</span>
-<span id="dash-att-absent" class="text-2xl font-bold text-red-700">0</span>
-</div>
-<div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-<span class="font-medium text-blue-800"><i class="fas fa-envelope-open text-blue-600 mr-2"></i>Excused</span>
-<span id="dash-att-excused" class="text-2xl font-bold text-blue-700">0</span>
-</div>
-</div>
-</div>
-
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 <!-- Upcoming Events -->
 <div class="bg-white rounded-xl shadow p-6">
 <h3 class="text-lg font-bold text-suNavy mb-4"><i class="fas fa-calendar-alt mr-2"></i>Upcoming Events</h3>
@@ -338,7 +305,6 @@ Already have an account?
 <select id="student-status-filter" onchange="renderStudents()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
 <option value="all">All Status</option>
 <option value="active">Active</option>
-<option value="pending">Pending</option>
 <option value="inactive">Inactive</option>
 <option value="alumni">Alumni</option>
 </select>
@@ -363,7 +329,7 @@ Already have an account?
 </div>
 </div>
 
-<!-- NEW: Announcements Tab (Admin) -->
+<!-- Announcements Tab (Admin) -->
 <div id="tab-announcements" class="tab-content hidden">
 <div class="bg-white rounded-xl shadow p-6 mb-6">
 <div class="flex justify-between items-center mb-4">
@@ -398,8 +364,7 @@ Already have an account?
 <label class="block text-sm font-medium text-gray-700 mb-1">Attendance Status</label>
 <select id="manual-attendance-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
 <option value="present">Present</option>
-<option value="late">Late</option>
-<option value="excused">Excused</option>
+<option value="absent">Absent</option>
 </select>
 </div>
 <button type="submit" class="w-full bg-suNavy text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition">
@@ -499,7 +464,7 @@ Already have an account?
 </div>
 </div>
 
-<!-- NEW: Payment Audit Trail Tab -->
+<!-- Payment Audit Trail Tab -->
 <div id="tab-payment-audit" class="tab-content hidden">
 <div class="bg-white rounded-xl shadow p-6">
 <h3 class="text-lg font-bold text-suNavy mb-2"><i class="fas fa-file-invoice-dollar mr-2"></i>Payment Audit Trail</h3>
@@ -541,7 +506,7 @@ Already have an account?
 </div>
 </div>
 
-<!-- NEW: Activity Log Tab -->
+<!-- Activity Log Tab -->
 <div id="tab-activity-log" class="tab-content hidden">
 <div class="bg-white rounded-xl shadow p-6">
 <h3 class="text-lg font-bold text-suNavy mb-2"><i class="fas fa-history mr-2"></i>System Activity Log</h3>
@@ -888,7 +853,7 @@ Generate My ID Card
 </div>
 </div>
 </div>
-<!-- NEW: Payment History Timeline -->
+<!-- Payment History Timeline -->
 <div class="mt-6">
 <h4 class="font-bold text-suNavy mb-3 flex items-center">
 <i class="fas fa-history mr-2"></i> Payment History
@@ -907,7 +872,7 @@ If you believe there's an error with your payment status, please contact your ye
 </div>
 </div>
 
-<!-- NEW: Student Announcements Tab -->
+<!-- Student Announcements Tab -->
 <div id="student-tab-announcements" class="student-tab-content hidden">
 <div class="bg-white rounded-xl shadow-lg p-6">
 <h3 class="text-xl font-bold text-suNavy mb-4 flex items-center">
@@ -981,7 +946,7 @@ If you believe there's an error with your payment status, please contact your ye
 </div>
 </div>
 
-<!-- NEW: Change Member Status Modal -->
+<!-- Change Member Status Modal - NO PENDING -->
 <div id="status-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
 <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md fade-in">
 <h3 class="text-xl font-bold text-suNavy mb-4"><i class="fas fa-user-edit mr-2"></i>Change Member Status</h3>
@@ -996,7 +961,6 @@ If you believe there's an error with your payment status, please contact your ye
 <label class="block text-sm font-medium text-gray-700 mb-1">New Status</label>
 <select id="new-member-status" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-suNavy outline-none">
 <option value="active">Active</option>
-<option value="pending">Pending Registration</option>
 <option value="inactive">Inactive</option>
 <option value="alumni">Alumni</option>
 </select>
@@ -1013,7 +977,7 @@ If you believe there's an error with your payment status, please contact your ye
 </div>
 </div>
 
-<!-- NEW: Announcement Modal -->
+<!-- Announcement Modal -->
 <div id="announcement-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
 <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg fade-in max-h-[90vh] overflow-y-auto">
 <h3 class="text-xl font-bold text-suNavy mb-4" id="announcement-modal-title"><i class="fas fa-bullhorn mr-2"></i>New Announcement</h3>
@@ -1056,7 +1020,7 @@ If you believe there's an error with your payment status, please contact your ye
 </div>
 </div>
 
-<!-- NEW: Announcement View Modal (for students) -->
+<!-- Announcement View Modal -->
 <div id="announcement-view-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 no-print">
 <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg fade-in max-h-[90vh] overflow-y-auto">
 <div id="announcement-view-content"></div>
@@ -1135,7 +1099,7 @@ let dashMemberChartInstance = null;
 let dashAttendanceChartInstance = null;
 
 // ============================================================
-// NEW: ACTIVITY LOG & PAYMENT AUDIT HELPERS
+// ACTIVITY LOG & PAYMENT AUDIT HELPERS
 // ============================================================
 async function logActivity(action, description, metadata = {}) {
     try {
@@ -1180,16 +1144,19 @@ async function logPaymentAudit(studentId, studentName, prevStatus, newStatus, pr
     }
 }
 
-// Helper: get member status (with backward compatibility)
+// Helper: get member status (backward compatible - NO PENDING)
 function getMemberStatus(studentData) {
-    if (studentData.memberStatus) return studentData.memberStatus;
+    if (studentData.memberStatus) {
+        // Migrate any old 'pending' status to 'active'
+        if (studentData.memberStatus === 'pending') return 'active';
+        return studentData.memberStatus;
+    }
     return studentData.active ? 'active' : 'inactive';
 }
 
 function getMemberStatusLabel(status) {
     const labels = {
         'active': 'Active',
-        'pending': 'Pending',
         'inactive': 'Inactive',
         'alumni': 'Alumni'
     };
@@ -1199,18 +1166,22 @@ function getMemberStatusLabel(status) {
 function getMemberStatusClass(status) {
     const classes = {
         'active': 'status-active',
-        'pending': 'status-pending',
         'inactive': 'status-inactive',
         'alumni': 'status-alumni'
     };
     return classes[status] || 'status-active';
 }
 
-// Helper: calculate payment amount
 function getPaymentAmount(paymentType) {
     if (paymentType === 'early-bird') return 130;
     if (paymentType === 'regular') return 145;
     return 0;
+}
+
+// Helper: normalize attendance status (only present/absent)
+function normalizeAttendanceStatus(status) {
+    if (status === 'absent') return 'absent';
+    return 'present'; // default everything else to present
 }
 
 window.toggleAuthMode = function() {
@@ -1666,7 +1637,7 @@ window.renderStudents = async () => {
     });
 };
 
-// NEW: Change Member Status Modal
+// Change Member Status Modal
 window.openStatusModal = async (studentId) => {
     const snap = await getDoc(doc(db, "students", studentId));
     if (!snap.exists()) {
@@ -1720,7 +1691,7 @@ document.getElementById('status-form').addEventListener('submit', async (e) => {
         
         await updateDoc(doc(db, "students", studentId), {
             memberStatus: newStatus,
-            active: newStatus === 'active' || newStatus === 'pending',
+            active: newStatus === 'active',
             statusUpdatedAt: serverTimestamp(),
             statusChangedBy: currentUser.email
         });
@@ -1821,7 +1792,6 @@ document.getElementById('student-form').addEventListener('submit', async (e) => 
     const paymentType = document.getElementById('form-payment-type').value;
     
     try {
-        // Get previous state for audit logging
         const existingSnap = await getDoc(doc(db, "students", id));
         const prevData = existingSnap.exists() ? existingSnap.data() : null;
         const prevPaymentStatus = prevData ? (prevData.paymentStatus || 'unpaid') : 'unpaid';
@@ -1833,13 +1803,11 @@ document.getElementById('student-form').addEventListener('submit', async (e) => 
         }
         await setDoc(doc(db, "students", id), studentData, { merge: true });
         
-        // Log activity
         const isEdit = prevData !== null;
         await logActivity(isEdit ? 'profile_update' : 'registration', 
             isEdit ? `Updated student profile: ${name}` : `Added new student: ${name}`,
             { studentId: id, studentName: name });
         
-        // Log payment audit if payment changed
         if (prevData && (prevPaymentStatus !== paymentStatus || prevPaymentType !== paymentType)) {
             const prevAmount = getPaymentAmount(prevPaymentType);
             const newAmount = getPaymentAmount(paymentType);
@@ -2031,7 +1999,7 @@ document.getElementById('manual-attendance-form').addEventListener('submit', asy
     const studentId = document.getElementById('manual-student-id').value.trim();
     const eventId = document.getElementById('manual-event-select').value;
     const eventName = document.getElementById('manual-event-select').options[document.getElementById('manual-event-select').selectedIndex].dataset.name;
-    const attendanceStatus = document.getElementById('manual-attendance-status').value;
+    const attendanceStatus = normalizeAttendanceStatus(document.getElementById('manual-attendance-status').value);
 
     try {
         const studentSnap = await getDoc(doc(db, "students", studentId));
@@ -2045,7 +2013,7 @@ document.getElementById('manual-attendance-form').addEventListener('submit', asy
         
         const attSnap = await getDocs(query(collection(db, "attendance"), where("eventId", "==", eventId), where("studentId", "==", studentId)));
         if (!attSnap.empty) {
-            showToast("⚠ Student is already marked as present for this event!", "warning");
+            showToast("⚠ Student is already marked for this event!", "warning");
             setButtonLoading(btn, false, originalText);
             return;
         }
@@ -2244,16 +2212,18 @@ window.startLiveAttendanceListener = async () => {
         sortedDocs.forEach(docSnap => {
             const d = docSnap.data();
             const time = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleTimeString() : "Just now";
-            const status = d.attendanceStatus || 'present';
+            const status = normalizeAttendanceStatus(d.attendanceStatus);
             const statusColors = {
                 'present': 'bg-green-100 text-green-800',
-                'late': 'bg-yellow-100 text-yellow-800',
-                'excused': 'bg-blue-100 text-blue-800',
                 'absent': 'bg-red-100 text-red-800'
+            };
+            const statusLabels = {
+                'present': '✔ Present',
+                'absent': '✗ Absent'
             };
             const tr = document.createElement('tr');
             tr.className = "border-b fade-in";
-            tr.innerHTML = `<td class="p-3 text-sm text-gray-500">${time}</td><td class="p-3 font-mono text-sm">${d.studentId}</td><td class="p-3">${d.studentName}</td><td class="p-3">${d.studentYear}</td><td class="p-3"><span class="px-2 py-1 text-xs rounded-full font-semibold ${statusColors[status] || statusColors.present}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></td>`;
+            tr.innerHTML = `<td class="p-3 text-sm text-gray-500">${time}</td><td class="p-3 font-mono text-sm">${d.studentId}</td><td class="p-3">${d.studentName}</td><td class="p-3">${d.studentYear}</td><td class="p-3"><span class="px-2 py-1 text-xs rounded-full font-semibold ${statusColors[status]}">${statusLabels[status]}</span></td>`;
             tbody.appendChild(tr);
         });
     });
@@ -2266,24 +2236,43 @@ window.stopLiveAttendanceListener = () => {
     }
 };
 
+// ============================================================
+// FIXED: Complete loadAnalytics function with year breakdown
+// ============================================================
 window.loadAnalytics = async () => {
     const select = document.getElementById('analytics-event-select');
     const selectedEventId = select.value;
+    
+    // Populate event dropdown if empty
     if (select.options.length <= 1) {
-        const eventsSnap = await getDocs(query(collection(db, "events"), orderBy("createdAt", "desc")));
-        eventsSnap.forEach(docSnap => {
-            const data = docSnap.data();
-            const option = document.createElement('option');
-            option.value = docSnap.id;
-            option.text = data.name + (data.active ? " 🟢 (Active)" : "");
-            select.appendChild(option);
-        });
+        try {
+            const eventsSnap = await getDocs(query(collection(db, "events"), orderBy("createdAt", "desc")));
+            eventsSnap.forEach(docSnap => {
+                const data = docSnap.data();
+                const option = document.createElement('option');
+                option.value = docSnap.id;
+                option.text = data.name + (data.active ? " 🟢 (Active)" : "");
+                select.appendChild(option);
+            });
+        } catch (err) {
+            console.error("Error loading events for analytics:", err);
+        }
     }
+    
+    // Get all students
     const studentsSnap = await getDocs(collection(db, "students"));
     const total = studentsSnap.size;
-    const years = {1: 0, 2: 0, 3: 0, 4: 0};
-    studentsSnap.forEach(d => { if (years[d.data().year] !== undefined) years[d.data().year]++; });
-    let present = 0;
+    
+    // Group students by year level
+    const studentsByYear = {1: [], 2: [], 3: [], 4: []};
+    studentsSnap.forEach(d => {
+        const year = d.data().year;
+        if (studentsByYear[year] !== undefined) {
+            studentsByYear[year].push(d.id);
+        }
+    });
+    
+    // Get attendance records
     let attQuery;
     if (selectedEventId === 'all') {
         attQuery = collection(db, "attendance");
@@ -2291,29 +2280,113 @@ window.loadAnalytics = async () => {
         attQuery = query(collection(db, "attendance"), where("eventId", "==", selectedEventId));
     }
     const attSnap = await getDocs(attQuery);
-    present = attSnap.size;
+    
+    // Get unique students who attended (only count 'present' status)
+    const attendedStudentIds = new Set();
+    attSnap.forEach(d => {
+        const status = normalizeAttendanceStatus(d.data().attendanceStatus);
+        if (status === 'present') {
+            attendedStudentIds.add(d.data().studentId);
+        }
+    });
+    
+    // Calculate present and absent per year level
+    const presentByYear = {1: 0, 2: 0, 3: 0, 4: 0};
+    const absentByYear = {1: 0, 2: 0, 3: 0, 4: 0};
+    
+    for (let year = 1; year <= 4; year++) {
+        const studentsInYear = studentsByYear[year];
+        studentsInYear.forEach(studentId => {
+            if (attendedStudentIds.has(studentId)) {
+                presentByYear[year]++;
+            } else {
+                absentByYear[year]++;
+            }
+        });
+    }
+    
+    // Calculate totals
+    const present = attendedStudentIds.size;
     const absent = selectedEventId === 'all' ? 'N/A' : (total - present);
     const rate = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
+    
+    // Update stat cards
     document.getElementById("stat-total").innerText = total;
     document.getElementById("stat-present").innerText = present;
     document.getElementById("stat-absent").innerText = absent;
     document.getElementById("stat-rate").innerText = rate + "%";
+    
+    // Update Year Level Breakdown Chart
     const ctxYear = document.getElementById('yearChart').getContext('2d');
-    const ctxStatus = document.getElementById('statusChart').getContext('2d');
     if (yearChartInstance) yearChartInstance.destroy();
-    if (statusChartInstance) statusChartInstance.destroy();
+    
     yearChartInstance = new Chart(ctxYear, {
         type: 'bar',
-        data: { labels: ['1st Year', '2nd Year', '3rd Year', '4th Year'], datasets: [{ label: 'Students', data: [years[1], years[2], years[3], years[4]], backgroundColor: '#0B1F4D' }] },
-        options: { responsive: true, plugins: { legend: { display: false } } }
+        data: {
+            labels: ['1st Year', '2nd Year', '3rd Year', '4th Year'],
+            datasets: [
+                {
+                    label: 'Present',
+                    data: [presentByYear[1], presentByYear[2], presentByYear[3], presentByYear[4]],
+                    backgroundColor: '#10B981',
+                    borderColor: '#059669',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Absent',
+                    data: [absentByYear[1], absentByYear[2], absentByYear[3], absentByYear[4]],
+                    backgroundColor: '#EF4444',
+                    borderColor: '#DC2626',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                title: {
+                    display: true,
+                    text: 'Attendance by Year Level'
+                }
+            },
+            scales: {
+                x: {
+                    stacked: false
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
     });
+    
+    // Update Attendance Status Chart
+    const ctxStatus = document.getElementById('statusChart').getContext('2d');
+    if (statusChartInstance) statusChartInstance.destroy();
+    
     const statusLabels = selectedEventId === 'all' ? ['Total Scans', 'Unscanned Members'] : ['Present', 'Absent'];
     const statusData = selectedEventId === 'all' ? [present, total] : [present, total - present];
     const statusColors = selectedEventId === 'all' ? ['#0B1F4D', '#E5E7EB'] : ['#10B981', '#EF4444'];
+    
     statusChartInstance = new Chart(ctxStatus, {
         type: 'doughnut',
-        data: { labels: statusLabels, datasets: [{ data: statusData, backgroundColor: statusColors }] },
-        options: { responsive: true }
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusData,
+                backgroundColor: statusColors
+            }]
+        },
+        options: {
+            responsive: true
+        }
     });
 };
 
@@ -2333,7 +2406,7 @@ window.exportData = async (scope, format) => {
         const attSnap = await getDocs(query(collection(db, "attendance"), where("eventId", "==", eventId)));
         attSnap.forEach(d => {
             const val = d.data();
-            data.push({ "Event ID": eventId, "Event Name": eventName, "Student ID": val.studentId, "Name": val.studentName, "Year": val.studentYear, "Status": val.attendanceStatus || 'present', "Timestamp": val.timestamp ? new Date(val.timestamp.seconds * 1000).toLocaleString() : "N/A", "Scanned By": val.scannedBy });
+            data.push({ "Event ID": eventId, "Event Name": eventName, "Student ID": val.studentId, "Name": val.studentName, "Year": val.studentYear, "Status": normalizeAttendanceStatus(val.attendanceStatus), "Timestamp": val.timestamp ? new Date(val.timestamp.seconds * 1000).toLocaleString() : "N/A", "Scanned By": val.scannedBy });
         });
     } else {
         const eventsSnap = await getDocs(collection(db, "events"));
@@ -2342,7 +2415,7 @@ window.exportData = async (scope, format) => {
         const attSnap = await getDocs(collection(db, "attendance"));
         attSnap.forEach(d => {
             const val = d.data();
-            data.push({ "Event ID": val.eventId, "Event Name": eventNames[val.eventId] || "Unknown", "Student ID": val.studentId, "Name": val.studentName, "Year": val.studentYear, "Status": val.attendanceStatus || 'present', "Timestamp": val.timestamp ? new Date(val.timestamp.seconds * 1000).toLocaleString() : "N/A", "Scanned By": val.scannedBy });
+            data.push({ "Event ID": val.eventId, "Event Name": eventNames[val.eventId] || "Unknown", "Student ID": val.studentId, "Name": val.studentName, "Year": val.studentYear, "Status": normalizeAttendanceStatus(val.attendanceStatus), "Timestamp": val.timestamp ? new Date(val.timestamp.seconds * 1000).toLocaleString() : "N/A", "Scanned By": val.scannedBy });
         });
     }
     if (data.length === 0) { showToast("No data to export.", "warning"); return; }
@@ -2768,7 +2841,7 @@ document.getElementById('student-register-form').addEventListener('submit', asyn
         document.getElementById('student-registration-form').classList.add('hidden');
         document.getElementById('student-id-card-view').classList.remove('hidden');
         document.getElementById('user-role-badge').innerText = 'student';
-        renderIDCard(studentId, name, year);
+        renderIDCard(studentId, name, year, 'active');
         
     } catch (err) {
         console.error(err);
@@ -2877,17 +2950,14 @@ async function loadStudentAttendance() {
                 const data = docSnap.data();
                 const date = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : 'Just now';
                 const eventName = data.eventName || "Unknown Event";
-                const status = data.attendanceStatus || 'present';
+                const status = normalizeAttendanceStatus(data.attendanceStatus);
+                
                 const statusColors = {
                     'present': 'bg-green-100 text-green-800',
-                    'late': 'bg-yellow-100 text-yellow-800',
-                    'excused': 'bg-blue-100 text-blue-800',
                     'absent': 'bg-red-100 text-red-800'
                 };
                 const statusLabels = {
                     'present': '✔ Present',
-                    'late': '⏰ Late',
-                    'excused': '✉ Excused',
                     'absent': '✗ Absent'
                 };
                 
@@ -2896,7 +2966,7 @@ async function loadStudentAttendance() {
                 tr.innerHTML = `
                     <td class="p-3 text-sm text-gray-600">${date}</td>
                     <td class="p-3 font-medium text-suNavy">${eventName}</td>
-                    <td class="p-3"><span class="px-2 py-1 text-xs rounded-full font-semibold ${statusColors[status] || statusColors.present}">${statusLabels[status] || statusLabels.present}</span></td>
+                    <td class="p-3"><span class="px-2 py-1 text-xs rounded-full font-semibold ${statusColors[status]}">${statusLabels[status]}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -2948,7 +3018,6 @@ async function loadStudentPayment() {
             document.getElementById('payment-amount-display').innerText = amount;
             document.getElementById('payment-date-display').innerText = dateDisplay;
             
-            // Load payment history timeline
             loadPaymentTimeline(studentId, data.name);
             
             loadingEl.classList.add('hidden');
@@ -2961,7 +3030,6 @@ async function loadStudentPayment() {
     }
 }
 
-// NEW: Load payment history timeline for students
 async function loadPaymentTimeline(studentId, studentName) {
     const timelineEl = document.getElementById('student-payment-timeline');
     timelineEl.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Loading history...</p>';
@@ -3010,13 +3078,12 @@ async function loadPaymentTimeline(studentId, studentName) {
 }
 
 // ============================================================
-// NEW: ADMIN DASHBOARD
+// ADMIN DASHBOARD - NO PENDING, NO ATTENDANCE OVERVIEW
 // ============================================================
 window.renderDashboard = async () => {
     try {
-        // Load students data
         const studentsSnap = await getDocs(collection(db, "students"));
-        let totalMembers = 0, activeMembers = 0, pendingMembers = 0, inactiveMembers = 0, alumniMembers = 0;
+        let totalMembers = 0, activeMembers = 0, inactiveMembers = 0, alumniMembers = 0;
         let paidMembers = 0, unpaidMembers = 0;
         const studentsByYear = {1: 0, 2: 0, 3: 0, 4: 0};
         const attendedStudentIds = new Set();
@@ -3027,7 +3094,6 @@ window.renderDashboard = async () => {
             const status = getMemberStatus(data);
             
             if (status === 'active') activeMembers++;
-            else if (status === 'pending') pendingMembers++;
             else if (status === 'alumni') alumniMembers++;
             else inactiveMembers++;
             
@@ -3037,39 +3103,28 @@ window.renderDashboard = async () => {
             if (studentsByYear[data.year] !== undefined) studentsByYear[data.year]++;
         });
         
-        // Load all attendance
+        // Load all attendance - only count 'present' for rate
         const attSnap = await getDocs(collection(db, "attendance"));
-        let presentCount = 0, lateCount = 0, absentCount = 0, excusedCount = 0;
         attSnap.forEach(d => {
-            const status = d.data().attendanceStatus || 'present';
-            if (status === 'present') presentCount++;
-            else if (status === 'late') lateCount++;
-            else if (status === 'absent') absentCount++;
-            else if (status === 'excused') excusedCount++;
-            attendedStudentIds.add(d.data().studentId);
+            const status = normalizeAttendanceStatus(d.data().attendanceStatus);
+            if (status === 'present') {
+                attendedStudentIds.add(d.data().studentId);
+            }
         });
         
         const attendanceRate = totalMembers > 0 ? ((attendedStudentIds.size / totalMembers) * 100).toFixed(1) : 0;
         
-        // Load events
         const eventsSnap = await getDocs(collection(db, "events"));
         const totalEvents = eventsSnap.size;
         
-        // Update dashboard cards
+        // Update dashboard cards (NO PENDING)
         document.getElementById('dash-total-members').innerText = totalMembers;
         document.getElementById('dash-active-members').innerText = activeMembers;
-        document.getElementById('dash-pending-members').innerText = pendingMembers;
         document.getElementById('dash-inactive-members').innerText = inactiveMembers + alumniMembers;
         document.getElementById('dash-total-events').innerText = totalEvents;
         document.getElementById('dash-attendance-rate').innerText = attendanceRate + '%';
         document.getElementById('dash-paid-members').innerText = paidMembers;
         document.getElementById('dash-unpaid-members').innerText = unpaidMembers;
-        
-        // Update attendance overview
-        document.getElementById('dash-att-present').innerText = presentCount;
-        document.getElementById('dash-att-late').innerText = lateCount;
-        document.getElementById('dash-att-absent').innerText = absentCount;
-        document.getElementById('dash-att-excused').innerText = excusedCount;
         
         // Upcoming events
         const upcomingEl = document.getElementById('dash-upcoming-events');
@@ -3127,7 +3182,6 @@ window.renderDashboard = async () => {
                 });
             }
         } catch (err) {
-            // If orderBy fails due to missing index, try without orderBy
             const activitySnap = await getDocs(collection(db, "activityLogs"));
             const sorted = activitySnap.docs.sort((a, b) => {
                 const timeA = a.data().timestamp?.seconds || 0;
@@ -3157,16 +3211,15 @@ window.renderDashboard = async () => {
             }
         }
         
-        // Dashboard Charts
-        renderDashboardCharts(totalMembers, activeMembers, pendingMembers, inactiveMembers, alumniMembers, studentsByYear, attendedStudentIds, studentsSnap);
+        renderDashboardCharts(totalMembers, activeMembers, inactiveMembers, alumniMembers, studentsByYear, attendedStudentIds, studentsSnap);
         
     } catch (err) {
         console.error("Error rendering dashboard:", err);
     }
 };
 
-function renderDashboardCharts(total, active, pending, inactive, alumni, studentsByYear, attendedStudentIds, studentsSnap) {
-    // Member Status Breakdown
+function renderDashboardCharts(total, active, inactive, alumni, studentsByYear, attendedStudentIds, studentsSnap) {
+    // Member Status Breakdown - NO PENDING
     const ctxMember = document.getElementById('dashMemberStatusChart');
     if (!ctxMember) return;
     if (dashMemberChartInstance) dashMemberChartInstance.destroy();
@@ -3174,10 +3227,10 @@ function renderDashboardCharts(total, active, pending, inactive, alumni, student
     dashMemberChartInstance = new Chart(ctxMember.getContext('2d'), {
         type: 'doughnut',
         data: {
-            labels: ['Active', 'Pending', 'Inactive', 'Alumni'],
+            labels: ['Active', 'Inactive', 'Alumni'],
             datasets: [{
-                data: [active, pending, inactive, alumni],
-                backgroundColor: ['#10B981', '#F59E0B', '#6B7280', '#3B82F6']
+                data: [active, inactive, alumni],
+                backgroundColor: ['#10B981', '#6B7280', '#3B82F6']
             }]
         },
         options: {
@@ -3191,7 +3244,6 @@ function renderDashboardCharts(total, active, pending, inactive, alumni, student
     if (!ctxAtt) return;
     if (dashAttendanceChartInstance) dashAttendanceChartInstance.destroy();
     
-    // Count attended students per year
     const attendedByYear = {1: 0, 2: 0, 3: 0, 4: 0};
     studentsSnap.forEach(d => {
         if (attendedStudentIds.has(d.id)) {
@@ -3226,7 +3278,7 @@ function renderDashboardCharts(total, active, pending, inactive, alumni, student
 }
 
 // ============================================================
-// NEW: ANNOUNCEMENTS SYSTEM
+// ANNOUNCEMENTS SYSTEM
 // ============================================================
 window.openAnnouncementModal = (announcementId = null) => {
     document.getElementById('announcement-form').reset();
@@ -3234,7 +3286,6 @@ window.openAnnouncementModal = (announcementId = null) => {
     document.getElementById('announcement-modal-title').innerText = 'New Announcement';
     
     if (announcementId) {
-        // Edit mode - load existing
         getDoc(doc(db, "announcements", announcementId)).then(snap => {
             if (snap.exists()) {
                 const data = snap.data();
@@ -3288,12 +3339,10 @@ document.getElementById('announcement-form').addEventListener('submit', async (e
         }
         
         if (id) {
-            // Update existing
             await updateDoc(doc(db, "announcements", id), announcementData);
             await logActivity('announcement', `Updated announcement: "${title}"`, { announcementId: id, announcementTitle: title });
             showToast("Announcement updated!", "success");
         } else {
-            // Create new
             announcementData.createdAt = serverTimestamp();
             announcementData.reads = [];
             const newRef = doc(collection(db, "announcements"));
@@ -3395,7 +3444,6 @@ window.deleteAnnouncement = async (id, title) => {
     }
 };
 
-// Student announcements view
 async function loadStudentAnnouncements() {
     const container = document.getElementById('student-announcements-list');
     if (!container) return;
@@ -3417,10 +3465,9 @@ async function loadStudentAnnouncements() {
         snap.forEach(docSnap => {
             const data = docSnap.data();
             
-            // Check expiration
             if (data.expiresAt) {
                 const expDate = new Date(data.expiresAt);
-                if (expDate < now) return; // Skip expired
+                if (expDate < now) return;
             }
             
             const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : 'Just now';
@@ -3430,7 +3477,6 @@ async function loadStudentAnnouncements() {
                 'normal': 'priority-normal bg-blue-50'
             };
             
-            // Check if read
             const reads = data.reads || [];
             const isRead = currentUser && reads.includes(currentUser.uid);
             if (!isRead) unreadCount++;
@@ -3482,7 +3528,6 @@ window.viewAnnouncement = async (id) => {
         const data = snap.data();
         const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleString() : 'Just now';
         
-        // Mark as read
         if (currentUser) {
             const reads = data.reads || [];
             if (!reads.includes(currentUser.uid)) {
@@ -3513,7 +3558,6 @@ window.viewAnnouncement = async (id) => {
         document.getElementById('announcement-view-modal').classList.remove('hidden');
         document.getElementById('announcement-view-modal').classList.add('flex');
         
-        // Refresh the list to update the badge
         loadStudentAnnouncements();
     } catch (err) {
         console.error(err);
@@ -3522,7 +3566,7 @@ window.viewAnnouncement = async (id) => {
 };
 
 // ============================================================
-// NEW: PAYMENT AUDIT TRAIL
+// PAYMENT AUDIT TRAIL
 // ============================================================
 window.renderPaymentAudit = async () => {
     const search = document.getElementById('audit-search') ? document.getElementById('audit-search').value.toLowerCase() : '';
@@ -3533,7 +3577,6 @@ window.renderPaymentAudit = async () => {
     const tbody = document.getElementById('payment-audit-body');
     tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-500">Loading...</td></tr>';
     
-    // Populate user filter
     const userSelect = document.getElementById('audit-filter-user');
     if (userSelect && userSelect.options.length <= 1) {
         try {
@@ -3560,7 +3603,6 @@ window.renderPaymentAudit = async () => {
         snap.forEach(docSnap => {
             const data = docSnap.data();
             
-            // Apply filters
             if (search) {
                 const searchStr = `${data.studentId} ${data.studentName}`.toLowerCase();
                 if (!searchStr.includes(search)) return;
@@ -3571,7 +3613,6 @@ window.renderPaymentAudit = async () => {
             records.push({ id: docSnap.id, data: data });
         });
         
-        // Sort
         records.sort((a, b) => {
             const timeA = a.data.timestamp?.seconds || 0;
             const timeB = b.data.timestamp?.seconds || 0;
@@ -3651,7 +3692,7 @@ window.exportPaymentAudit = async () => {
 };
 
 // ============================================================
-// NEW: ACTIVITY LOG
+// ACTIVITY LOG
 // ============================================================
 window.renderActivityLog = async () => {
     const search = document.getElementById('activity-search') ? document.getElementById('activity-search').value.toLowerCase() : '';
