@@ -1106,10 +1106,13 @@
                         </span>
                     </div>
                     <p class="text-sm text-gray-500 mb-4">Created: ${data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</p>
-                    <div class="flex gap-2">
-                        ${!isActive ? `<button onclick="activateEvent('${docSnap.id}')" class="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 text-sm">Activate</button>` : ''}
-                        ${isActive ? `<button onclick="endEvent('${docSnap.id}')" class="flex-1 bg-red-600 text-white py-2 rounded hover:bg-red-700 text-sm">End Event</button>` : ''}
-                    </div>
+                   <div class="flex gap-2">
+    ${!isActive ? `<button onclick="activateEvent('${docSnap.id}')" class="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 text-sm">Activate</button>` : ''}
+    ${isActive ? `<button onclick="endEvent('${docSnap.id}')" class="flex-1 bg-red-600 text-white py-2 rounded hover:bg-red-700 text-sm">End Event</button>` : ''}
+    <button onclick="deleteEvent('${docSnap.id}', '${data.name}')" class="bg-gray-800 text-white px-3 py-2 rounded hover:bg-gray-900 text-sm" title="Delete event and all attendance records">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
                 `;
                 container.appendChild(div);
             });
@@ -1138,6 +1141,46 @@
                 showToast("Failed to end event", "error"); 
             }
         };
+
+        window.deleteEvent = async (eventId, eventName) => {
+    if (!confirm(`⚠️ DELETE EVENT: "${eventName}"\n\nThis will permanently delete:\n- The event itself\n- ALL attendance records for this event\n\nThis action CANNOT be undone!\n\nAre you absolutely sure?`)) {
+        return;
+    }
+    
+    // Double confirmation for extra safety
+    if (!confirm(`FINAL WARNING: Type the event name to confirm deletion:\n\n"${eventName}"\n\nClick OK only if you want to delete this event and all its attendance data.`)) {
+        return;
+    }
+    
+    try {
+        // First, get all attendance records for this event
+        const attSnap = await getDocs(query(collection(db, "attendance"), where("eventId", "==", eventId)));
+        
+        // Delete all attendance records
+        const batch = writeBatch(db);
+        attSnap.forEach(docSnap => {
+            batch.delete(docSnap.ref);
+        });
+        
+        // Delete the event itself
+        batch.delete(doc(db, "events", eventId));
+        
+        // Execute all deletions
+        await batch.commit();
+        
+        showToast(`✅ Event "${eventName}" and ${attSnap.size} attendance record(s) deleted!`, "success");
+        renderEvents();
+        
+        // Refresh analytics if it's open
+        if (!document.getElementById('tab-analytics').classList.contains('hidden')) {
+            loadAnalytics();
+        }
+        
+    } catch (err) {
+        console.error("Error deleting event:", err);
+        showToast("Failed to delete event: " + err.message, "error");
+    }
+};
 
         window.renderStudents = async () => {
             const search = document.getElementById('student-search').value.toLowerCase();
