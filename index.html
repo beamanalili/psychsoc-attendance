@@ -1786,7 +1786,49 @@
             plugins: {
                 legend: {
                     display: true,
-                    position
+                    position: 'top'
+                },
+                title: {
+                    display: true,
+                    text: 'Attendance by Year Level'
+                }
+            },
+            scales: {
+                x: {
+                    stacked: false
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+    
+    // Update Attendance Status Chart
+    const ctxStatus = document.getElementById('statusChart').getContext('2d');
+    if (statusChartInstance) statusChartInstance.destroy();
+    
+    const statusLabels = selectedEventId === 'all' ? ['Total Scans', 'Unscanned Members'] : ['Present', 'Absent'];
+    const statusData = selectedEventId === 'all' ? [present, total] : [present, total - present];
+    const statusColors = selectedEventId === 'all' ? ['#0B1F4D', '#E5E7EB'] : ['#10B981', '#EF4444'];
+    
+    statusChartInstance = new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusData,
+                backgroundColor: statusColors
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+};
 
         window.updateExportUI = async () => {
             const eventSnap = await getDocs(query(collection(db, "events"), where("active", "==", true)));
